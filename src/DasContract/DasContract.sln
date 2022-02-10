@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C21A755A-C7F5-49D1-8557-41BBEC1DAC98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DasContract.Blockchain.Plutus.Data.Tests", "DasContract.Blockchain.Plutus.Data.Tests\DasContract.Blockchain.Plutus.Data.Tests.csproj", "{67B9D43C-5FE4-4956-B097-539335FD45E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +42,16 @@ Global
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67B9D43C-5FE4-4956-B097-539335FD45E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67B9D43C-5FE4-4956-B097-539335FD45E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67B9D43C-5FE4-4956-B097-539335FD45E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67B9D43C-5FE4-4956-B097-539335FD45E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{67B9D43C-5FE4-4956-B097-539335FD45E3} = {C21A755A-C7F5-49D1-8557-41BBEC1DAC98}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8B3E0F44-3A81-4EE9-B25F-B6236DD63C1F}

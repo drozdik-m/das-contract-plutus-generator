@@ -13,9 +13,9 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Cardinality of this property - collection of single value?
+        /// Cardinality of this property - collection or single value?
         /// </summary>
-        public ContractPropertyCardinality Cardinality { get; set; } = ContractPropertyCardinality.Single;
+        public virtual ContractPropertyCardinality Cardinality { get; set; } = ContractPropertyCardinality.Single;
 
         /// <summary>
         /// True if this property is mandatory, else false

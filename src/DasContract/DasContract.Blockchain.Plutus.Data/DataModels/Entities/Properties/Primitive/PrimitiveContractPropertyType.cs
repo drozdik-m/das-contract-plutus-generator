@@ -3,13 +3,12 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Prim
 {
     public enum PrimitiveContractPropertyType
     {
-        Number,
-        UnsignedNumber,
+        Integer,
+        UnsignedInteger,
         Bool,
-        String,
-        DateTime,
+        ByteString,
+        POSIXTime,
         Address,
-        AddressPayable,
-        Data,
+        
     }
 }

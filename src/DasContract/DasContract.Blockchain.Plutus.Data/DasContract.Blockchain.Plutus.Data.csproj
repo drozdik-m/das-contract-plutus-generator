@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DasContract.Abstraction\DasContract.Abstraction.csproj" />
+  </ItemGroup>
+
 </Project>

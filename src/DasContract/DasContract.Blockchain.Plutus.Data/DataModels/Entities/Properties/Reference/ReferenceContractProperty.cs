@@ -1,6 +1,5 @@
 ﻿using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
-using DasContract.Editor.Migrator.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,5 +14,10 @@ namespace DasContract.Editor.Entities.DataModels.Entities.Properties.Reference
         /// Reference to the entity of which this property is data type of 
         /// </summary>
         public ContractEntity Entity { get; set; }
+
+        /// <summary>
+        /// Id if the linked entity 
+        /// </summary>
+        public string EntityId { get; set; }
     }
 }

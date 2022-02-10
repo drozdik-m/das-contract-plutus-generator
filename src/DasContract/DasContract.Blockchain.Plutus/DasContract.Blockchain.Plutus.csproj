@@ -5,4 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DasContract.Blockchain.Plutus.Data\DasContract.Blockchain.Plutus.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataModels\" />
+  </ItemGroup>
+
 </Project>

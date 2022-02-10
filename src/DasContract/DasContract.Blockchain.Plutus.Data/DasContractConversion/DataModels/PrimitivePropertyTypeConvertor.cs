@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using DasContract.Abstraction.Data;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
+
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+{
+    public class PrimitivePropertyTypeConvertor : IConvertor<PropertyDataType, PrimitiveContractPropertyType>
+    {
+        public PrimitiveContractPropertyType Convert(PropertyDataType source)
+        {
+            return source switch
+            {
+                PropertyDataType.Int => PrimitiveContractPropertyType.Integer,
+                PropertyDataType.Uint => PrimitiveContractPropertyType.UnsignedInteger,
+                PropertyDataType.Bool => PrimitiveContractPropertyType.Bool,
+                PropertyDataType.String => PrimitiveContractPropertyType.ByteString,
+                PropertyDataType.DateTime => PrimitiveContractPropertyType.POSIXTime,
+                PropertyDataType.Address => PrimitiveContractPropertyType.Address,
+                PropertyDataType.AddressPayable => PrimitiveContractPropertyType.Address,
+                PropertyDataType.Data => PrimitiveContractPropertyType.ByteString,
+                _ => throw new Exception("No suitable property type found"),
+            };
+        }
+    }
+}
