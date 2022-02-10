@@ -5,22 +5,24 @@ using DasContract.Abstraction.Data;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
+using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class ContractEntityConvertor : IConvertor<Entity, ContractEntity>
     {
-        private readonly PrimitivePropertyConvertor primitivePropertyConvertor;
-        private readonly ReferencePropertyConvertor referencePropertyConvertor;
+        private readonly IConvertor<Property, PrimitiveContractProperty> primitivePropertyConvertor;
+        private readonly IConvertor<Property, ReferenceContractProperty> referencePropertyConvertor;
 
         public ContractEntityConvertor(
-            PrimitivePropertyConvertor primitivePropertyConvertor,
-            ReferencePropertyConvertor referencePropertyConvertor)
+            IConvertor<Property, PrimitiveContractProperty> primitivePropertyConvertor,
+            IConvertor<Property, ReferenceContractProperty> referencePropertyConvertor)
         {
             this.primitivePropertyConvertor = primitivePropertyConvertor;
             this.referencePropertyConvertor = referencePropertyConvertor;
         }
 
+        /// <inheritdoc/>
         public ContractEntity Convert(Entity source)
         {
             var result = new ContractEntity

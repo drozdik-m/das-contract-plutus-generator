@@ -20,6 +20,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             this.contractDataModelConvertor = contractDataModelConvertor;
         }
 
+        /// <inheritdoc/>
         public PlutusContract Convert(Contract source)
         {
             var result = new PlutusContract

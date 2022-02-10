@@ -9,6 +9,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class PropertyCardinalityConvertor : IConvertor<PropertyType, ContractPropertyCardinality>
     {
+        /// <inheritdoc/>
         public ContractPropertyCardinality Convert(PropertyType source)
         {
             return source switch

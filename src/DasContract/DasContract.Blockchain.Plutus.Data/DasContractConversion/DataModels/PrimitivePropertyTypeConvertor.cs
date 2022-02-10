@@ -8,6 +8,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class PrimitivePropertyTypeConvertor : IConvertor<PropertyDataType, PrimitiveContractPropertyType>
     {
+        /// <inheritdoc/>
         public PrimitiveContractPropertyType Convert(PropertyDataType source)
         {
             return source switch

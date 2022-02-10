@@ -12,13 +12,14 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class ReferencePropertyConvertor : IConvertor<Property, ReferenceContractProperty>
     {
-        private readonly PropertyCardinalityConvertor cardinalityConvertor;
+        private readonly IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor;
 
-        public ReferencePropertyConvertor(PropertyCardinalityConvertor cardinalityConvertor)
+        public ReferencePropertyConvertor(IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor)
         {
             this.cardinalityConvertor = cardinalityConvertor;
         }
 
+        /// <inheritdoc/>
         public ReferenceContractProperty Convert(Property source)
         {
             var result = new ReferenceContractProperty

@@ -1,21 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace DasContract.Blockchain.Plutus
+namespace DasContract.Blockchain.Plutus.Code
 {
-    public class PlutusCode
+    public class PlutusCode : IPlutusCode
     {
-        public PlutusCode(string theCode)
+        public IEnumerable<IPlutusLine> LinesOfCode { get; }
+
+        public PlutusCode(IEnumerable<IPlutusLine> linesOfCode)
         {
-            TheCode = theCode;
+            LinesOfCode = linesOfCode;
         }
 
-        public string TheCode { get; }
-
-        public override string ToString()
+        /// <inheritdoc/>
+        public IPlutusCode Append(IPlutusCode code)
         {
-            return TheCode;
+            return new PlutusCode(LinesOfCode.Concat(code.LinesOfCode));
+        }
+
+        /// <inheritdoc/>
+        public IPlutusCode Prepend(IPlutusCode code)
+        {
+            return new PlutusCode(code.LinesOfCode.Concat(LinesOfCode));
+        }
+
+        /// <inheritdoc/>
+        public string InString()
+        {
+            return LinesOfCode.Aggregate("", (acc, line) => acc + line.InString() + Environment.NewLine);
         }
     }
 }

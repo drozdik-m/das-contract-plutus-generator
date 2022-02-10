@@ -12,14 +12,15 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class ContractDataModelConvertor : IConvertor<IEnumerable<Entity>, ContractDataModel>
     {
-        private readonly ContractEntityConvertor contractEntityConvertor;
+        private readonly IConvertor<Entity, ContractEntity> contractEntityConvertor;
 
         public ContractDataModelConvertor(
-            ContractEntityConvertor contractEntityConvertor)
+            IConvertor<Entity, ContractEntity> contractEntityConvertor)
         {
             this.contractEntityConvertor = contractEntityConvertor;
         }
 
+        /// <inheritdoc/>
         public ContractDataModel Convert(IEnumerable<Entity> source)
         {
             var result = new ContractDataModel();

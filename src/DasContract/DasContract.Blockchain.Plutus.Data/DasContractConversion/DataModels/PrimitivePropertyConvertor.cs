@@ -9,16 +9,17 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class PrimitivePropertyConvertor : IConvertor<Property, PrimitiveContractProperty>
     {
-        private readonly PrimitivePropertyTypeConvertor typeConvertor;
-        private readonly PropertyCardinalityConvertor cardinalityConvertor;
+        private readonly IConvertor<PropertyDataType, PrimitiveContractPropertyType> typeConvertor;
+        private readonly IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor;
 
-        public PrimitivePropertyConvertor(PrimitivePropertyTypeConvertor typeConvertor,
-            PropertyCardinalityConvertor cardinalityConvertor)
+        public PrimitivePropertyConvertor(IConvertor<PropertyDataType, PrimitiveContractPropertyType> typeConvertor,
+            IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor)
         {
             this.typeConvertor = typeConvertor;
             this.cardinalityConvertor = cardinalityConvertor;
         }
 
+        /// <inheritdoc/>
         public PrimitiveContractProperty Convert(Property source)
         {
             var result = new PrimitiveContractProperty
