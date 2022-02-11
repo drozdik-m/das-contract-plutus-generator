@@ -17,13 +17,21 @@ namespace DasContract.Blockchain.Plutus.Code
         /// <inheritdoc/>
         public IPlutusCode Append(IPlutusCode code)
         {
-            return new PlutusCode(LinesOfCode.Concat(code.LinesOfCode));
+            return new PlutusCodes(new List<IPlutusCode>()
+            {
+                this,
+                code
+            });
         }
 
         /// <inheritdoc/>
         public IPlutusCode Prepend(IPlutusCode code)
         {
-            return new PlutusCode(code.LinesOfCode.Concat(LinesOfCode));
+            return new PlutusCodes(new List<IPlutusCode>()
+            {
+                code,
+                this
+            });
         }
 
         /// <inheritdoc/>

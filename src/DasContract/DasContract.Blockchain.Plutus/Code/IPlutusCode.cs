@@ -8,11 +8,6 @@ namespace DasContract.Blockchain.Plutus
     public interface IPlutusCode : IStringable
     {
         /// <summary>
-        /// Lines of code of which this code consists of
-        /// </summary>
-        IEnumerable<IPlutusLine> LinesOfCode { get; }
-
-        /// <summary>
         /// Appends a code after this code
         /// </summary>
         /// <param name="code"></param>
