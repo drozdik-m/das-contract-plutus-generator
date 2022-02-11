@@ -25,11 +25,31 @@ namespace DasContract.Blockchain.Plutus.Code
         }
 
         /// <inheritdoc/>
+        public IPlutusCode Append(IPlutusLine line)
+        {
+            return new PlutusCodes(new List<IPlutusCode>()
+            {
+                this,
+                new PlutusCode(new List<IPlutusLine>(){ line })
+            });
+        }
+
+        /// <inheritdoc/>
         public IPlutusCode Prepend(IPlutusCode code)
         {
             return new PlutusCodes(new List<IPlutusCode>()
             {
                 code,
+                this
+            });
+        }
+
+        /// <inheritdoc/>
+        public IPlutusCode Prepend(IPlutusLine line)
+        {
+            return new PlutusCodes(new List<IPlutusCode>()
+            {
+                new PlutusCode(new List<IPlutusLine>(){ line }),
                 this
             });
         }

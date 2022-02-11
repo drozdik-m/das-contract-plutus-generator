@@ -12,14 +12,30 @@ namespace DasContract.Blockchain.Plutus
         /// </summary>
         /// <param name="code"></param>
         /// <returns>New plutus code</returns>
-        public IPlutusCode Append(IPlutusCode code);
+        IPlutusCode Append(IPlutusCode code);
+
+        /// <summary>
+        /// Appends a line after this code
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>New plutus code</returns>
+        IPlutusCode Append(IPlutusLine line);
 
         /// <summary>
         /// Prepends a code before this code
         /// </summary>
         /// <param name="code"></param>
         /// <returns>New plutus code</returns>
-        public IPlutusCode Prepend(IPlutusCode code);
+        IPlutusCode Prepend(IPlutusCode code);
+
+        /// <summary>
+        /// Appends a line before this code
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>New plutus code</returns>
+        IPlutusCode Prepend(IPlutusLine line);
+
+
     }
 
 }

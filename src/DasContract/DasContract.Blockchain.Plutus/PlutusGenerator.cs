@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Data;
 
 namespace DasContract.Blockchain.Plutus
@@ -16,7 +17,7 @@ namespace DasContract.Blockchain.Plutus
         /// <returns>Plutus code</returns>
         public IPlutusCode GeneratePlutusContract(PlutusContract contract)
         {
-            //--- Pragma ---
+            //--- Pragma -----------------------------------------
             var pragmas = new PlutusCode(new List<IPlutusLine>()
             {
                 new PlutusPragma(0, "LANGUAGE DataKinds"),
@@ -35,7 +36,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusPragma(0, "OPTIONS_GHC -fno-warn-unused-imports"),
             });
 
-            //--- Module ---
+            //--- Module -----------------------------------------
             var module = new PlutusCode(new List<IPlutusLine>()
             {
                 new PlutusRawLine(0, "module PlutusContract"),
@@ -43,8 +44,34 @@ namespace DasContract.Blockchain.Plutus
                     new PlutusRawLine(1, "where"),
             });
 
+            //----------------------------------------------------
+            //--                 DATA MODELS                   ---
+            //----------------------------------------------------
+            IPlutusCode dataModels = new PlutusSectionComment(0, "DATA MODELS");
+
+            // --- Timer event ---
+            dataModels = dataModels.Append(new PlutusSubsectionComment(0, "Timer event"));
+            var timerEventData = new PlutusAlgebraicType("TimerEvent", new List<PlutusAlgebraicTypeConstructor>()
+            {
+                new PlutusAlgebraicTypeConstructor("IntTime", new List<string>()),
+                new PlutusAlgebraicTypeConstructor("TimedOut", new List<string>())
+            }, new List<string>()
+            {
+                "Show",
+                "Generic",
+                "FromJSON",
+                "ToJSON",
+                "ToSchema"
+            });
+            dataModels = dataModels.Append(timerEventData);
+            dataModels = dataModels.Append(new PlutusMakeLift(timerEventData));
+            dataModels = dataModels.Append(new PlutusUnstableMakeIsData(timerEventData));
+
+
+            //Result
             return pragmas
-                .Append(module);
+                .Append(module)
+                .Append(dataModels);
         }
     }
 }

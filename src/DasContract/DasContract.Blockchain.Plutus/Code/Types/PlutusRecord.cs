@@ -6,15 +6,23 @@ using DasContract.Blockchain.Plutus.Code.Comments;
 
 namespace DasContract.Blockchain.Plutus.Code.Types
 {
-    public class PlutusRecord : PlutusCode
+    public class PlutusRecord : PlutusCode, INamable
     {
         public PlutusRecord(string name, 
             IEnumerable<PlutusRecordMember> members, 
             IEnumerable<string> derivings)
             :base(GetLinesOfCode(name, members, derivings))
         {
-
+            Name = name;
+            Members = members;
+            Derivings = derivings;
         }
+
+        public string Name { get; }
+
+        public IEnumerable<PlutusRecordMember> Members { get; }
+
+        public IEnumerable<string> Derivings { get; }
 
         static IEnumerable<IPlutusLine> GetLinesOfCode(string name, 
             IEnumerable<PlutusRecordMember> members,
@@ -35,8 +43,11 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             if (derivings.Count() > 0)
                 derivingsString = " deriving (" + string.Join(", ", derivings) + ")";
 
+            //Keyword
+            var keyword = members.Count() == 1 ? "newtype" : "data";
+
             return new List<IPlutusLine>()
-                .Append(new PlutusRawLine(0, $"data {name} = {name} " + "{"))
+                .Append(new PlutusRawLine(0, $"{keyword} {name} = {name} " + "{"))
                 .Concat(updatedMembers)
                 .Append(new PlutusRawLine(0, "}" + derivingsString));
         }

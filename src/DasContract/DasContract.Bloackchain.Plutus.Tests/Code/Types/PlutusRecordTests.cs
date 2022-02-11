@@ -25,6 +25,20 @@ namespace DasContract.Bloackchain.Plutus.Tests
         }
 
         [Test]
+        public void PlutusRecordSingleMember()
+        {
+            var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
+            {
+                new PlutusRecordMember("a", "BuiltinByteString"),
+            }, new List<string>());
+
+            Assert.AreEqual("newtype Record = Record {" + PlutusCode.NewLineString +
+                PlutusLine.IndentString + "a :: BuiltinByteString" + PlutusCode.NewLineString +
+                "}" + PlutusCode.NewLineString, record.InString());
+        }
+
+
+        [Test]
         public void EmptyPlutusRecord()
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>(), new List<string>());

@@ -21,9 +21,25 @@ namespace DasContract.Blockchain.Plutus.Code
         }
 
         /// <inheritdoc/>
+        public IPlutusCode Append(IPlutusLine line)
+        {
+            return new PlutusCodes(Codes.Append(
+                    new PlutusCode(new List<IPlutusLine>() { line })
+                ));
+        }
+
+        /// <inheritdoc/>
         public IPlutusCode Prepend(IPlutusCode code)
         {
             return new PlutusCodes(Codes.Prepend(code));
+        }
+
+        /// <inheritdoc/>
+        public IPlutusCode Prepend(IPlutusLine line)
+        {
+            return new PlutusCodes(Codes.Prepend(
+                    new PlutusCode(new List<IPlutusLine>() { line })
+                ));
         }
 
         /// <inheritdoc/>
@@ -37,5 +53,7 @@ namespace DasContract.Blockchain.Plutus.Code
         {
             return InString();
         }
+
+        
     }
 }
