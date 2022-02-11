@@ -29,7 +29,15 @@ namespace DasContract.Blockchain.Plutus.Code
         /// <inheritdoc/>
         public string InString()
         {
-            return LinesOfCode.Aggregate("", (acc, line) => acc + line.InString() + Environment.NewLine);
+            return LinesOfCode.Aggregate("", (acc, line) => acc + line.InString() + NewLineString);
         }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return InString();
+        }
+
+        public static string NewLineString = Environment.NewLine;
     }
 }

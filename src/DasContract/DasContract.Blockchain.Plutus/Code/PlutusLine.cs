@@ -17,7 +17,13 @@ namespace DasContract.Blockchain.Plutus.Code
         /// <inheritdoc/>
         public virtual string InString()
         {
-            return Enumerable.Repeat(IndentString, Indent).ToString();
+            return string.Join("", Enumerable.Repeat(IndentString, Indent));
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return InString();
         }
 
         /// <summary>

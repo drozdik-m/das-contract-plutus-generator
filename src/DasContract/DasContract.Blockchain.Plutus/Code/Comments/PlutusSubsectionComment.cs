@@ -20,7 +20,7 @@ namespace DasContract.Blockchain.Plutus.Code.Comments
             var beginWith = $"-- {Comment} ";
             return base.InString() +
                 beginWith +
-                Enumerable.Repeat("-", DashLimit - beginWith.Length);
+                string.Join(string.Empty, Enumerable.Repeat("-", DashLimit - beginWith.Length));
         }
 
         public static int DashLimit = PlutusCommentDivider.Length;

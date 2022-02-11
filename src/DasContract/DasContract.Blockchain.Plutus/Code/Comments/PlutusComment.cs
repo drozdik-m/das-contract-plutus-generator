@@ -16,6 +16,8 @@ namespace DasContract.Blockchain.Plutus.Code.Comments
         /// <inheritdoc/>
         public override string InString()
         {
+            if (string.IsNullOrWhiteSpace(Comment))
+                return string.Empty;
             return base.InString() + $"-- {Comment}";
         }
     }

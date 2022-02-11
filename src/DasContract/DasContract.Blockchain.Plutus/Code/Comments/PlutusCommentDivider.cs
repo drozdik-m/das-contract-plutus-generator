@@ -15,10 +15,9 @@ namespace DasContract.Blockchain.Plutus.Code.Comments
         /// <inheritdoc/>
         public override string InString()
         {
-            return Enumerable.Repeat("-", Length).ToString();
+            return base.InString() + 
+                string.Join(string.Empty, Enumerable.Repeat("-", Length));
         }
-
-        //-- Datum ------------------------------------------
 
         public static int Length = 52;
     }
