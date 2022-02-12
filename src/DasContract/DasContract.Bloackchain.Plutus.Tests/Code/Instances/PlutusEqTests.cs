@@ -9,13 +9,24 @@ namespace DasContract.Bloackchain.Plutus.Tests
 {
     public class PlutusEqTests
     {
+        class TestType : INamable
+        {
+            public TestType(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+        }
+
         [Test]
         public void PlutusEqRecord()
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                new PlutusRecordMember("a", "BuiltinByteString"),
-                new PlutusRecordMember("b", "POSIXTime"),
+                new PlutusRecordMember("a", new TestType("BuiltinByteString")),
+                new PlutusRecordMember("b", new TestType("POSIXTime")),
             }, new List<string>());
 
             Assert.AreEqual("instance Eq Record where" + PlutusCode.NewLineString +
@@ -28,7 +39,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                new PlutusRecordMember("a", "BuiltinByteString"),
+                new PlutusRecordMember("a", new TestType("BuiltinByteString")),
             }, new List<string>());
 
             Assert.AreEqual("instance Eq Record where" + PlutusCode.NewLineString +
@@ -55,9 +66,9 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var type = new PlutusAlgebraicType("AlgType", new List<PlutusAlgebraicTypeConstructor>()
             {
-                new PlutusAlgebraicTypeConstructor("A", new List<string>{ "Type", "AndAnotherOne" }),
-                new PlutusAlgebraicTypeConstructor("B", new List<string>()),
-                new PlutusAlgebraicTypeConstructor("C", new List<string>{ "Type" }),
+                new PlutusAlgebraicTypeConstructor("A", new List<INamable>{ new TestType("Type"), new TestType("AndAnotherOne") }),
+                new PlutusAlgebraicTypeConstructor("B", new List<INamable>()),
+                new PlutusAlgebraicTypeConstructor("C", new List<INamable>{ new TestType("Type") }),
             }, new List<string>());
 
             Assert.AreEqual("instance Eq AlgType where" + PlutusCode.NewLineString +

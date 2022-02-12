@@ -9,13 +9,24 @@ namespace DasContract.Bloackchain.Plutus.Tests
 {
     public class PlutusAlgebraicTypeTests
     {
+        class TestType : INamable
+        {
+            public TestType(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+        }
+
         [Test]
         public void PlutusAlgebraicType()
         {
             var record = new PlutusAlgebraicType("Record", new List<PlutusAlgebraicTypeConstructor>()
             {
-                new PlutusAlgebraicTypeConstructor("A", new List<string>{ "Type" }),
-                new PlutusAlgebraicTypeConstructor("B", new List<string>()),
+                new PlutusAlgebraicTypeConstructor("A", new List<INamable>{ new TestType("Type") }),
+                new PlutusAlgebraicTypeConstructor("B", new List<INamable>()),
             }, new List<string>());
 
             Assert.AreEqual("data Record =" + PlutusCode.NewLineString +
@@ -29,8 +40,8 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var record = new PlutusAlgebraicType("Record", new List<PlutusAlgebraicTypeConstructor>()
             {
-                new PlutusAlgebraicTypeConstructor("A", new List<string>{ "Type" }),
-                new PlutusAlgebraicTypeConstructor("B", new List<string>()),
+                new PlutusAlgebraicTypeConstructor("A", new List<INamable>{ new TestType("Type") }),
+                new PlutusAlgebraicTypeConstructor("B", new List<INamable>()),
             }, new List<string>
             {
                 "Show", 

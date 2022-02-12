@@ -9,13 +9,24 @@ namespace DasContract.Bloackchain.Plutus.Tests
 {
     public class PlutusRecordTests
     {
+        class TestType : INamable
+        {
+            public TestType(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+        }
+
         [Test]
         public void PlutusRecord()
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                new PlutusRecordMember("a", "BuiltinByteString"),
-                new PlutusRecordMember("b", "POSIXTime"),
+                new PlutusRecordMember("a", new TestType("BuiltinByteString")),
+                new PlutusRecordMember("b", new TestType("POSIXTime")),
             }, new List<string>());
 
             Assert.AreEqual("data Record = Record {" + PlutusCode.NewLineString +
@@ -29,7 +40,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                new PlutusRecordMember("a", "BuiltinByteString"),
+                new PlutusRecordMember("a", new TestType("BuiltinByteString")),
             }, new List<string>());
 
             Assert.AreEqual("newtype Record = Record {" + PlutusCode.NewLineString +
@@ -52,8 +63,8 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                new PlutusRecordMember("a", "BuiltinByteString"),
-                new PlutusRecordMember("b", "POSIXTime"),
+                new PlutusRecordMember("a", new TestType("BuiltinByteString")),
+                new PlutusRecordMember("b", new TestType("POSIXTime")),
             }, new List<string>()
             {
                 "Show",

@@ -9,10 +9,21 @@ namespace DasContract.Bloackchain.Plutus.Tests
 {
     public class PlutusAlgebraicTypeConstructorTests
     {
+        class TestType : INamable
+        {
+            public TestType(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+        }
+
         [Test]
         public void PlutusAlgebraicTypeConstructor()
         {
-            var member = new PlutusAlgebraicTypeConstructor("A", new List<string> { "Type" }, false);
+            var member = new PlutusAlgebraicTypeConstructor("A", new List<INamable> { new TestType("Type") }, false);
             Assert.AreEqual(PlutusLine.IndentString +
                 "A Type |", member.InString());
         }
@@ -20,7 +31,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         [Test]
         public void PlutusAlgebraicTypeConstructorLast()
         {
-            var member = new PlutusAlgebraicTypeConstructor("A", new List<string> { "Type" }, true);
+            var member = new PlutusAlgebraicTypeConstructor("A", new List<INamable> { new TestType("Type") }, true);
             Assert.AreEqual(PlutusLine.IndentString +
                 "A Type", member.InString());
         }
@@ -28,7 +39,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         [Test]
         public void PlutusAlgebraicTypeConstructorNoConstructors()
         {
-            var member = new PlutusAlgebraicTypeConstructor("A", new List<string>());
+            var member = new PlutusAlgebraicTypeConstructor("A", new List<INamable>());
             Assert.AreEqual(PlutusLine.IndentString +
                 "A |", member.InString());
         }
@@ -38,7 +49,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             try
             {
-                var member = new PlutusAlgebraicTypeConstructor("", new List<string> { "Type" }, true);
+                var member = new PlutusAlgebraicTypeConstructor("", new List<INamable> { new TestType("Type") }, true);
                 Assert.Fail();
             }
             catch

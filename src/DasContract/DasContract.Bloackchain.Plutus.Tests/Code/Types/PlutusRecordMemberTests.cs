@@ -8,10 +8,21 @@ namespace DasContract.Bloackchain.Plutus.Tests
 {
     public class PlutusRecordMemberTests
     {
+        class TestType : INamable
+        {
+            public TestType(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+        }
+
         [Test]
         public void PlutusRecordMember()
         {
-            var member = new PlutusRecordMember("a", "BuiltinByteString");
+            var member = new PlutusRecordMember("a", new TestType("BuiltinByteString"));
             Assert.AreEqual(PlutusLine.IndentString + 
                 "a :: BuiltinByteString,", member.InString());
         }
@@ -19,7 +30,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         [Test]
         public void PlutusRecordMemberLast()
         {
-            var member = new PlutusRecordMember("bcd", "POSIXTime", true);
+            var member = new PlutusRecordMember("bcd", new TestType("POSIXTime"), true);
             Assert.AreEqual(PlutusLine.IndentString +
                 "bcd :: POSIXTime", member.InString());
         }
@@ -29,7 +40,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             try
             {
-                var member = new PlutusRecordMember("", "POSIXTime", true);
+                var member = new PlutusRecordMember("", new TestType("POSIXTime"), true);
                 Assert.Fail();
             }
             catch

@@ -4,6 +4,7 @@ using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
+using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Data;
 
 namespace DasContract.Blockchain.Plutus
@@ -89,8 +90,8 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusSubsectionComment(0, "Timer event"));
             var timerEventData = new PlutusAlgebraicType("TimerEvent", new List<PlutusAlgebraicTypeConstructor>()
             {
-                new PlutusAlgebraicTypeConstructor("InTime", new List<string>()),
-                new PlutusAlgebraicTypeConstructor("TimedOut", new List<string>())
+                new PlutusAlgebraicTypeConstructor("InTime", new List<INamable>()),
+                new PlutusAlgebraicTypeConstructor("TimedOut", new List<INamable>())
             }, new List<string>()
             {
                 "Show",
@@ -112,8 +113,8 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusSubsectionComment(0, "Sequential multi instance"));
             var sequentialMultiInstanceData = new PlutusAlgebraicType("SequentialMultiInstance", new List<PlutusAlgebraicTypeConstructor>()
             {
-                new PlutusAlgebraicTypeConstructor("ToLoop", new List<string>{ "Integer" }),
-                new PlutusAlgebraicTypeConstructor("LoopEnded", new List<string>())
+                new PlutusAlgebraicTypeConstructor("ToLoop", new List<INamable>{ PlutusInteger.Type }),
+                new PlutusAlgebraicTypeConstructor("LoopEnded", new List<INamable>())
             }, new List<string>()
             {
                 "Show",
