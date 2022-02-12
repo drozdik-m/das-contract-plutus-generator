@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Code.Types
 {
-    public class PlutusAlgebraicTypeConstructor : PlutusLine
+    public class PlutusAlgebraicTypeConstructor : PlutusLine, INamable
     {
         public PlutusAlgebraicTypeConstructor(string name, IEnumerable<string> types, bool isLast = false): base(1)
         {

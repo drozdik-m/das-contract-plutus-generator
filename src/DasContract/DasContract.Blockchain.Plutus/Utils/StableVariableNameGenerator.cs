@@ -9,7 +9,15 @@ namespace DasContract.Blockchain.Plutus.Utils
     {
         string current = string.Empty;
 
-        public string Next()
+
+
+        public string GetNext()
+        {
+            current = GetNextLetter();
+            return current;
+        }
+
+        string GetNextLetter()
         {
             if (current == string.Empty) return "a";
             if (current.Last() == 'a') return CurrentWithLastAs('b');
