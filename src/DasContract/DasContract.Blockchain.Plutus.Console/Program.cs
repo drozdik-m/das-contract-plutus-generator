@@ -1,3 +1,6 @@
-﻿
+﻿using DasContract.Blockchain.Plutus;
 
-Console.WriteLine("Hello, World!");
+
+
+Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(null));
+

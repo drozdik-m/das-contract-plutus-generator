@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DasContract.Blockchain.Plutus\DasContract.Blockchain.Plutus.csproj" />
+  </ItemGroup>
+
 </Project>
