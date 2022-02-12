@@ -10,7 +10,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         [Test]
         public void PlutusEmptyLine()
         {
-            var line = new PlutusEmptyLine();
+            var line = PlutusLine.Empty;
             Assert.AreEqual(string.Empty, line.InString());
         }
 

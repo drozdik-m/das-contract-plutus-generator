@@ -30,5 +30,12 @@ namespace DasContract.Blockchain.Plutus.Code
         /// String for one level of indentation
         /// </summary>
         public static string IndentString = "\t";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static PlutusLine Empty { get; set; } = new PlutusLine(0);
+
     }
 }

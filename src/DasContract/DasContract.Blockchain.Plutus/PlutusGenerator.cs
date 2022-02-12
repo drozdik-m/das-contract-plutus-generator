@@ -33,9 +33,9 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusPragma(0, "LANGUAGE TypeApplications"),
                 new PlutusPragma(0, "LANGUAGE TypeFamilies"),
                 new PlutusPragma(0, "LANGUAGE TypeOperators"),
-                new PlutusEmptyLine(),
+                PlutusLine.Empty,
                 new PlutusPragma(0, "OPTIONS_GHC -fno-warn-unused-imports"),
-                new PlutusEmptyLine(),
+                PlutusLine.Empty,
             });
 
             //--- Module -----------------------------------------
@@ -45,8 +45,8 @@ namespace DasContract.Blockchain.Plutus
                     new PlutusRawLine(1, "(module PlutusContract)"),
                     new PlutusRawLine(1, "where"),
 
-                new PlutusEmptyLine(),
-                new PlutusEmptyLine(),
+                PlutusLine.Empty,
+                PlutusLine.Empty,
             });
 
 
@@ -76,7 +76,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusImport(0, "qualified PlutusTx.IsData as PlutusTx"),
                 new PlutusImport(0, "Plutus.V1.Ledger.Value"),
                 new PlutusImport(0, "Data.Char (GeneralCategory(CurrencySymbol))"),
-                new PlutusEmptyLine(),
+                PlutusLine.Empty,
             });
 
             //----------------------------------------------------
@@ -86,7 +86,7 @@ namespace DasContract.Blockchain.Plutus
 
             // --- Timer event -----------------------------------
             dataModels = dataModels
-                .Append(new PlutusEmptyLine())
+                .Append(PlutusLine.Empty)
                 .Append(new PlutusSubsectionComment(0, "Timer event"));
             var timerEventData = new PlutusAlgebraicType("TimerEvent", new List<PlutusAlgebraicTypeConstructor>()
             {
@@ -103,13 +103,13 @@ namespace DasContract.Blockchain.Plutus
                 .Append(timerEventData)
                 .Append(new PlutusMakeLift(timerEventData))
                 .Append(new PlutusUnstableMakeIsData(timerEventData))
-                .Append(new PlutusEmptyLine())
+                .Append(PlutusLine.Empty)
                 .Append(new PlutusEq(timerEventData));
 
 
             // -- Sequential multi instance ----------------------
             dataModels = dataModels
-                .Append(new PlutusEmptyLine())
+                .Append(PlutusLine.Empty)
                 .Append(new PlutusSubsectionComment(0, "Sequential multi instance"));
             var sequentialMultiInstanceData = new PlutusAlgebraicType("SequentialMultiInstance", new List<PlutusAlgebraicTypeConstructor>()
             {
@@ -126,8 +126,56 @@ namespace DasContract.Blockchain.Plutus
                 .Append(sequentialMultiInstanceData)
                 .Append(new PlutusMakeLift(sequentialMultiInstanceData))
                 .Append(new PlutusUnstableMakeIsData(sequentialMultiInstanceData))
-                .Append(new PlutusEmptyLine())
-                .Append(new PlutusEq(sequentialMultiInstanceData));
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(sequentialMultiInstanceData))
+                .Append(PlutusLine.Empty);
+
+            var nextLoopFunctionSig = new PlutusFunctionSignature(0, "nextLoop", new List<INamable>
+            {
+                sequentialMultiInstanceData,
+                sequentialMultiInstanceData,
+            });
+            dataModels = dataModels
+                .Append(nextLoopFunctionSig)
+                .Append(new PlutusOnelineFunction(0, nextLoopFunctionSig, new List<string>
+                {
+                    "LoopEnded"
+                }, "LoopEnded"))
+                .Append(new PlutusOnelineFunction(0, nextLoopFunctionSig, new List<string>
+                {
+                    "(ToLoop i)"
+                }, "ToLoop $ i-1"))
+                .Append(PlutusLine.Empty);
+
+            var toSeqMultiInstanceSig = new PlutusFunctionSignature(0, "toSeqMultiInstance", new List<INamable>
+            {
+                PlutusInteger.Type,
+                sequentialMultiInstanceData,
+            });
+            dataModels = dataModels
+                .Append(toSeqMultiInstanceSig)
+                .Append(new PlutusGuardFunction(0, toSeqMultiInstanceSig, new List<string>
+                {
+                    "i"
+                }, new List<(string, string)>
+                {
+                    ("i <= 0", "LoopEnded"),
+                    ("otherwise", "ToLoop i"),
+                }))
+                .Append(PlutusLine.Empty);
+
+            var toNextSeqMultiInstanceSig = new PlutusFunctionSignature(0, "toNextSeqMultiInstance", new List<INamable>
+            {
+                PlutusInteger.Type,
+                sequentialMultiInstanceData,
+            });
+            dataModels = dataModels
+                .Append(toNextSeqMultiInstanceSig)
+                .Append(new PlutusOnelineFunction(0, toNextSeqMultiInstanceSig, new List<string>
+                {
+                    "i"
+                }, "toSeqMultiInstance $ i - 1"))
+                .Append(PlutusLine.Empty);
 
 
             //Result
