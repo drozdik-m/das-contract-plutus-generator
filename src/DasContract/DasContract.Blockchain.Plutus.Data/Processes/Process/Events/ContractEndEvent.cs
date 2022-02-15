@@ -6,6 +6,6 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Events
 {
     public class ContractEndEvent : ContractEvent
     {
-        public ContractProcessElement Incoming { get; set; }
+        //public ContractProcessElement Incoming { get; set; }
     }
 }

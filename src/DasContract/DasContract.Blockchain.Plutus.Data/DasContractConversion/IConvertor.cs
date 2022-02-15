@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion
 {
     public interface IConvertor<TSource, TTarget>
     {

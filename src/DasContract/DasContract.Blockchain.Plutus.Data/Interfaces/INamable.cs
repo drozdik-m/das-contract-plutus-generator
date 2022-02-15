@@ -9,6 +9,6 @@ namespace DasContract.Blockchain.Plutus.Data.Interfaces
         /// <summary>
         /// Display (reader friendly) name of this entity
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
     }
 }

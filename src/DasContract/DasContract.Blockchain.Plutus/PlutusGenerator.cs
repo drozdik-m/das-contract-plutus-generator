@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Data;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
+using DasContract.Blockchain.Plutus.Data.Processes.Process;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 
 namespace DasContract.Blockchain.Plutus
 {
@@ -85,7 +89,7 @@ namespace DasContract.Blockchain.Plutus
             IPlutusCode dataModels = new PlutusSectionComment(0, "DATA MODELS");
 
             // --- Timer event -----------------------------------
-            dataModels = dataModels
+            /*dataModels = dataModels
                 .Append(PlutusLine.Empty)
                 .Append(new PlutusSubsectionComment(0, "Timer event"));
             var timerEventData = new PlutusAlgebraicType("TimerEvent", new List<PlutusAlgebraicTypeConstructor>()
@@ -104,7 +108,7 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusMakeLift(timerEventData))
                 .Append(new PlutusUnstableMakeIsData(timerEventData))
                 .Append(PlutusLine.Empty)
-                .Append(new PlutusEq(timerEventData));
+                .Append(new PlutusEq(timerEventData));*/
 
 
             // -- Sequential multi instance ----------------------
@@ -177,12 +181,89 @@ namespace DasContract.Blockchain.Plutus
                 }, "toSeqMultiInstance $ i - 1"))
                 .Append(PlutusLine.Empty);
 
+            // -- Phase ------------------------------------------
+
+            dataModels = dataModels
+                    .Append(new PlutusSubsectionComment(0, "Phase"));
+
+            //Subprocesses
+            var subprocesses = contract.Processes.Subprocesses;
+            foreach (var subprocess in subprocesses)
+            {
+                var subprocessPhases = new PlutusAlgebraicType(subprocess.Id,
+                    subprocess.ProcessElements
+                        .Select(e => ProcessElementToAlgTypeCtor(e, sequentialMultiInstanceData))
+                , new List<string>()
+                {
+                    "Show",
+                    "Generic",
+                    "FromJSON",
+                    "ToJSON"
+                });
+
+                dataModels = dataModels
+                    .Append(subprocessPhases)
+                    .Append(new PlutusMakeLift(subprocessPhases))
+                    .Append(new PlutusUnstableMakeIsData(subprocessPhases))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusEq(subprocessPhases))
+                    .Append(PlutusLine.Empty)
+                    .Append(PlutusLine.Empty);
+            }
+
+            //Main process
+            var contractState = new PlutusAlgebraicType("ContractState",
+                    contract.Processes.Main.ProcessElements
+                        .Select(e => ProcessElementToAlgTypeCtor(e, sequentialMultiInstanceData))
+                        .Concat(contract.Processes.Subprocesses
+                            .Select(e => new PlutusAlgebraicTypeConstructor(e.Id, new INamable[]
+                            {
+                                e
+                            }))
+                         )
+                , new List<string>()
+                {
+                    "Show",
+                    "Generic",
+                    "FromJSON",
+                    "ToJSON"
+                });
+
+            dataModels = dataModels
+                .Append(contractState)
+                .Append(new PlutusMakeLift(contractState))
+                .Append(new PlutusUnstableMakeIsData(contractState))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(contractState))
+                .Append(PlutusLine.Empty)
+                .Append(PlutusLine.Empty);
 
             //Result
             return pragmas
                 .Append(module)
                 .Append(imports)
                 .Append(dataModels);
+        }
+
+        /// <summary>
+        /// Converts a process element into plutus algebraic type constructor
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="sequentialInstanceType"></param>
+        /// <returns></returns>
+        private PlutusAlgebraicTypeConstructor ProcessElementToAlgTypeCtor(
+            ContractProcessElement element, 
+            PlutusAlgebraicType sequentialInstanceType)
+        {
+            var types = new List<INamable>();
+            if (element is ContractActivity)
+            {
+                var contractActivity = element as ContractActivity;
+                if (!(contractActivity?.MultiInstance is null))
+                    types.Add(sequentialInstanceType);
+            }
+
+            return new PlutusAlgebraicTypeConstructor(element.Id, types);
         }
     }
 }

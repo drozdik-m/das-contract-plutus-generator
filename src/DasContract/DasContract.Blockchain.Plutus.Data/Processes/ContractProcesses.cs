@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Editor.Entities.Processes.Diagrams;
-using DasContract.Editor.Entities.Processes.Factories;
-using DasContract.Editor.Entities.Processes.Process.Activities;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes
 {
-    public class ContractProcesses
+    public class ContractProcesses 
     {
+
         /// <summary>
         /// BPMN 2.0 XML with process description and a visual process information
         /// </summary>
@@ -26,5 +26,10 @@ namespace DasContract.Blockchain.Plutus.Data.Processes
         /// The main process where the contract starts and ends
         /// </summary>
         public ContractProcess Main => Processes.Where(e => e.IsMain).Single();
+
+        /// <summary>
+        /// Processes without the main process
+        /// </summary>
+        public IEnumerable<ContractProcess> Subprocesses => Processes.Where(e => !e.IsMain);
     }
 }

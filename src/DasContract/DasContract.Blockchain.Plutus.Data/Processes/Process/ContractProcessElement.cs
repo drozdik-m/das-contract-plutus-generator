@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
-using DasContract.Editor.Entities.Processes.Process.Activities;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process
 {
@@ -11,5 +11,10 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string Name { get; set; } = string.Empty;
+
+        public virtual void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
+        {
+            collector.TryAdd(Id, this);
+        }
     }
 }
