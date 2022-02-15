@@ -1,5 +1,6 @@
 ﻿using DasContract.Blockchain.Plutus.Data.DataModels;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
+using DasContract.Blockchain.Plutus.Data.Processes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,5 +20,10 @@ namespace DasContract.Blockchain.Plutus.Data
         /// Data model of this contract
         /// </summary>
         public ContractDataModel DataModel { get; set; } = new ContractDataModel();
+
+        /// <summary>
+        /// Processes of this contract
+        /// </summary>
+        public ContractProcesses Processes { get; set; } = new ContractProcesses();
     }
 }
