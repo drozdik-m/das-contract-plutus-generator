@@ -3,6 +3,7 @@ using DasContract.Blockchain.Plutus.Data;
 using DasContract.Blockchain.Plutus.Data.DataModels;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
@@ -202,6 +203,63 @@ var contract = new PlutusContract()
                         EntityId = contractLogEntity.Id
                     },
 
+                },
+                DictionaryProperties = new DictionaryContractProperty[]
+                {
+                    new DictionaryContractProperty()
+                    {
+                        Id = "simpleDictionaryId",
+                        Name = "simpleDictionary",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        KeyType = PrimitiveContractPropertyType.Integer,
+                        ValueType = new PrimitiveContractProperty()
+                        {
+                            Id = "DICT_ID",
+                            Name = "DICT",
+                            Cardinality = ContractPropertyCardinality.Collection,
+                            IsMandatory = true,
+                            Type = PrimitiveContractPropertyType.Address
+                        },
+                    },
+                    new DictionaryContractProperty()
+                    {
+                        Id = "referenceDictionaryId",
+                        Name = "referenceDictionary",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        KeyType = PrimitiveContractPropertyType.Integer,
+                        ValueType = new ReferenceContractProperty()
+                        {
+                            Id = "DICT_ID",
+                            Name = "DICT",
+                            Cardinality = ContractPropertyCardinality.Single,
+                            IsMandatory = true,
+                            Entity = contractLogEntity,
+                            EntityId= contractLogEntity.Id  
+                        },
+                    },
+                    new DictionaryContractProperty()
+                    {
+                        Id = "crazyDictionaryId",
+                        Name = "crazyDictionary",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        KeyType = PrimitiveContractPropertyType.Integer,
+                        ValueType = new DictionaryContractProperty()
+                        {
+                            Cardinality = ContractPropertyCardinality.Collection,
+                            IsMandatory = true,
+                            KeyType = PrimitiveContractPropertyType.Bool,
+                            ValueType = new ReferenceContractProperty()
+                            {
+                                Cardinality = ContractPropertyCardinality.Single,
+                                IsMandatory = true,
+                                Entity = contractLogEntity,
+                                EntityId= contractLogEntity.Id
+                            },
+                        },
+                    }
                 }
 
             }

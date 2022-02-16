@@ -10,7 +10,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 
-namespace DasContract.Blockchain.Plutus.Code.Convertors
+namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
 {
     /// <summary>
     /// Reorders the contract entity collection by their dependency relations
@@ -22,13 +22,12 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors
         public IEnumerable<ContractEntity> Convert(IEnumerable<ContractEntity> source)
         {
             //Return topologic sort
-            return Sort(source, e => e.ReferenceProperties
-                .Aggregate(new List<ContractEntity>(), (acc, item) =>
-                {
-                    acc.Append(item.Entity);
-                    return acc;
-                }))
-                .Reverse();
+            return Sort(source, e =>
+            {
+                var dependencyDictionary = new Dictionary<string, ContractEntity>();
+                e.Properties.ToList().ForEach(p => p.CollectDependencies(ref dependencyDictionary));
+                return dependencyDictionary.Values;
+            });
         }
 
 

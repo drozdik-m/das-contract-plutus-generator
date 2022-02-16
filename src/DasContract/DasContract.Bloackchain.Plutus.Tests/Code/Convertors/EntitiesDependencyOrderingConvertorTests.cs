@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DasContract.Blockchain.Plutus.Code.Convertors;
+using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 using NUnit.Framework;
@@ -85,9 +86,20 @@ namespace DasContract.Bloackchain.Plutus.Tests.Code.Convertors
                 entity1
             };
 
+            /*
+                1----
+                |   |
+                2-  3
+                ||  |
+                4|  |
+                ||  |
+                5----
+                 
+             */
+
             var convertor = new EntitiesDependencyOrderingConvertor();
             var result = string.Join(", ", convertor.Convert(entities).Select(e => e.Id));
-            Assert.AreEqual("1, 3, 2, 4, 5", result);
+            Assert.AreEqual("1, 2, 4, 3, 5", result);
         }
     }
 }

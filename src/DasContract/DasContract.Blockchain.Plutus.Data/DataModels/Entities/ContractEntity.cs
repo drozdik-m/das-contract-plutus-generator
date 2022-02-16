@@ -6,6 +6,7 @@ using System.Linq;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
 
 namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
 {
@@ -33,11 +34,17 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         public ICollection<ReferenceContractProperty> ReferenceProperties { get; set; } = new List<ReferenceContractProperty>();
 
         /// <summary>
+        /// Collection of dictionary properties of this entity
+        /// </summary>
+        public ICollection<DictionaryContractProperty> DictionaryProperties { get; set; } = new List<DictionaryContractProperty>();
+
+        /// <summary>
         /// Collection of all properties of this entity
         /// </summary>
         public IEnumerable<ContractProperty> Properties => new List<ContractProperty>()
             .Concat(PrimitiveProperties)
             .Concat(ReferenceProperties)
+            .Concat(DictionaryProperties)
             .ToList();
 
         /// <summary>
@@ -74,6 +81,24 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         public void RemoveProperty(ReferenceContractProperty removeProperty)
         {
             ReferenceProperties.Remove(removeProperty);
+        }
+
+        /// <summary>
+        /// Adds a property from this entity
+        /// </summary>
+        /// <param name="newProperty"></param>
+        public void AddProperty(DictionaryContractProperty newProperty)
+        {
+            DictionaryProperties.Add(newProperty);
+        }
+
+        /// <summary>
+        /// Removes a property from this entity
+        /// </summary>
+        /// <param name="removeProperty"></param>
+        public void RemoveProperty(DictionaryContractProperty removeProperty)
+        {
+            DictionaryProperties.Remove(removeProperty);
         }
     }
 }

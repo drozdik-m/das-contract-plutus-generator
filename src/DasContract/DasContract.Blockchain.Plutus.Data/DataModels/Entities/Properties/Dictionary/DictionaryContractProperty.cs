@@ -16,6 +16,13 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dict
         /// <summary>
         /// Value data type of this property
         /// </summary>
-        public ContractProperty Property { get; set; }
+        public ContractProperty ValueType { get; set; }
+
+        /// <inheritdoc/>
+        public override void CollectDependencies(ref Dictionary<string, ContractEntity> dependencies)
+        {
+            base.CollectDependencies(ref dependencies);
+            ValueType.CollectDependencies(ref dependencies);
+        }
     }
 }

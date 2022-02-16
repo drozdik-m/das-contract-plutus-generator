@@ -5,6 +5,7 @@ using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Convertors;
+using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
@@ -330,34 +331,39 @@ namespace DasContract.Blockchain.Plutus
         private IEnumerable<PlutusRecordMember> EntityToRecordMembers(ContractEntity entity)
         {
             var result = new List<PlutusRecordMember>();    
-            var primPropertyToPlutusConv = new PrimitivePropertyTypeToPlutusConvertor();
 
+            //Primitive properties
             foreach(var property in entity.PrimitiveProperties)
             {
-                var type = primPropertyToPlutusConv.Convert(property.Type);
-                INamable cardinalizedType = new TypeToCardinalizedType(property.Cardinality)
-                    .Convert(type);
-                INamable mandatorizedType = new TypeToMaybeType(property.IsMandatory)
-                    .Convert(cardinalizedType);
-
                 result.Add(new PlutusRecordMember(
-                    property.Name, 
-                    mandatorizedType));
+                    property.Name,
+                    new PrimitivePropertyToTypeConvertor(
+                            new PrimitivePropertyTypeToPlutusConvertor()
+                        ).Convert(property)));
             }
 
+            //Reference properties
             foreach (var property in entity.ReferenceProperties)
             {
-                var type = PlutusFutureDataType.Type(property.Entity.Id);
-                INamable cardinalizedType = new TypeToCardinalizedType(property.Cardinality)
-                    .Convert(type);
-                INamable mandatorizedType = new TypeToMaybeType(property.IsMandatory)
-                    .Convert(cardinalizedType);
+                result.Add(new PlutusRecordMember(
+                    property.Name,
+                    new ReferencePropertyToTypeConvertor().Convert(property)));
+            }
+
+            //Dictionary properties
+            foreach (var property in entity.DictionaryProperties)
+            {
+                var primitiveConv = new PrimitivePropertyTypeToPlutusConvertor();
 
                 result.Add(new PlutusRecordMember(
                     property.Name,
-                    mandatorizedType));
+                    new DictionaryPropertyToTypeConvertor(
+                            primitiveConv,
+                            new PrimitivePropertyToTypeConvertor(primitiveConv),
+                            new ReferencePropertyToTypeConvertor()
+                        ).Convert(property)));
             }
-            
+
             return result;
         }
     }

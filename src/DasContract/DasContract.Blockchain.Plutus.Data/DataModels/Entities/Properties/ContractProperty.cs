@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 
@@ -21,5 +22,14 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties
         /// True if this property is mandatory, else false
         /// </summary>
         public bool IsMandatory { get; set; } = false;
+
+        /// <summary>
+        /// Collects entity dependencies of this property
+        /// </summary>
+        /// <param name="dependencies">The list of dependencies</param>
+        public virtual void CollectDependencies(ref Dictionary<string, ContractEntity> dependencies)
+        {
+            
+        }
     }
 }
