@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Functions
 {
     public class PlutusFunctionSignatureTests
     {
-        class TestType: INamable
+        class TestType : INamable
         {
             public TestType(string name)
             {

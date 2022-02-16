@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Utils
 {
     public class PlutusRawLineTests
     {
@@ -18,8 +18,8 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusRawLineIndent()
         {
             var line = new PlutusRawLine(2, "stuff");
-            Assert.AreEqual(PlutusLine.IndentString + 
-                PlutusLine.IndentString + 
+            Assert.AreEqual(PlutusLine.IndentString +
+                PlutusLine.IndentString +
                 "stuff", line.InString());
         }
     }

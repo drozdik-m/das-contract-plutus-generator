@@ -29,7 +29,6 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             var result = new ContractEntity
             {
                 Id = source.Id,
-                Name = source.Name,
                 IsRoot = source.IsRootEntity
             };
 

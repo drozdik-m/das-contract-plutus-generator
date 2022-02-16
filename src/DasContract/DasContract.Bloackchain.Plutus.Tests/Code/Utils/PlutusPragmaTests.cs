@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Utils
 {
     public class PlutusPragmaTests
     {
@@ -18,7 +18,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusPragmaIndent()
         {
             var line = new PlutusPragma(2, "pragma");
-            Assert.AreEqual(PlutusLine.IndentString + 
+            Assert.AreEqual(PlutusLine.IndentString +
                 PlutusLine.IndentString +
                 "{-# pragma #-}", line.InString());
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Code.Convertors;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
@@ -246,11 +247,36 @@ namespace DasContract.Blockchain.Plutus
             dataModels = dataModels
                     .Append(new PlutusSubsectionComment(0, "Datum"));
 
-           
+            //Other models
+            foreach(var entity in new EntitiesDependencyOrderingConvertor()
+                .Convert(contract.DataModel.NonRootEntities))
+            {
+                var entityRecord = new PlutusRecord(entity.Id,
+                    EntityToRecordMembers(entity)
+                , new List<string>()
+                {
+                    "Show",
+                    "Generic",
+                    "FromJSON",
+                    "ToJSON"
+                });
+                dataModels = dataModels
+                    .Append(entityRecord)
+                    .Append(new PlutusMakeLift(entity))
+                    .Append(new PlutusUnstableMakeIsData(entity))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusEq(entityRecord))
+                    .Append(PlutusLine.Empty);
+            }
+
+            //Root
             var datum = new PlutusRecord("ContractDatum",
-                    contract.DataModel.RootEntity.PrimitiveProperties.Select(e => 
-                            new PlutusRecordMember(e.Name, primPropertyToPlutusConv.Convert(e.Type))
-                        )
+                    EntityToRecordMembers(contract.DataModel.RootEntity)
+                        .Concat(new PlutusRecordMember[]
+                        {
+                            new PlutusRecordMember("contractState", contractState),
+                            new PlutusRecordMember("stateStack", PlutusList.Type(contractState)),
+                        })
                 , new List<string>()
                 {
                     "Show",
@@ -266,6 +292,10 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusEq(datum))
                 .Append(PlutusLine.Empty)
                 .Append(PlutusLine.Empty);
+
+            
+
+
 
             //Result
             return pragmas
@@ -299,26 +329,36 @@ namespace DasContract.Blockchain.Plutus
 
         private IEnumerable<PlutusRecordMember> EntityToRecordMembers(ContractEntity entity)
         {
+            var result = new List<PlutusRecordMember>();    
             var primPropertyToPlutusConv = new PrimitivePropertyTypeToPlutusConvertor();
 
             foreach(var property in entity.PrimitiveProperties)
             {
                 var type = primPropertyToPlutusConv.Convert(property.Type);
-                
-                INamable cardinalizedType;
-                if (property.Cardinality == ContractPropertyCardinality.Single)
-                    cardinalizedType = type;
-                else if (property.Cardinality == ContractPropertyCardinality.Collection)
-                    cardinalizedType = PlutusList.Type(type);
-                else
-                    throw new Exception("Unknown cardinality");
-                
+                INamable cardinalizedType = new TypeToCardinalizedType(property.Cardinality)
+                    .Convert(type);
+                INamable mandatorizedType = new TypeToMaybeType(property.IsMandatory)
+                    .Convert(cardinalizedType);
+
+                result.Add(new PlutusRecordMember(
+                    property.Name, 
+                    mandatorizedType));
             }
 
-            entity.PrimitiveProperties.Select(e => new PlutusRecordMember(
-                e.Name, 
-                e.
-                ))
+            foreach (var property in entity.ReferenceProperties)
+            {
+                var type = PlutusFutureDataType.Type(property.Entity.Id);
+                INamable cardinalizedType = new TypeToCardinalizedType(property.Cardinality)
+                    .Convert(type);
+                INamable mandatorizedType = new TypeToMaybeType(property.IsMandatory)
+                    .Convert(cardinalizedType);
+
+                result.Add(new PlutusRecordMember(
+                    property.Name,
+                    mandatorizedType));
+            }
+            
+            return result;
         }
     }
 }

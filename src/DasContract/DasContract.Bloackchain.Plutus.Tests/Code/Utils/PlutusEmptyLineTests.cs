@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Utils
 {
     public class PlutusEmptyLineTests
     {

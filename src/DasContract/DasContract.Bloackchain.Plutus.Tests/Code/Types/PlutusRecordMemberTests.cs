@@ -2,9 +2,10 @@
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Types
 {
     public class PlutusRecordMemberTests
     {
@@ -23,7 +24,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusRecordMember()
         {
             var member = new PlutusRecordMember("a", new TestType("BuiltinByteString"));
-            Assert.AreEqual(PlutusLine.IndentString + 
+            Assert.AreEqual(PlutusLine.IndentString +
                 "a :: BuiltinByteString,", member.InString());
         }
 

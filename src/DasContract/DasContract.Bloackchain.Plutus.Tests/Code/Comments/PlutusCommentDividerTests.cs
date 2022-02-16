@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Comments
 {
     public class PlutusCommentDividerTests
     {
@@ -13,7 +13,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusCommentDivider()
         {
             var line = new PlutusCommentDivider(0);
-            Assert.AreEqual(DIVIDER, 
+            Assert.AreEqual(DIVIDER,
                 line.InString());
         }
 
@@ -21,7 +21,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusCommentDividerIndent()
         {
             var line = new PlutusCommentDivider(2);
-            Assert.AreEqual(PlutusLine.IndentString + 
+            Assert.AreEqual(PlutusLine.IndentString +
                 PlutusLine.IndentString +
                 DIVIDER, line.InString());
         }

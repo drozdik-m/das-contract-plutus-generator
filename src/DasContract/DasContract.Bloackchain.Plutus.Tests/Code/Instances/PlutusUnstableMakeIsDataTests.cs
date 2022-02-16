@@ -1,8 +1,9 @@
 ﻿using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Instances
 {
     public class PlutusUnstableMakeIsDataTests
     {

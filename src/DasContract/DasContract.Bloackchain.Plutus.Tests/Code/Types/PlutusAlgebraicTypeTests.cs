@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Types
 {
     public class PlutusAlgebraicTypeTests
     {
@@ -44,7 +45,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
                 new PlutusAlgebraicTypeConstructor("B", new List<INamable>()),
             }, new List<string>
             {
-                "Show", 
+                "Show",
                 "Generic"
             });
 
@@ -60,8 +61,8 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             try
             {
-                var record = new PlutusAlgebraicType("Record", 
-                    new List<PlutusAlgebraicTypeConstructor>(), 
+                var record = new PlutusAlgebraicType("Record",
+                    new List<PlutusAlgebraicTypeConstructor>(),
                     new List<string>());
 
                 Assert.Fail();

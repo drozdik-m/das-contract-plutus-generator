@@ -25,6 +25,12 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels
             .Single();
 
         /// <summary>
+        /// Returns all entities except the root one
+        /// </summary>
+        public IEnumerable<ContractEntity> NonRootEntities => Entities
+            .Where(e => !e.IsRoot);
+
+        /// <summary>
         /// Adds a new entity to this data model
         /// </summary>
         /// <param name="newEntity"></param>

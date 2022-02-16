@@ -12,20 +12,18 @@ namespace DasContract.Blockchain.Plutus.Code.Types.Premade
     {
         
 
-        public PlutusMaybe(INamable? innerType)
+        public PlutusMaybe(INamable innerType)
         {
             InnerType = innerType;
         }
 
-        public INamable? InnerType { get; }
+        public INamable InnerType { get; }
 
         private string InnerTypeString => InnerType.Name.Contains(" ")
             ? $"({InnerType.Name})"
             : InnerType.Name;
 
-        public override string Name => InnerType is null 
-            ? "Nothing" 
-            : $"Just {InnerTypeString}";
+        public override string Name => $"Maybe {InnerTypeString}";
 
         public static PlutusMaybe Type(INamable innerType) => new PlutusMaybe(innerType);
     }

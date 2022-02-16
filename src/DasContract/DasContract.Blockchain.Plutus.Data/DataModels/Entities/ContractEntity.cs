@@ -15,7 +15,7 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <inheritdoc/>
-        public string Name { get; set; } = string.Empty;
+        public string Name => Id;
 
         /// <summary>
         /// True if this entity is the root entity, else false

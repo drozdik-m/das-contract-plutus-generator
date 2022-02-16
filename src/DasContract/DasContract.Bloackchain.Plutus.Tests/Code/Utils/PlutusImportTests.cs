@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Utils
 {
     public class PlutusImportTests
     {
@@ -18,8 +18,8 @@ namespace DasContract.Bloackchain.Plutus.Tests
         public void PlutusImportIndent()
         {
             var line = new PlutusImport(2, "stuff");
-            Assert.AreEqual(PlutusLine.IndentString + 
-                PlutusLine.IndentString + 
+            Assert.AreEqual(PlutusLine.IndentString +
+                PlutusLine.IndentString +
                 "import stuff", line.InString());
         }
     }

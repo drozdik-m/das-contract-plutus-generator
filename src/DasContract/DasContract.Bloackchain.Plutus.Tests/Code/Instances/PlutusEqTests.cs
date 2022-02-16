@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
+using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Instances
 {
     public class PlutusEqTests
     {
@@ -52,7 +53,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
         {
             var record = new PlutusRecord("Record", new List<PlutusRecordMember>()
             {
-                
+
             }, new List<string>());
 
             Assert.AreEqual("instance Eq Record where" + PlutusCode.NewLineString +
@@ -80,7 +81,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
                 new PlutusEq(type).InString());
         }
 
-        
+
 
     }
 }

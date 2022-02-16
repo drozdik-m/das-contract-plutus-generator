@@ -2,7 +2,7 @@
 using DasContract.Blockchain.Plutus.Code.Comments;
 using NUnit.Framework;
 
-namespace DasContract.Bloackchain.Plutus.Tests
+namespace DasContract.Bloackchain.Plutus.Tests.Code.Comments
 {
     public class PlutusSectionCommentTests
     {
@@ -15,7 +15,7 @@ namespace DasContract.Bloackchain.Plutus.Tests
             var code = new PlutusSectionComment(0, "Hello there");
             Assert.AreEqual(DIVIDER + PlutusCode.NewLineString +
                 "-- Hello there -------------------------------------" + PlutusCode.NewLineString +
-                DIVIDER + PlutusCode.NewLineString, 
+                DIVIDER + PlutusCode.NewLineString,
                 code.InString());
         }
 

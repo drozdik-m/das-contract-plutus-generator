@@ -9,6 +9,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 
 var mainEnd = new ContractEndEvent()
 {
@@ -95,6 +96,23 @@ var processes = new ContractProcesses()
     },
 };
 
+var contractLogEntity = new ContractEntity()
+{
+    IsRoot = false,
+    Id = "LogEntityId",
+    PrimitiveProperties = new PrimitiveContractProperty[]
+                {
+                    new PrimitiveContractProperty()
+                    {
+                        Id = "logMessageId",
+                        Name = "logMessage",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        Type = PrimitiveContractPropertyType.Integer
+                    },
+                }
+};
+
 var contract = new PlutusContract()
 {
     Id = "contractId",
@@ -104,11 +122,11 @@ var contract = new PlutusContract()
     {
         Entities = new ContractEntity[]
         {
+            contractLogEntity,
             new ContractEntity()
             {
                 IsRoot = true,
                 Id = "RootEntityId",
-                Name = "RootEntity",
                 PrimitiveProperties = new PrimitiveContractProperty[]
                 {
                     new PrimitiveContractProperty()
@@ -142,8 +160,50 @@ var contract = new PlutusContract()
                         Cardinality = ContractPropertyCardinality.Collection,
                         IsMandatory = false,
                         Type = PrimitiveContractPropertyType.Bool
+                    }
+                },
+                ReferenceProperties = new ReferenceContractProperty[]
+                {
+                    new ReferenceContractProperty()
+                    {
+                        Id = "logId",
+                        Name = "log",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        Entity = contractLogEntity,
+                        EntityId = contractLogEntity.Id
                     },
+                    new ReferenceContractProperty()
+                    {
+                        Id = "optionalLogId",
+                        Name = "optionalLog",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = false,
+                        Entity = contractLogEntity,
+                        EntityId = contractLogEntity.Id
+                    },
+
+                    new ReferenceContractProperty()
+                    {
+                        Id = "collectionLogId",
+                        Name = "collectionLog",
+                        Cardinality = ContractPropertyCardinality.Collection,
+                        IsMandatory = true,
+                        Entity = contractLogEntity,
+                        EntityId = contractLogEntity.Id
+                    },
+                    new ReferenceContractProperty()
+                    {
+                        Id = "optionalCollectionLogId",
+                        Name = "optionalCollectionLog",
+                        Cardinality = ContractPropertyCardinality.Collection,
+                        IsMandatory = false,
+                        Entity = contractLogEntity,
+                        EntityId = contractLogEntity.Id
+                    },
+
                 }
+
             }
         }
     }
