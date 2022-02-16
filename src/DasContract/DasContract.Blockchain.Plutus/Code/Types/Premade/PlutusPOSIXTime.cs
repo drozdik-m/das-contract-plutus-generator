@@ -8,10 +8,10 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Code.Types.Premade
 {
-    public class PlutusInteger : PlutusPremadeType
+    public class PlutusPOSIXTime : PlutusPremadeType
     {
-        public override string Name { get; } = "Integer";
+        public override string Name { get; } = "POSIXTime";
 
-        public static PlutusInteger Type { get; } = new PlutusInteger();
+        public static PlutusPOSIXTime Type { get; } = new PlutusPOSIXTime();
     }
 }

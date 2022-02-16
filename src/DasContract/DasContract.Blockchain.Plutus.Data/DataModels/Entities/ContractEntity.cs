@@ -25,12 +25,12 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         /// <summary>
         /// Collection of primitive properties of this entity
         /// </summary>
-        public ICollection<PrimitiveContractProperty> PrimitiveProperties { get; } = new List<PrimitiveContractProperty>();
+        public ICollection<PrimitiveContractProperty> PrimitiveProperties { get; set; } = new List<PrimitiveContractProperty>();
 
         /// <summary>
         /// Collection of reference properties of this entity
         /// </summary>
-        public ICollection<ReferenceContractProperty> ReferenceProperties { get; } = new List<ReferenceContractProperty>();
+        public ICollection<ReferenceContractProperty> ReferenceProperties { get; set; } = new List<ReferenceContractProperty>();
 
         /// <summary>
         /// Collection of all properties of this entity

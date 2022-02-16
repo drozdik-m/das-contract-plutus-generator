@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using DasContract.Abstraction.Data;
+using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
@@ -14,7 +15,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             return source switch
             {
                 PropertyDataType.Int => PrimitiveContractPropertyType.Integer,
-                PropertyDataType.Uint => PrimitiveContractPropertyType.UnsignedInteger,
+                PropertyDataType.Uint => PrimitiveContractPropertyType.Integer,
                 PropertyDataType.Bool => PrimitiveContractPropertyType.Bool,
                 PropertyDataType.String => PrimitiveContractPropertyType.ByteString,
                 PropertyDataType.DateTime => PrimitiveContractPropertyType.POSIXTime,

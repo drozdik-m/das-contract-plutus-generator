@@ -6,10 +6,15 @@ using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
+using DasContract.Blockchain.Plutus.Code.Types.Temporary;
 using DasContract.Blockchain.Plutus.Data;
+using DasContract.Blockchain.Plutus.Data.DataModels;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
+using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus
 {
@@ -182,7 +187,6 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             // -- Phase ------------------------------------------
-
             dataModels = dataModels
                     .Append(new PlutusSubsectionComment(0, "Phase"));
 
@@ -238,11 +242,38 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty)
                 .Append(PlutusLine.Empty);
 
+            // -- Datum ------------------------------------------
+            dataModels = dataModels
+                    .Append(new PlutusSubsectionComment(0, "Datum"));
+
+           
+            var datum = new PlutusRecord("ContractDatum",
+                    contract.DataModel.RootEntity.PrimitiveProperties.Select(e => 
+                            new PlutusRecordMember(e.Name, primPropertyToPlutusConv.Convert(e.Type))
+                        )
+                , new List<string>()
+                {
+                    "Show",
+                    "Generic",
+                    "FromJSON",
+                    "ToJSON"
+                });
+            dataModels = dataModels
+                .Append(datum)
+                .Append(new PlutusMakeLift(datum))
+                .Append(new PlutusUnstableMakeIsData(datum))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(datum))
+                .Append(PlutusLine.Empty)
+                .Append(PlutusLine.Empty);
+
             //Result
             return pragmas
                 .Append(module)
                 .Append(imports)
                 .Append(dataModels);
+
+            
         }
 
         /// <summary>
@@ -264,6 +295,30 @@ namespace DasContract.Blockchain.Plutus
             }
 
             return new PlutusAlgebraicTypeConstructor(element.Id, types);
+        }
+
+        private IEnumerable<PlutusRecordMember> EntityToRecordMembers(ContractEntity entity)
+        {
+            var primPropertyToPlutusConv = new PrimitivePropertyTypeToPlutusConvertor();
+
+            foreach(var property in entity.PrimitiveProperties)
+            {
+                var type = primPropertyToPlutusConv.Convert(property.Type);
+                
+                INamable cardinalizedType;
+                if (property.Cardinality == ContractPropertyCardinality.Single)
+                    cardinalizedType = type;
+                else if (property.Cardinality == ContractPropertyCardinality.Collection)
+                    cardinalizedType = PlutusList.Type(type);
+                else
+                    throw new Exception("Unknown cardinality");
+                
+            }
+
+            entity.PrimitiveProperties.Select(e => new PlutusRecordMember(
+                e.Name, 
+                e.
+                ))
         }
     }
 }

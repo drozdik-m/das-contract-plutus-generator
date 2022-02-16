@@ -7,15 +7,15 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Data.DataModels
 {
-    public class ContractDataModel : IIdentifiable
+    public class ContractDataModel //: IIdentifiable
     {
         /// <inheritdoc/>
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        //public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Collection of entities contained in this model
         /// </summary>
-        public ICollection<ContractEntity> Entities { get; } = new List<ContractEntity>();
+        public ICollection<ContractEntity> Entities { get; set; } = new List<ContractEntity>();
 
         /// <summary>
         /// Returns the root entity of this data model

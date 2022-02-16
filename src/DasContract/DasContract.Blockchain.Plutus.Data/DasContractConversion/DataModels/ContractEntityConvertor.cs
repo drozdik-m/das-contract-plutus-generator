@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using DasContract.Abstraction.Data;
+using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;

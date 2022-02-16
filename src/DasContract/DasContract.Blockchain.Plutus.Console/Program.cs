@@ -1,5 +1,9 @@
 ﻿using DasContract.Blockchain.Plutus;
 using DasContract.Blockchain.Plutus.Data;
+using DasContract.Blockchain.Plutus.Data.DataModels;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
@@ -88,7 +92,7 @@ var processes = new ContractProcesses()
     {
         mainProcess,
         subProcess,
-    }
+    },
 };
 
 var contract = new PlutusContract()
@@ -96,6 +100,53 @@ var contract = new PlutusContract()
     Id = "contractId",
     Name = "NumberContract",
     Processes = processes,
+    DataModel = new ContractDataModel()
+    {
+        Entities = new ContractEntity[]
+        {
+            new ContractEntity()
+            {
+                IsRoot = true,
+                Id = "RootEntityId",
+                Name = "RootEntity",
+                PrimitiveProperties = new PrimitiveContractProperty[]
+                {
+                    new PrimitiveContractProperty()
+                    {
+                        Id = "interestingNumberId",
+                        Name = "interestingNumber",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        Type = PrimitiveContractPropertyType.Integer
+                    },
+                    new PrimitiveContractProperty()
+                    {
+                        Id = "setNumberTimeoutId",
+                        Name = "setNumberTimeout",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = true,
+                        Type = PrimitiveContractPropertyType.Integer
+                    },
+                    new PrimitiveContractProperty()
+                    {
+                        Id = "optinalWalletId",
+                        Name = "optinalWallet",
+                        Cardinality = ContractPropertyCardinality.Single,
+                        IsMandatory = false,
+                        Type = PrimitiveContractPropertyType.Address
+                    },
+                    new PrimitiveContractProperty()
+                    {
+                        Id = "optinalBooleansId",
+                        Name = "optinalBooleans",
+                        Cardinality = ContractPropertyCardinality.Collection,
+                        IsMandatory = false,
+                        Type = PrimitiveContractPropertyType.Bool
+                    },
+                }
+            }
+        }
+    }
 };
 
 Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(contract));

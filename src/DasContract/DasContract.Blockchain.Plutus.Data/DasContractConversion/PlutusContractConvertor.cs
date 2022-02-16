@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DasContract.Abstraction;
 using DasContract.Abstraction.Data;
+using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
