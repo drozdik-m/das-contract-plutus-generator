@@ -349,13 +349,16 @@ namespace DasContract.Blockchain.Plutus
                 }))
                 .Append(PlutusLine.Empty);
 
+            // -- User forms -------------------------------------
+            dataModels = dataModels
+                    .Append(new PlutusSubsectionComment(0, "User forms"));
+
             //Result
             return pragmas
                 .Append(module)
                 .Append(imports)
                 .Append(dataModels);
 
-            
         }
 
         /// <summary>
