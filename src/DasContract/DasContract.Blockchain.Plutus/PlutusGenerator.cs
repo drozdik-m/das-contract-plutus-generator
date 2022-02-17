@@ -343,7 +343,7 @@ namespace DasContract.Blockchain.Plutus
             foreach(var userActivity in userActivities)
             {
                 var form = userActivity.Form;
-                var formName = userActivity.Name + "Form";
+                var formName = userActivity.FormName;
 
                 var convertor = new PrimitivePropertyToTypeConvertor(
                     new PrimitivePropertyTypeToPlutusConvertor());
