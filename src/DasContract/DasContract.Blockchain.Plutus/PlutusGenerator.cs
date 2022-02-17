@@ -274,7 +274,7 @@ namespace DasContract.Blockchain.Plutus
             }
 
             //Root
-            var datum = new PlutusRecord("ContractDatum",
+            var contractDatum = new PlutusRecord("ContractDatum",
                     EntityToRecordMembers(contract.DataModel.RootEntity)
                         .Concat(new PlutusRecordMember[]
                         {
@@ -289,24 +289,64 @@ namespace DasContract.Blockchain.Plutus
                     "ToJSON"
                 });
             dataModels = dataModels
-                .Append(datum)
-                .Append(new PlutusMakeLift(datum))
-                .Append(new PlutusUnstableMakeIsData(datum))
+                .Append(contractDatum)
+                .Append(new PlutusMakeLift(contractDatum))
+                .Append(new PlutusUnstableMakeIsData(contractDatum))
                 .Append(PlutusLine.Empty)
-                .Append(new PlutusEq(datum))
+                .Append(new PlutusEq(contractDatum))
                 .Append(PlutusLine.Empty)
-                .Append(new PlutusDefault(datum))
+                .Append(new PlutusDefault(contractDatum))
                 .Append(PlutusLine.Empty)
                 .Append(PlutusLine.Empty);
 
             //Initial datum
             var initialDatumSig = new PlutusFunctionSignature(0, "initialDatum", new INamable[]
             {
-                datum
+                contractDatum
             });
             dataModels = dataModels
                 .Append(initialDatumSig)
                 .Append(new PlutusOnelineFunction(0, initialDatumSig, Array.Empty<string>(), "def"))
+                .Append(PlutusLine.Empty);
+
+            //Push state
+            var pushStateSig = new PlutusFunctionSignature(0, "pushState", new INamable[]
+            {
+                contractState,
+                contractDatum,
+                contractDatum
+            });
+            dataModels = dataModels
+                .Append(pushStateSig)
+                .Append(new PlutusFunction(0, pushStateSig, new string[]
+                { 
+                    "newState",
+                    "datum"
+                }, new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "datum {"),
+                        new PlutusRawLine(2, "stateStack = newState : stateStack datum"),
+                    new PlutusRawLine(1, "}"),
+                }))
+                .Append(PlutusLine.Empty);
+
+            //Pop state
+            var popStateSig = new PlutusFunctionSignature(0, "popState", new INamable[]
+            {
+                contractDatum,
+                PlutusTuple.Type(contractState, contractDatum),
+            });
+            dataModels = dataModels
+                .Append(popStateSig)
+                .Append(new PlutusFunction(0, popStateSig, new string[]
+                {
+                    "datum",
+                }, new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "(head $ stateStack datum, datum {"),
+                        new PlutusRawLine(2, "stateStack = tail $ stateStack datum"),
+                    new PlutusRawLine(1, "})"),
+                }))
                 .Append(PlutusLine.Empty);
 
             //Result
