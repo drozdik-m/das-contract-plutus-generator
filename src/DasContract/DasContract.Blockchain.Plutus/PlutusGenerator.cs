@@ -96,29 +96,6 @@ namespace DasContract.Blockchain.Plutus
             //----------------------------------------------------
             IPlutusCode dataModels = new PlutusSectionComment(0, "DATA MODELS");
 
-            // --- Timer event -----------------------------------
-            /*dataModels = dataModels
-                .Append(PlutusLine.Empty)
-                .Append(new PlutusSubsectionComment(0, "Timer event"));
-            var timerEventData = new PlutusAlgebraicType("TimerEvent", new List<PlutusAlgebraicTypeConstructor>()
-            {
-                new PlutusAlgebraicTypeConstructor("InTime", new List<INamable>()),
-                new PlutusAlgebraicTypeConstructor("TimedOut", new List<INamable>())
-            }, new List<string>()
-            {
-                "Show",
-                "Generic",
-                "FromJSON",
-                "ToJSON"
-            });
-            dataModels = dataModels
-                .Append(timerEventData)
-                .Append(new PlutusMakeLift(timerEventData))
-                .Append(new PlutusUnstableMakeIsData(timerEventData))
-                .Append(PlutusLine.Empty)
-                .Append(new PlutusEq(timerEventData));*/
-
-
             // -- Sequential multi instance ----------------------
             dataModels = dataModels
                 .Append(PlutusLine.Empty)
@@ -352,6 +329,45 @@ namespace DasContract.Blockchain.Plutus
             // -- User forms -------------------------------------
             dataModels = dataModels
                     .Append(new PlutusSubsectionComment(0, "User forms"));
+
+            var userActivities = contract.Processes.Processes
+                .Aggregate(
+                    new List<ContractUserActivity>(),
+                    (acc, item) =>
+                    {
+                        return acc
+                            .Concat(item.ProcessElements.OfType<ContractUserActivity>())
+                            .ToList();
+                    });
+            
+            foreach(var userActivity in userActivities)
+            {
+                var form = userActivity.Form;
+                var formName = userActivity.Name + "Form";
+
+                var convertor = new PrimitivePropertyToTypeConvertor(
+                    new PrimitivePropertyTypeToPlutusConvertor());
+
+                var formRecord = new PlutusRecord(formName,
+                    form.Fields.Select(e => new PlutusRecordMember(
+                        e.Name, convertor.Convert(e)))
+                , new List<string>()
+                {
+                    "Show",
+                    "Generic",
+                    "FromJSON",
+                    "ToJSON"
+                });
+                dataModels = dataModels
+                    .Append(formRecord)
+                    .Append(new PlutusMakeLift(formRecord))
+                    .Append(new PlutusUnstableMakeIsData(formRecord))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusEq(formRecord))
+                    .Append(PlutusLine.Empty);
+            }
+
+
 
             //Result
             return pragmas

@@ -10,7 +10,7 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        public string Name { get; set; } = string.Empty;
+        public string Name => Id;
 
         public virtual void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {

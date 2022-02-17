@@ -11,7 +11,7 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <inheritdoc/>
-        public string Name { get; set; } = string.Empty;
+        public string Name => Id;
 
         /// <summary>
         /// Cardinality of this property - collection or single value?

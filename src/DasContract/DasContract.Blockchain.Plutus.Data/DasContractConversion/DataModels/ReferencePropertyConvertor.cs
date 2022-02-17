@@ -26,7 +26,6 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             var result = new ReferenceContractProperty
             {
                 Id = source.Id,
-                Name = source.Name,
                 IsMandatory = source.IsMandatory,
                 EntityId = source.ReferencedDataType
             };

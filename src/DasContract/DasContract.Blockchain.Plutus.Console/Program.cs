@@ -5,6 +5,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
+using DasContract.Blockchain.Plutus.Data.Forms;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
@@ -15,7 +16,6 @@ using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 var mainEnd = new ContractEndEvent()
 {
     Id = "ContractEnd",
-    Name = "Dieee",
 };
 var helloWorldScript1 = new ContractScriptActivity()
 {
@@ -23,7 +23,20 @@ var helloWorldScript1 = new ContractScriptActivity()
 };
 var helloWorldUser1 = new ContractUserActivity()
 {
-    Id = "HelloWorldUser1"
+    Id = "HelloWorldUser1",
+    Form = new ContractForm()
+    {
+        Fields = new PrimitiveContractProperty[]
+        {
+            new PrimitiveContractProperty()
+            {
+                Id = "someProperty123",
+                Cardinality = ContractPropertyCardinality.Single,
+                IsMandatory = true,
+                Type = PrimitiveContractPropertyType.Integer
+            },
+        }
+    }
 };
 var helloWorldScript2 = new ContractScriptActivity()
 {
@@ -32,7 +45,6 @@ var helloWorldScript2 = new ContractScriptActivity()
 var mainStart = new ContractStartEvent()
 {
     Id = "ContractStart",
-    Name = "StartPlsMate"
 };
 var mainProcess = new ContractProcess()
 {
@@ -49,12 +61,10 @@ helloWorldScript2.Outgoing = mainEnd;
 var subEnd = new ContractEndEvent()
 {
     Id = "ContractEndSub",
-    Name = "Dieee",
 };
 var subStart = new ContractStartEvent()
 {
     Id = "ContractStartSub",
-    Name = "StartPlsMate"
 };
 var subScript1 = new ContractScriptActivity()
 {
@@ -106,7 +116,6 @@ var contractLogEntity = new ContractEntity()
                     new PrimitiveContractProperty()
                     {
                         Id = "logMessageId",
-                        Name = "logMessage",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         Type = PrimitiveContractPropertyType.Integer
@@ -133,7 +142,6 @@ var contract = new PlutusContract()
                     new PrimitiveContractProperty()
                     {
                         Id = "interestingNumberId",
-                        Name = "interestingNumber",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         Type = PrimitiveContractPropertyType.Integer
@@ -141,7 +149,6 @@ var contract = new PlutusContract()
                     new PrimitiveContractProperty()
                     {
                         Id = "setNumberTimeoutId",
-                        Name = "setNumberTimeout",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         Type = PrimitiveContractPropertyType.Integer
@@ -149,7 +156,6 @@ var contract = new PlutusContract()
                     new PrimitiveContractProperty()
                     {
                         Id = "optinalWalletId",
-                        Name = "optinalWallet",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = false,
                         Type = PrimitiveContractPropertyType.Address
@@ -157,7 +163,6 @@ var contract = new PlutusContract()
                     new PrimitiveContractProperty()
                     {
                         Id = "optinalBooleansId",
-                        Name = "optinalBooleans",
                         Cardinality = ContractPropertyCardinality.Collection,
                         IsMandatory = false,
                         Type = PrimitiveContractPropertyType.Bool
@@ -168,7 +173,6 @@ var contract = new PlutusContract()
                     new ReferenceContractProperty()
                     {
                         Id = "logId",
-                        Name = "log",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         Entity = contractLogEntity,
@@ -177,7 +181,6 @@ var contract = new PlutusContract()
                     new ReferenceContractProperty()
                     {
                         Id = "optionalLogId",
-                        Name = "optionalLog",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = false,
                         Entity = contractLogEntity,
@@ -187,7 +190,6 @@ var contract = new PlutusContract()
                     new ReferenceContractProperty()
                     {
                         Id = "collectionLogId",
-                        Name = "collectionLog",
                         Cardinality = ContractPropertyCardinality.Collection,
                         IsMandatory = true,
                         Entity = contractLogEntity,
@@ -196,7 +198,6 @@ var contract = new PlutusContract()
                     new ReferenceContractProperty()
                     {
                         Id = "optionalCollectionLogId",
-                        Name = "optionalCollectionLog",
                         Cardinality = ContractPropertyCardinality.Collection,
                         IsMandatory = false,
                         Entity = contractLogEntity,
@@ -209,14 +210,12 @@ var contract = new PlutusContract()
                     new DictionaryContractProperty()
                     {
                         Id = "simpleDictionaryId",
-                        Name = "simpleDictionary",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         KeyType = PrimitiveContractPropertyType.Integer,
                         ValueType = new PrimitiveContractProperty()
                         {
                             Id = "DICT_ID",
-                            Name = "DICT",
                             Cardinality = ContractPropertyCardinality.Collection,
                             IsMandatory = true,
                             Type = PrimitiveContractPropertyType.Address
@@ -225,14 +224,12 @@ var contract = new PlutusContract()
                     new DictionaryContractProperty()
                     {
                         Id = "referenceDictionaryId",
-                        Name = "referenceDictionary",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         KeyType = PrimitiveContractPropertyType.Integer,
                         ValueType = new ReferenceContractProperty()
                         {
                             Id = "DICT_ID",
-                            Name = "DICT",
                             Cardinality = ContractPropertyCardinality.Single,
                             IsMandatory = true,
                             Entity = contractLogEntity,
@@ -242,7 +239,6 @@ var contract = new PlutusContract()
                     new DictionaryContractProperty()
                     {
                         Id = "crazyDictionaryId",
-                        Name = "crazyDictionary",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = true,
                         KeyType = PrimitiveContractPropertyType.Integer,

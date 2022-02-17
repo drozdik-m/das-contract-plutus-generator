@@ -33,7 +33,6 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             var myStart = new ContractStartEvent
             {
                 Id = start.Id,
-                Name = start.Name,
                 Outgoing = ConstructNext(source, start.Outgoing.Single())
             };
 
