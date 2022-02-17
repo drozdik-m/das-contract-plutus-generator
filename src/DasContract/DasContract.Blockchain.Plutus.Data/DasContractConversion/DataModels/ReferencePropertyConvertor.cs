@@ -40,7 +40,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
                 throw new Exception("Data type is dictionary, but the convertor converts only references");
 
             //Cardinality
-            result.Cardinality = cardinalityConvertor.Convert(source.PropertyType);
+            result.Cardinality = cardinalityConvertor.Convert(source.PropertyType.Value);
 
             return result;
         }
