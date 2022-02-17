@@ -19,6 +19,10 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dict
         public ContractProperty ValueType { get; set; }
 
         /// <inheritdoc/>
+        public override T Accept<T>(IContractPropertyVisitor<T> visitor)
+            => visitor.Visit(this);
+
+        /// <inheritdoc/>
         public override void CollectDependencies(ref Dictionary<string, ContractEntity> dependencies)
         {
             base.CollectDependencies(ref dependencies);

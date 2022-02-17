@@ -26,5 +26,10 @@ namespace DasContract.Editor.Entities.DataModels.Entities.Properties.Reference
             base.CollectDependencies(ref dependencies);
             dependencies.TryAdd(Entity.Id, Entity);
         }
+
+        /// <inheritdoc/>
+        public override T Accept<T>(IContractPropertyVisitor<T> visitor)
+            => visitor.Visit(this);
+
     }
 }

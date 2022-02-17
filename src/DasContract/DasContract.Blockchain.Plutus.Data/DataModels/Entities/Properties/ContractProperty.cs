@@ -31,5 +31,11 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties
         {
             
         }
+
+        /// <summary>
+        /// Accepts a property visitor
+        /// </summary>
+        /// <param name="visitor"></param>
+        public abstract T Accept<T>(IContractPropertyVisitor<T> visitor); 
     }
 }
