@@ -67,6 +67,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusImport(0, "Control.Monad hiding (fmap)"),
                 new PlutusImport(0, "Data.Aeson (ToJSON, FromJSON)"),
                 new PlutusImport(0, "Data.Map as Map"),
+                new PlutusImport(0, "Data.Default"),
                 new PlutusImport(0, "Data.Text (Text, pack)"),
                 new PlutusImport(0, "Data.Void (Void)"),
                 new PlutusImport(0, "Data.Monoid (Last (..))"),
@@ -267,6 +268,8 @@ namespace DasContract.Blockchain.Plutus
                     .Append(new PlutusUnstableMakeIsData(entity))
                     .Append(PlutusLine.Empty)
                     .Append(new PlutusEq(entityRecord))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusDefault(entityRecord))
                     .Append(PlutusLine.Empty);
             }
 
@@ -292,11 +295,19 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty)
                 .Append(new PlutusEq(datum))
                 .Append(PlutusLine.Empty)
+                .Append(new PlutusDefault(datum))
+                .Append(PlutusLine.Empty)
                 .Append(PlutusLine.Empty);
 
-            
-
-
+            //Initial datum
+            var initialDatumSig = new PlutusFunctionSignature(0, "initialDatum", new INamable[]
+            {
+                datum
+            });
+            dataModels = dataModels
+                .Append(initialDatumSig)
+                .Append(new PlutusOnelineFunction(0, initialDatumSig, Array.Empty<string>(), "def"))
+                .Append(PlutusLine.Empty);
 
             //Result
             return pragmas
