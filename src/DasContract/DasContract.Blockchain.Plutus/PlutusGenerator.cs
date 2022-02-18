@@ -445,7 +445,12 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             //Roles
-            //TODO
+            /*var rolesSig = new PlutusFunctionSignature(0, "roles", new INamable[] 
+            { 
+                PlutusList.Type(role)
+            });
+            var roles = new PlutusFunction()*/
+
 
 
             //Result
