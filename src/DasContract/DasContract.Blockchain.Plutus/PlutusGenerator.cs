@@ -394,6 +394,59 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusEq(contractRedeemer))
                 .Append(PlutusLine.Empty);
 
+            // -- Users ------------------------------------------
+            dataModels = dataModels
+                   .Append(new PlutusSubsectionComment(0, "Users"));
+
+            //Role
+            var role = new PlutusRecord("Role", new PlutusRecordMember[]
+            {
+                new PlutusRecordMember("rName", PlutusByteString.Type),
+                new PlutusRecordMember("rDescription", PlutusByteString.Type),
+            }, new string[]
+            {
+                "Show",
+                "Generic",
+                "FromJSON",
+                "ToJSON"
+            });
+            dataModels = dataModels
+                .Append(role)
+                .Append(new PlutusMakeLift(role))
+                .Append(new PlutusUnstableMakeIsData(role))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(role))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusDefault(role))
+                .Append(PlutusLine.Empty);
+
+            //User
+            var user = new PlutusRecord("User", new PlutusRecordMember[]
+            {
+                new PlutusRecordMember("uName", PlutusByteString.Type),
+                new PlutusRecordMember("uAddress", PlutusPubKeyHash.Type),
+                new PlutusRecordMember("uDescription", PlutusByteString.Type),
+                new PlutusRecordMember("uRoles", PlutusList.Type(role)),
+            }, new string[]
+            {
+                "Show",
+                "Generic",
+                "FromJSON",
+                "ToJSON"
+            });
+            dataModels = dataModels
+                .Append(user)
+                .Append(new PlutusMakeLift(user))
+                .Append(new PlutusUnstableMakeIsData(user))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(user))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusDefault(user))
+                .Append(PlutusLine.Empty);
+
+            //Roles
+            //TODO
+
 
             //Result
             return pragmas
