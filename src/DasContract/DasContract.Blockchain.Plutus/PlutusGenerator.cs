@@ -340,6 +340,7 @@ namespace DasContract.Blockchain.Plutus
                             .ToList();
                     });
             
+
             foreach(var userActivity in userActivities)
             {
                 var form = userActivity.Form;
@@ -367,6 +368,31 @@ namespace DasContract.Blockchain.Plutus
                     .Append(PlutusLine.Empty);
             }
 
+            // -- Redeemers --------------------------------------
+            dataModels = dataModels
+                   .Append(new PlutusSubsectionComment(0, "Redeemers"));
+
+            var contractRedeemer = new PlutusAlgebraicType("ContractRedeemer",
+                userActivities.Select(e => new PlutusAlgebraicTypeConstructor(e.Name + "Redeemer", new INamable[]
+                    {
+                        PlutusFutureDataType.Type(e.FormName)
+                    }))
+                .Append(new PlutusAlgebraicTypeConstructor("ContractFinishedRedeemer", Array.Empty<INamable>()))
+                .Append(new PlutusAlgebraicTypeConstructor("TimeoutRedeemer", Array.Empty<INamable>())),
+            new List<string>()
+            {
+                "Show",
+                "Generic",
+                "FromJSON",
+                "ToJSON"
+            });
+            dataModels = dataModels
+                .Append(contractRedeemer)
+                .Append(new PlutusMakeLift(contractRedeemer))
+                .Append(new PlutusUnstableMakeIsData(contractRedeemer))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusEq(contractRedeemer))
+                .Append(PlutusLine.Empty);
 
 
             //Result
