@@ -6,6 +6,8 @@ namespace DasContract.Blockchain.Plutus.Data.Users
 {
     public class ContractUsers
     {
-        public ICollection<ContractUser> Users { get; set; } = new List<ContractUser>();    
+        public ICollection<ContractUser> Users { get; set; } = new List<ContractUser>();
+
+        public ICollection<ContractRole> Roles { get; set; } = new List<ContractRole>();
     }
 }

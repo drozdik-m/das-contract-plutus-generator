@@ -445,12 +445,25 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             //Roles
-            /*var rolesSig = new PlutusFunctionSignature(0, "roles", new INamable[] 
+            var rolesSig = new PlutusFunctionSignature(0, "roles", new INamable[] 
             { 
                 PlutusList.Type(role)
             });
-            var roles = new PlutusFunction()*/
+            var roles = new PlutusFunction(0, rolesSig, Array.Empty<string>(), new IPlutusLine[]
+            {
+                new PlutusRawLine(1, "[")
+            }.Concat(
+                contract.Identities.Roles.Select((e, i) =>
+                        new PlutusRawLine(2, "Role { " + $"rName = \"{e.Name}\", rDescription = \"{e.Description}\"" + "}" +
+                        (i == contract.Identities.Roles.Count() - 1 ? "" : ",")))
+                )
+             .Append(new PlutusRawLine(1, "]")));
 
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {rolesSig.Name}"))
+                .Append(rolesSig)
+                .Append(roles)
+                .Append(PlutusLine.Empty);
 
 
             //Result

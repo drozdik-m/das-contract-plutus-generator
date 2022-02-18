@@ -11,6 +11,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Blockchain.Plutus.Data.Users;
 using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 
 var mainEnd = new ContractEndEvent()
@@ -122,6 +123,19 @@ var contractLogEntity = new ContractEntity()
                     },
                 }
 };
+
+var role1 = new ContractRole()
+{
+    Id = "Role1",
+    Description = "This is role 1 bruh"
+};
+
+var role2 = new ContractRole()
+{
+    Id = "Role2",
+    Description = "This is role 2 mate"
+};
+
 
 var contract = new PlutusContract()
 {
@@ -260,8 +274,39 @@ var contract = new PlutusContract()
 
             }
         }
+    },
+    Identities = new ContractUsers()
+    {
+        Roles = new ContractRole[]
+        {
+            role1,
+            role2,
+        },
+        Users = new ContractUser[]
+        {
+            new ContractUser
+            {
+                Id = "User1",
+                Description = "This is user 1",
+                Address = "00000000000000000000000000000000000000000000000000000001",
+                Roles = new List<ContractRole>() { role1 }
+            },
+            new ContractUser
+            {
+                Id = "User2",
+                Description = "This is user 2",
+                Address = "00000000000000000000000000000000000000000000000000000002",
+                Roles = new List<ContractRole>() { role1, role2 }
+            },
+            new ContractUser
+            {
+                Id = "User3",
+                Description = "This is user 3",
+                Address = "00000000000000000000000000000000000000000000000000000003",
+                Roles = new List<ContractRole>() { }
+            }
+        }
     }
 };
 
 Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(contract));
-
