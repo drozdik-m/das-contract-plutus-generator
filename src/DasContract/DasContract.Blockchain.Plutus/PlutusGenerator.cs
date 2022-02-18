@@ -471,7 +471,7 @@ namespace DasContract.Blockchain.Plutus
             var roleByNameSig = new PlutusFunctionSignature(0, "roleByName", new INamable[]
             {
                 PlutusByteString.Type,
-                PlutusList.Type(role)
+                role
             });
             var roleByName = new PlutusFunction(0, roleByNameSig, new string[]
             {
@@ -503,7 +503,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusRawLine(1, "[")
             }.Concat(
                 contract.Identities.Users.Select((e, i) =>
-                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\"," + 
+                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\", " + 
                         $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"roleByName \"{e.Name}\""))}]" + "}" +
                         (i == contract.Identities.Roles.Count() - 1 ? "" : ",")))
                 )
@@ -515,6 +515,30 @@ namespace DasContract.Blockchain.Plutus
                 .Append(users)
                 .Append(PlutusLine.Empty);
 
+            //User by name
+            var userByNameSig = new PlutusFunctionSignature(0, "userByName", new INamable[]
+            {
+                PlutusByteString.Type,
+                user
+            });
+            var userByName = new PlutusFunction(0, userByNameSig, new string[]
+            {
+                "userName"
+            }, Array.Empty<IPlutusLine>())
+                .Append(new PlutusLetIn(1, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "searchResult = find (\\x -> uName x == userName) users")
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "case searchResult of"),
+                    new PlutusRawLine(3, "Just a -> a"),
+                    new PlutusRawLine(3, "Nothing -> def"),
+            }));
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {userByNameSig.Name}"))
+                .Append(userByNameSig)
+                .Append(userByName)
+                .Append(PlutusLine.Empty);
 
 
             //Result
