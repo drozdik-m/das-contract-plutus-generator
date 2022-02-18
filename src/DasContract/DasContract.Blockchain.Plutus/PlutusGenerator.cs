@@ -6,6 +6,7 @@ using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Convertors;
 using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
+using DasContract.Blockchain.Plutus.Code.Keywords;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
@@ -464,6 +465,37 @@ namespace DasContract.Blockchain.Plutus
                 .Append(rolesSig)
                 .Append(roles)
                 .Append(PlutusLine.Empty);
+
+
+            //Role by name
+            var roleByNameSig = new PlutusFunctionSignature(0, "roleByName", new INamable[]
+            {
+                PlutusByteString.Type,
+                PlutusList.Type(role)
+            });
+            var roleByName = new PlutusFunction(0, roleByNameSig, new string[]
+            {
+                "roleName"
+            }, Array.Empty<IPlutusLine>())
+                .Append(new PlutusLetIn(1, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "searchResult = find (\\x -> rName x == roleName) roles")
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "case searchResult of"),
+                    new PlutusRawLine(3, "Just a -> a"),
+                    new PlutusRawLine(3, "Nothing -> def"),
+            }));
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {roleByNameSig.Name}"))
+                .Append(roleByNameSig)
+                .Append(roleByName)
+                .Append(PlutusLine.Empty);
+
+
+
+            //Users
+
 
 
             //Result
