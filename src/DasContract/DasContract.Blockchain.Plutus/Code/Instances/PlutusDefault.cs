@@ -17,10 +17,28 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             
         }
 
+        public PlutusDefault(PlutusAlgebraicType algType, PlutusAlgebraicTypeConstructor defaultCtor)
+            : base(GetLinesOfCode(algType, defaultCtor))
+        {
+
+        }
+
         static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusRecord record)
         {
             return GetDeclaration(record)
                 .Concat(GetDefaultLines(record));
+        }
+
+        static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusAlgebraicType algType, PlutusAlgebraicTypeConstructor defaultCtor)
+        {
+            return GetDeclaration(algType)
+                .Append(GetDefaultLine(algType, defaultCtor));
+        }
+
+        static IPlutusLine GetDefaultLine(PlutusAlgebraicType algType, PlutusAlgebraicTypeConstructor defaultCtor)
+        {
+            return new PlutusRawLine(1, $"def = {defaultCtor.Name} " +
+                $"{string.Join(" ", defaultCtor.Types.Select(e => GetDefValueFor(e)))}");
         }
 
         static IEnumerable<IPlutusLine> GetDefaultLines(PlutusRecord record)
@@ -39,28 +57,33 @@ namespace DasContract.Blockchain.Plutus.Code.Types
                 if (i == memberCount - 1)
                     lineEnding = "";
 
-                if (member.DataType.Name == PlutusInteger.Type.Name)
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = 0{lineEnding}"));
-                else if (member.DataType.Name == PlutusPubKeyHash.Type.Name)
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = \"00000000000000000000000000000000000000000000000000000000\"{lineEnding}"));
-                else if (member.DataType.Name == PlutusBool.Type.Name)
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = False{lineEnding}"));
-                else if (member.DataType.Name == PlutusByteString.Type.Name)
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = \"\"{lineEnding}"));
-                else if (member.DataType.Name == PlutusPOSIXTime.Type.Name)
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = 0{lineEnding}"));
-                else if (member.DataType.Name.StartsWith("[") && member.DataType.Name.EndsWith("]"))
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = []{lineEnding}"));
-                else if (member.DataType.Name.StartsWith("Maybe "))
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = Nothing{lineEnding}"));
-                else
-                    result.Add(new PlutusRawLine(2, $"{member.Name} = def{lineEnding}"));
+                result.Add(new PlutusRawLine(2, $"{member.Name} = {GetDefValueFor(member.DataType)}{lineEnding}"));
 
                 i++;
             }
 
             result.Add(new PlutusRawLine(1, "}"));
             return result;
+        }
+
+        static string GetDefValueFor(INamable type)
+        {
+            if (type.Name == PlutusInteger.Type.Name)
+                return "0";
+            else if (type.Name == PlutusPubKeyHash.Type.Name)
+                return "\"00000000000000000000000000000000000000000000000000000000\"";
+            else if (type.Name == PlutusBool.Type.Name)
+                return "False";
+            else if (type.Name == PlutusByteString.Type.Name)
+                return "\"\"";
+            else if (type.Name == PlutusPOSIXTime.Type.Name)
+                return "0";
+            else if (type.Name.StartsWith("[") && type.Name.EndsWith("]"))
+                return "[]";
+            else if (type.Name.StartsWith("Maybe "))
+                return "Nothing";
+            else
+                return "def";
         }
 
         static IEnumerable<IPlutusLine> GetDeclaration(INamable item)

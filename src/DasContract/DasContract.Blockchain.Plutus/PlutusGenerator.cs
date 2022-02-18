@@ -214,12 +214,17 @@ namespace DasContract.Blockchain.Plutus
                     "ToJSON"
                 });
 
+
             dataModels = dataModels
                 .Append(contractState)
                 .Append(new PlutusMakeLift(contractState))
                 .Append(new PlutusUnstableMakeIsData(contractState))
                 .Append(PlutusLine.Empty)
                 .Append(new PlutusEq(contractState))
+                .Append(PlutusLine.Empty)
+                .Append(new PlutusDefault(contractState, new PlutusAlgebraicTypeConstructor(
+                    contract.Processes.Main.StartEvent.Name,
+                    Array.Empty<INamable>())))
                 .Append(PlutusLine.Empty)
                 .Append(PlutusLine.Empty);
 
@@ -505,7 +510,7 @@ namespace DasContract.Blockchain.Plutus
                 contract.Identities.Users.Select((e, i) =>
                         new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\", " + 
                         $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"roleByName \"{e.Name}\""))}]" + "}" +
-                        (i == contract.Identities.Roles.Count() - 1 ? "" : ",")))
+                        (i == contract.Identities.Users.Count() - 1 ? "" : ",")))
                 )
              .Append(new PlutusRawLine(1, "]")));
 
