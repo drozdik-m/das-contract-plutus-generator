@@ -233,7 +233,7 @@ namespace DasContract.Blockchain.Plutus
                     .Append(new PlutusSubsectionComment(0, "Datum"));
 
             //Other models
-            foreach(var entity in new EntitiesDependencyOrderingConvertor()
+            foreach (var entity in new EntitiesDependencyOrderingConvertor()
                 .Convert(contract.DataModel.NonRootEntities))
             {
                 var entityRecord = new PlutusRecord(entity.Id,
@@ -302,7 +302,7 @@ namespace DasContract.Blockchain.Plutus
             dataModels = dataModels
                 .Append(pushStateSig)
                 .Append(new PlutusFunction(0, pushStateSig, new string[]
-                { 
+                {
                     "newState",
                     "datum"
                 }, new IPlutusLine[]
@@ -345,9 +345,9 @@ namespace DasContract.Blockchain.Plutus
                             .Concat(item.ProcessElements.OfType<ContractUserActivity>())
                             .ToList();
                     });
-            
 
-            foreach(var userActivity in userActivities)
+
+            foreach (var userActivity in userActivities)
             {
                 var form = userActivity.Form;
                 var formName = userActivity.FormName;
@@ -375,11 +375,12 @@ namespace DasContract.Blockchain.Plutus
             }
 
             // -- Redeemers --------------------------------------
+            const string redeemerPostfix = "Redeemer";
             dataModels = dataModels
                    .Append(new PlutusSubsectionComment(0, "Redeemers"));
 
             var contractRedeemer = new PlutusAlgebraicType("ContractRedeemer",
-                userActivities.Select(e => new PlutusAlgebraicTypeConstructor(e.Name + "Redeemer", new INamable[]
+                userActivities.Select(e => new PlutusAlgebraicTypeConstructor(e.Name + redeemerPostfix, new INamable[]
                     {
                         PlutusFutureDataType.Type(e.FormName)
                     }))
@@ -451,8 +452,8 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             //Roles
-            var rolesSig = new PlutusFunctionSignature(0, "roles", new INamable[] 
-            { 
+            var rolesSig = new PlutusFunctionSignature(0, "roles", new INamable[]
+            {
                 PlutusList.Type(role)
             });
             var roles = new PlutusFunction(0, rolesSig, Array.Empty<string>(), new IPlutusLine[]
@@ -508,7 +509,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusRawLine(1, "[")
             }.Concat(
                 contract.Identities.Users.Select((e, i) =>
-                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\", " + 
+                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\", " +
                         $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"roleByName \"{e.Name}\""))}]" + "}" +
                         (i == contract.Identities.Users.Count() - 1 ? "" : ",")))
                 )
@@ -586,9 +587,31 @@ namespace DasContract.Blockchain.Plutus
             onChain = onChain
                 .Append(new PlutusPragma(0, $"INLINABLE {lovelacesSig.Name}"))
                 .Append(lovelacesSig)
-                .Append(lovelaces);
+                .Append(lovelaces)
+                .Append(PlutusLine.Empty);
 
             // -- Form validations -------------------------------
+            var formValidationSig = new PlutusFunctionSignature(0, "userDefinedFormValidation", new INamable[]
+            {
+                contractRedeemer,
+                PlutusBool.Type,
+            });
+            onChain = onChain
+                .Append(formValidationSig)
+                .Append(PlutusLine.Empty);
+
+            foreach (var userActivity in userActivities)
+            {
+                var validationFunction = new PlutusFunction(0, formValidationSig, new string[]
+                {
+                    $"({userActivity.Name}{redeemerPostfix} form)"
+                }, Array.Empty<IPlutusLine>()); //TODO code lines
+            }
+
+            var defaultValidation = new PlutusOnelineFunction(0, formValidationSig, new string[] { "_" }, "False");
+            onChain = onChain
+                .Append(defaultValidation)
+                .Append(PlutusLine.Empty);
 
 
 
