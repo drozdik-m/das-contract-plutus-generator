@@ -593,7 +593,10 @@ namespace DasContract.Blockchain.Plutus
             // -- Form validations -------------------------------
             var formValidationSig = new PlutusFunctionSignature(0, "userDefinedFormValidation", new INamable[]
             {
+                contractParam,
+                contractDatum,
                 contractRedeemer,
+                PlutusValue.Type,
                 PlutusBool.Type,
             });
             onChain = onChain
@@ -602,18 +605,37 @@ namespace DasContract.Blockchain.Plutus
 
             foreach (var userActivity in userActivities)
             {
+                var validationLines = userActivity.FormValidationCodeLines;
+                if (validationLines.Count() == 0)
+                    validationLines = validationLines.Append("True");
+
                 var validationFunction = new PlutusFunction(0, formValidationSig, new string[]
                 {
-                    $"({userActivity.Name}{redeemerPostfix} form)"
-                }, Array.Empty<IPlutusLine>()); //TODO code lines
+                    "param",
+                    "datum",
+                    $"({userActivity.Name}{redeemerPostfix} form)",
+                    "val",
+                },
+                validationLines.Select(e => new PlutusRawLine(1, e)));
+
+                onChain = onChain
+                   .Append(validationFunction)
+                   .Append(PlutusLine.Empty);
             }
 
-            var defaultValidation = new PlutusOnelineFunction(0, formValidationSig, new string[] { "_" }, "False");
+            var defaultValidation = new PlutusOnelineFunction(0, formValidationSig, new string[] 
+            { 
+                "_",
+                "_",
+                "_",
+                "_",
+            }, "False");
             onChain = onChain
                 .Append(defaultValidation)
                 .Append(PlutusLine.Empty);
 
-
+            // -- Script transitions -----------------------------
+            var scriptTransitionSig = 
 
             //Result
             return pragmas

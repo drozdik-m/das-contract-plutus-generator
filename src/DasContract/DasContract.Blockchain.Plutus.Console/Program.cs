@@ -37,7 +37,10 @@ var helloWorldUser1 = new ContractUserActivity()
                 Type = PrimitiveContractPropertyType.Integer
             },
         }
-    }
+    },
+    Code = "this is some useless code" + Environment.NewLine +
+           "{-# FORM_VALIDATION #-}" + Environment.NewLine +
+           "fInterestingNumber form < 1000000"
 };
 var helloWorldScript2 = new ContractScriptActivity()
 {
@@ -135,7 +138,6 @@ var role2 = new ContractRole()
     Id = "Role2",
     Description = "This is role 2 mate"
 };
-
 
 var contract = new PlutusContract()
 {
