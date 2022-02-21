@@ -66,6 +66,8 @@ namespace DasContract.Blockchain.Plutus.Code
             return InString();
         }
 
+        public static PlutusCode Empty => new PlutusCode(Array.Empty<IPlutusLine>());
+
         public static string NewLineString = Environment.NewLine;
     }
 }

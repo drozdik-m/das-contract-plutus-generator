@@ -17,6 +17,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus
@@ -650,11 +651,23 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
 
-            //Start events
-            //TODO
+            //Script activities
+            var scriptActivities = contract.Processes.Processes
+                .Aggregate(
+                    new List<ContractScriptActivity>(),
+                    (acc, item) =>
+                    {
+                        return acc
+                            .Concat(item.ProcessElements.OfType<ContractScriptActivity>())
+                            .ToList();
+                    });
+            foreach(var scriptActivity in scriptActivities)
+            {
+                var transitionComment = new PlutusComment(0, $"{scriptActivity.} -> {}");
+                var transitionFunction = new PlutusFunction(0, scriptTransitionSig, );
+            }
 
-            //End events
-            //TODO
+
 
             var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
             onChain = onChain
@@ -667,6 +680,43 @@ namespace DasContract.Blockchain.Plutus
                 .Append(imports)
                 .Append(dataModels)
                 .Append(onChain);
+        }
+
+        private IPlutusCode GenerateScriptTransitions(
+            ContractProcessElement processElement, 
+            PlutusFunctionSignature scriptTransitionSignature,
+            ref HashSet<string> visitedActivities) 
+        {
+            //No double visits
+            if (visitedActivities.Contains(processElement.Id))
+                return PlutusCode.Empty;
+
+            //Mark this state as visited
+            visitedActivities.Add(processElement.Id);
+            IPlutusCode result = PlutusCode.Empty;
+
+            //This element is a merging gateway
+            if (processElement is ContractMergingExclusiveGateway mergingExclusiveGateway)
+            {
+                var target = mergingExclusiveGateway.Outgoing;
+
+                if (target is ContractMergingExclusiveGateway targetExclusiveGateway)
+                {
+                    result = result
+                        .Append(new PlutusComment(0, $"{processElement.Name} -> {target.Name}"))
+                        .Append(new PlutusFunction(0, scriptTransitionSignature, new string[]
+                        {
+                            "dat@ContractDatum{ contractState = " + processElement.Id + " }"
+                        }, new IPlutusLine[]
+                        {
+                            new PlutusRawLine(0, "doScriptTransition $ datum{ contractState = " + target.Id + " }")
+                        }))
+                        .Append(GenerateScriptTransitions(target, scriptTransitionSignature, ref visitedActivities));
+
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
