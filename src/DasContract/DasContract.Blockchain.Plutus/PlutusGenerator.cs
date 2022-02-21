@@ -546,12 +546,58 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
 
+            // -- Contract param ---------------------------------
+            dataModels = dataModels
+                   .Append(new PlutusSubsectionComment(0, "Contract param"));
+
+            var contractParam = new PlutusRecord("ContractParam", new PlutusRecordMember[]
+            {
+                new PlutusRecordMember("cpUsers", PlutusList.Type(user)),
+                new PlutusRecordMember("cpToken", PlutusThreadToken.Type),
+            }, new string[]
+            {
+                "Show",
+                "Generic",
+                "FromJSON",
+                "ToJSON"
+            });
+
+            dataModels = dataModels
+                .Append(contractParam)
+                .Append(new PlutusMakeLift(contractParam))
+                .Append(PlutusLine.Empty);
+
+
+            //----------------------------------------------------
+            //--                ON-CHAIN CODE                  ---
+            //----------------------------------------------------
+            IPlutusCode onChain = new PlutusSectionComment(0, "ON-CHAIN CODE")
+                .Append(PlutusLine.Empty);
+
+            //Lovelaces
+            var lovelacesSig = new PlutusFunctionSignature(0, "lovelaces", new INamable[]
+            {
+                PlutusValue.Type,
+                PlutusInteger.Type,
+            });
+            var lovelaces = new PlutusOnelineFunction(0, lovelacesSig, Array.Empty<string>(),
+                "Ada.getLovelace . Ada.fromValue");
+
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {lovelacesSig.Name}"))
+                .Append(lovelacesSig)
+                .Append(lovelaces);
+
+            // -- Form validations -------------------------------
+
+
+
             //Result
             return pragmas
                 .Append(module)
                 .Append(imports)
-                .Append(dataModels);
-
+                .Append(dataModels)
+                .Append(onChain);
         }
 
         /// <summary>
