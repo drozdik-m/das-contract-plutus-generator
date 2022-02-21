@@ -1,10 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
-    public class ContractScriptActivity : ContractActivity
+    public class ContractScriptActivity : ContractActivityWithCode
     {
-        public string Script { get; set; } = string.Empty;
+        public IEnumerable<string> TransitionCodeLines => ReadPragma(TransitionPragma);
+
+        protected override bool IsCodePragma(string code)
+        {
+            code = code.Trim().ToUpperInvariant();
+
+            return base.IsCodePragma(code) ||
+                code == TransitionPragma.ToUpperInvariant();
+        }
+
+
+        const string TransitionPragma = "{-# TRANSITION #-}";
+
     }
 }

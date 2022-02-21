@@ -6,64 +6,44 @@ using DasContract.Blockchain.Plutus.Data.Forms;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
-    public class ContractUserActivity : ContractActivity
+    public class ContractUserActivity : ContractActivityWithCode
     {
-        public string Code { get; set; } = string.Empty;
-
         public ContractForm Form { get; set; } = new ContractForm();
 
         public string FormName => Name + "Form";
 
 
-        public IEnumerable<string> FormValidationCodeLines => ReadPragma(formValidationPragma);
+        public IEnumerable<string> FormValidationCodeLines => ReadPragma(FormValidationPragma);
 
+        public IEnumerable<string> ExpectedValueCodeLines => ReadPragma(ExpectedValuePragma);
 
-        IEnumerable<string> ReadPragma(string pragma)
-        {
-            using var reader = new StringReader(Code);
-            bool readingPragma = false;
-            List<string> result = new List<string>();
+        public IEnumerable<string> NewValueCodeLines => ReadPragma(NewValuePragma);
 
-            for (string line = reader.ReadLine(); line != null; line = reader.ReadLine())
-            {
-                //Read the code
-                if (readingPragma)
-                {
-                    //Should stop reading the code
-                    if (IsUserActivityPragma(line))
-                        break;
+        public IEnumerable<string> ContrainsCodeLines => ReadPragma(ConstrainsPragma);
 
-                    result.Add(line);
-                }
+        public IEnumerable<string> TransitionCodeLines => ReadPragma(TransitionPragma);
 
-                //Looking for the pragma
-                else if (line.Trim().ToUpperInvariant() == pragma.Trim().ToUpperInvariant())
-                    readingPragma = true;
-            }
-
-            return result;
-        }
-
-        static bool IsUserActivityPragma(string code)
+        protected override bool IsCodePragma(string code)
         {
             code = code.Trim().ToUpperInvariant();
 
-            return
-                code == formValidationPragma.ToUpperInvariant() ||
-                code == expectedValuePragma.ToUpperInvariant() ||
-                code == newValuePragma.ToUpperInvariant() ||
-                code == constrainsPragma.ToUpperInvariant() ||
-                code == transitionPragma.ToUpperInvariant();
+            return base.IsCodePragma(code) ||
+                code == FormValidationPragma.ToUpperInvariant() ||
+                code == ExpectedValuePragma.ToUpperInvariant() ||
+                code == NewValuePragma.ToUpperInvariant() ||
+                code == ConstrainsPragma.ToUpperInvariant() ||
+                code == TransitionPragma.ToUpperInvariant();
         }
 
-        const string formValidationPragma = "{-# FORM_VALIDATION #-}";
 
-        const string expectedValuePragma = "{-# EXPECTED_VALUE #-}";
+        const string FormValidationPragma = "{-# FORM_VALIDATION #-}";
 
-        const string newValuePragma = "{-# NEW_VALUE #-}";
+        const string ExpectedValuePragma = "{-# EXPECTED_VALUE #-}";
 
-        const string constrainsPragma = "{-# CONSTRAINS #-}";
+        const string NewValuePragma = "{-# NEW_VALUE #-}";
 
-        const string transitionPragma = "{-# TRANSITION #-}";
+        const string ConstrainsPragma = "{-# CONSTRAINS #-}";
+
+        const string TransitionPragma = "{-# TRANSITION #-}";
     }
 }

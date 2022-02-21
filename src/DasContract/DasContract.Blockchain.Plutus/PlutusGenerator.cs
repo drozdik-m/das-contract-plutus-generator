@@ -591,6 +591,9 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             // -- Form validations -------------------------------
+            onChain = onChain
+                   .Append(new PlutusSubsectionComment(0, "Form validations"));
+
             var formValidationSig = new PlutusFunctionSignature(0, "userDefinedFormValidation", new INamable[]
             {
                 contractParam,
@@ -635,7 +638,28 @@ namespace DasContract.Blockchain.Plutus
                 .Append(PlutusLine.Empty);
 
             // -- Script transitions -----------------------------
-            var scriptTransitionSig = 
+            onChain = onChain
+                   .Append(new PlutusSubsectionComment(0, "Script transitions"));
+            var scriptTransitionSig = new PlutusFunctionSignature(0, "doScriptTransition", new INamable[]
+            {
+                contractDatum,
+                contractDatum
+            });
+            onChain = onChain
+                .Append(scriptTransitionSig)
+                .Append(PlutusLine.Empty);
+
+
+            //Start events
+            //TODO
+
+            //End events
+            //TODO
+
+            var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
+            onChain = onChain
+                .Append(identityTransition)
+                .Append(PlutusLine.Empty);
 
             //Result
             return pragmas
