@@ -8,6 +8,7 @@ using DasContract.Blockchain.Plutus.Code.Convertors;
 using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
 using DasContract.Blockchain.Plutus.Code.Keywords;
 using DasContract.Blockchain.Plutus.Code.Types;
+using DasContract.Blockchain.Plutus.Code.Types.Determined;
 using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
 using DasContract.Blockchain.Plutus.Data;
@@ -18,6 +19,7 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
+using DasContract.Blockchain.Plutus.Transitions.NoTx;
 using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus
@@ -258,7 +260,7 @@ namespace DasContract.Blockchain.Plutus
             }
 
             //Root
-            var contractDatum = new PlutusRecord("ContractDatum",
+            var contractDatum = new PlutusRecord(PlutusContractDatum.Type.Name,
                     EntityToRecordMembers(contract.DataModel.RootEntity)
                         .Concat(new PlutusRecordMember[]
                         {
@@ -641,11 +643,9 @@ namespace DasContract.Blockchain.Plutus
             // -- Script transitions -----------------------------
             onChain = onChain
                    .Append(new PlutusSubsectionComment(0, "Script transitions"));
-            var scriptTransitionSig = new PlutusFunctionSignature(0, "doScriptTransition", new INamable[]
-            {
-                contractDatum,
-                contractDatum
-            });
+
+            var scriptTransitionSig = NoTxTransitionVisitor.TransitionFunctionSignature;
+
             onChain = onChain
                 .Append(scriptTransitionSig)
                 .Append(PlutusLine.Empty);
@@ -663,8 +663,8 @@ namespace DasContract.Blockchain.Plutus
                     });
             foreach(var scriptActivity in scriptActivities)
             {
-                var transitionComment = new PlutusComment(0, $"{scriptActivity.} -> {}");
-                var transitionFunction = new PlutusFunction(0, scriptTransitionSig, );
+                //var transitionComment = new PlutusComment(0, $"{scriptActivity.} -> {}");
+                //var transitionFunction = new PlutusFunction(0, scriptTransitionSig, );
             }
 
 

@@ -9,4 +9,8 @@
     <ProjectReference Include="..\DasContract.Blockchain.Plutus.Data\DasContract.Blockchain.Plutus.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Transitions\Tx\" />
+  </ItemGroup>
+
 </Project>

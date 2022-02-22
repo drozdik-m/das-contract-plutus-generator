@@ -16,5 +16,9 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Events
             base.CollectSuccessors(ref collector);
             TimeOutDirection.CollectSuccessors(ref collector);
         }
+
+        /// <inheritdoc/>
+        public override T Accept<T>(IContractProcessElementVisitor<T> visitor)
+            => visitor.Visit(this);
     }
 }
