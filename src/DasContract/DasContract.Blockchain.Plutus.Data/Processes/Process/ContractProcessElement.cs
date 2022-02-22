@@ -16,5 +16,11 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process
         {
             collector.TryAdd(Id, this);
         }
+
+        /// <summary>
+        /// Accepts a process element visitor
+        /// </summary>
+        /// <param name="visitor"></param>
+        public abstract T Accept<T>(IContractProcessElementVisitor<T> visitor);
     }
 }

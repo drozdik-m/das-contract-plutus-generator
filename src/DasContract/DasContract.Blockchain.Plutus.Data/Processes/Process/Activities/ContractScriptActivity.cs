@@ -19,5 +19,9 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 
         const string TransitionPragma = "{-# TRANSITION #-}";
 
+        /// <inheritdoc/>
+        public override T Accept<T>(IContractProcessElementVisitor<T> visitor)
+            => visitor.Visit(this);
+
     }
 }

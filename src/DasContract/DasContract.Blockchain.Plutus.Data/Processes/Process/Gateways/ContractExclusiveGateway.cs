@@ -14,5 +14,10 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways
             foreach(var outgoing in Outgoing)
                 outgoing.CollectSuccessors(ref collector);
         }
+
+
+        /// <inheritdoc/>
+        public override T Accept<T>(IContractProcessElementVisitor<T> visitor)
+            => visitor.Visit(this);
     }
 }
