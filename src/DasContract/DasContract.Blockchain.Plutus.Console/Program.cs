@@ -75,7 +75,7 @@ var subScript1 = new ContractScriptActivity()
     Id = "HelloWorldScript1Sub",
     MultiInstance = new ContractSequentialMultiInstance()
     {
-        LoopCardinalityExpr = "3"
+        LoopCardinality = "3"
     }
 };
 var subUser1 = new ContractUserActivity()

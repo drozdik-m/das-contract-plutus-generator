@@ -5,9 +5,9 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
-    public class ContractActivityWithCode : ContractActivity
+    public abstract class ContractActivityWithCode : ContractActivity
     {
-        string Code { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
 
         protected virtual IEnumerable<string> ReadPragma(string pragma)
         {

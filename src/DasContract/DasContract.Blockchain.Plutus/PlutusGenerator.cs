@@ -19,7 +19,7 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
-using DasContract.Blockchain.Plutus.Transitions.NoTx;
+using DasContract.Blockchain.Plutus.Transitions.NonTx;
 using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus
@@ -644,7 +644,7 @@ namespace DasContract.Blockchain.Plutus
             onChain = onChain
                    .Append(new PlutusSubsectionComment(0, "Script transitions"));
 
-            var scriptTransitionSig = NoTxTransitionVisitor.TransitionFunctionSignature;
+            var scriptTransitionSig = NonTxTransitionVisitor.TransitionFunctionSignature;
 
             onChain = onChain
                 .Append(scriptTransitionSig)

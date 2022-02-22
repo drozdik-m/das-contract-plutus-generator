@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
@@ -13,66 +14,93 @@ namespace DasContract.Blockchain.Plutus.Transitions
 {
     public abstract class TransitionVisitor : IContractProcessElementVisitor<IPlutusCode>
     {
-        public TransitionVisitor(ContractProcessElement sourceElement)
+        public TransitionVisitor()
         {
-            SourceElement = sourceElement;
+            
         }
 
-        public TransitionVisitor(ContractProcessElement sourceElement, INamable subprocess)
-            :this(sourceElement)
+        public TransitionVisitor(INamable subprocess)
+            :this()
         {
             Subprocess = subprocess;
         }
 
-        public INamable? Subprocess { get; }
+        public INamable? Subprocess { get; } = null;
 
-        protected ContractProcessElement SourceElement { get; }
+        protected HashSet<string> VisitedElements { get; } = new HashSet<string>();
 
-        protected string AddSubprocessPrefix(string current)
+        protected string AddSubprocessPrefix(INamable subprocess, string current)
         {
-            if (!(Subprocess is null))
+            if (!(subprocess is null))
             {
                 if (current.Any(char.IsWhiteSpace))
-                    current = $"{Subprocess.Name} ({current})";
+                    current = $"{subprocess.Name} ({current})";
                 else
-                    current = $"{Subprocess.Name} ({current})";
+                    current = $"{subprocess.Name} {current}";
             }
 
             return current;
         }
 
-        protected string CurrentElementName
+        protected string CurrentElementName(ContractProcessElement element, INamable? subprocess = null)
         {
-            get
+            var result = element.Name;
+
+            //Check for sequential loop
+            if (element is ContractActivity activity
+                && activity.MultiInstance is ContractSequentialMultiInstance)
             {
-                var result = SourceElement.Name;
-
-                //Check for sequential loop
-                if (SourceElement is ContractActivity activity 
-                    && activity.MultiInstance is ContractSequentialMultiInstance)
-                {
-                    result = $"{result} LoopEnded";
-                }
-
-                return AddSubprocessPrefix(result);
+                result = $"{result} LoopEnded";
             }
+
+            if (subprocess is null)
+                return result;
+            return AddSubprocessPrefix(subprocess, result);
         }
 
-        protected string FutureElementName(ContractProcessElement element);
 
-        protected string FutureElementName(ContractActivity activity);
 
-        public IPlutusCode Visit(ContractStartEvent element)
+        protected string FutureElementName(ContractProcessElement element, INamable? subprocess = null)
         {
-            throw new Exception("Start event can not process an input");
+            var result = element.Name;
+
+            //Check for sequential loop
+            if (element is ContractActivity activity
+                && activity.MultiInstance is ContractSequentialMultiInstance sequentialMultiInstance)
+            {
+                var toLoop = sequentialMultiInstance.LoopCardinality;
+                if (toLoop.Any(char.IsWhiteSpace))
+                    toLoop = $"$ {toLoop}";
+                result = $"{result} (toNextSeqMultiInstance {toLoop})";
+            }
+
+            if (subprocess is null)
+                return result;
+            return AddSubprocessPrefix(subprocess, result);
+        }
+
+        protected bool TryVisit(INamable element)
+        {
+            var result = false;
+            if (VisitedElements.Contains(element.Name))
+                return true;
+            else
+                VisitedElements.Add(element.Name);
+
+            return result;
+        }
+
+        public IPlutusCode Visit(ContractEndEvent element)
+        {
+            return PlutusCode.Empty;
         }
 
         public abstract IPlutusCode Visit(ContractExclusiveGateway element);
         public abstract IPlutusCode Visit(ContractMergingExclusiveGateway element);
-        public abstract IPlutusCode Visit(ContractEndEvent element);
         public abstract IPlutusCode Visit(ContractCallActivity element);
         public abstract IPlutusCode Visit(ContractUserActivity element);
         public abstract IPlutusCode Visit(ContractScriptActivity element);
         public abstract IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
+        public abstract IPlutusCode Visit(ContractStartEvent element);
     }
 }
