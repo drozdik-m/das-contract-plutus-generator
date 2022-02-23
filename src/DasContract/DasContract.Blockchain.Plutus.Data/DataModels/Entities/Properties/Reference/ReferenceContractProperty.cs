@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace DasContract.Editor.Entities.DataModels.Entities.Properties.Reference
+namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference
 {
     public class ReferenceContractProperty : ContractProperty
     {

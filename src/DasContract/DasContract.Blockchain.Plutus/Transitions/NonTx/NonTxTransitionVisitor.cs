@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
@@ -9,6 +10,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 {
@@ -124,53 +126,232 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             return CallTransition(source, callActivity);
         }
 
+        /// <summary>
+        /// Snippet code that transitions into another state
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        string SimpleStateTransitionSnippet(ContractProcessElement target)
+        {
+            var futureName = FutureElementName(target, Subprocess);
+            return TransitionFunctionSignature.Name + " $ dat{ contractState = " + futureName + " }";
+        }
+
+        /// <summary>
+        /// Simple transition that changes a state from a source to a target
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        IPlutusCode SimpleStateTransition(ContractProcessElement source, ContractProcessElement target)
+        {
+            var sourceName = CurrentElementName(source, Subprocess);
+            var futureName = FutureElementName(target, Subprocess);
+
+            var transitionFunction = new PlutusFunction(0, 
+                TransitionFunctionSignature, 
+                CurrentStateParams(sourceName),
+                new IPlutusLine[]
+                {
+                        new PlutusRawLine(1, SimpleStateTransitionSnippet(target))
+                });
+
+            return TransitionComment(sourceName, futureName)
+                .Append(transitionFunction)
+                .Append(PlutusLine.Empty)
+                .Append(target.Accept(this));
+        }
+
+        /// <summary>
+        /// Snippet code that transitions into another state and executes a code
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="scriptActivity"></param>
+        /// <returns></returns>
+        string ScriptTransitionSnippet(ContractScriptActivity scriptActivity,  
+            out IEnumerable<IPlutusLine> userDefinedTransition,
+            string transformFunctionName = "userDefinedNewDatum")
+        {
+            var futureName = FutureElementName(scriptActivity, Subprocess);
+            userDefinedTransition = ScriptTransitionUserDefinedSnippet(scriptActivity, transformFunctionName);
+            return TransitionFunctionSignature.Name + " $ " + transformFunctionName + " dat{ contractState = " + futureName + " }";
+        }
+
+        IEnumerable<IPlutusLine> ScriptTransitionUserDefinedSnippet(
+            ContractScriptActivity scriptActivity, 
+            string transformFunctionName = "userDefinedNewDatum")
+        {
+            var userDefinedFuncSig = new PlutusFunctionSignature(2, transformFunctionName, new INamable[]
+                {
+                    PlutusContractDatum.Type,
+                    PlutusContractDatum.Type,
+                });
+
+            IEnumerable<IPlutusLine> transitionCodeLines = new IPlutusLine[] { new PlutusRawLine(3, "datum") };
+            if (scriptActivity.TransitionCodeLines.Count() > 0)
+                transitionCodeLines = scriptActivity
+                    .TransitionCodeLines
+                    .Select(e => new PlutusRawLine(3, e));
+
+            var userDefinedFunction = PlutusFunction.GetLinesOfCode(2, userDefinedFuncSig, new string[]
+               {
+                    "datum"
+               }, transitionCodeLines);
+
+            return userDefinedFunction
+                .Prepend(userDefinedFuncSig);
+        }
+
+        /// <summary>
+        /// Transition to a script 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        IPlutusCode ScriptTransition(ContractProcessElement source, ContractScriptActivity target)
+        {
+            var sourceName = CurrentElementName(source, Subprocess);
+            var futureName = FutureElementName(target, Subprocess);
+
+            var codeSnippet = ScriptTransitionSnippet(target, out IEnumerable<IPlutusLine> userDefinedTransition);
+
+            var resultCode = new List<IPlutusLine>
+                {
+                        new PlutusRawLine(1, codeSnippet),
+                        new PlutusRawLine(1, "where"),
+                };
+            resultCode.AddRange(userDefinedTransition);
+            resultCode.Add(PlutusLine.Empty);
+
+            var transitionFunction = new PlutusFunction(0,
+                TransitionFunctionSignature,
+                CurrentStateParams(sourceName),
+                resultCode);
+
+            return TransitionComment(sourceName, futureName)
+                .Append(transitionFunction)
+                .Append(PlutusLine.Empty)
+                .Append(target.Accept(this));
+        }
+
+        IPlutusCode SingleOutputCommongTransition(ContractProcessElement source, ContractProcessElement target)
+        {
+            var typeVisitor = new TxTypeVisitor();
+            var txType = target.Accept(typeVisitor);
+
+            //Tx types
+            if (txType == TxType.Implicit || txType == TxType.Tx)
+                return target.Accept(this);
+
+            //NonTx type
+            else if (txType == TxType.NonTx)
+            {
+                //Target is an activity
+                if (target is ContractActivity activity)
+                {
+                    //Target is sequential multi instance activity
+                    if (activity.MultiInstance is ContractSequentialMultiInstance)
+                        return SimpleStateTransition(source, target);
+
+                    //Target is contract call activity
+                    else if (activity is ContractCallActivity callActivity)
+                        return CallTransition(source, callActivity);
+
+                    //Target is contract script activity
+                    else if (activity is ContractScriptActivity scriptActivity)
+                        return ScriptTransition(source, scriptActivity);
+
+                    //Other activities
+                    else
+                        return SimpleStateTransition(source, target);
+                }
+
+                //Other situations
+                else
+                    return SimpleStateTransition(source, target);
+            }
+
+            //Unhandled tx type
+            else
+                throw new Exception("Unknown TxType");
+        }
+
+
         #region elementTransitions
-        
+
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractExclusiveGateway element)
         {
             //Already visited
-            /*if (!TryVisit(element))
+            if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            var typeVisitor = new TxTypeVisitor();
-            var txType = element.Outgoing.Accept(typeVisitor);
+            var targets = element.Outgoing;
 
-            var currentName = CurrentElementName(element, Subprocess);
+            var guardLines = new List<IPlutusLine>();
+            var whereLines = new List<IPlutusLine>();
 
-            //NonTx types
-            if (txType == TxType.Implicit || txType == TxType.Tx)
-                return PlutusCode.Empty;
-
-            //Tx type
-            else if (txType == TxType.NonTx)
+ 
+            var i = 0;
+            foreach (var targetConnection in targets)
             {
-                var futureName = FutureElementName(element.Outgoing, Subprocess);
+                var target = targetConnection.Target;
+                var condition = targetConnection.Condition;
 
-                var transitionComment = new PlutusComment(0, $"{currentName} -> {futureName}");
-                var transitionFunction = new PlutusFunction(0, TransitionFunctionSignature, new string[]
-                {
-                    "dat@ContractDatum{ contractState = " + currentName + " }",
-                }, new IPlutusLine[]
-                {
-                    new PlutusRawLine(1, TransitionFunctionSignature.Name + " $ datum{ contractState = " + futureName + " }")
-                });
+                var typeVisitor = new TxTypeVisitor();
+                var txType = target.Accept(typeVisitor);
 
-                return new PlutusCode(new IPlutusLine[] { transitionComment })
-                    .Append(transitionFunction)
-                    .Append(PlutusLine.Empty)
-                    .Append(element.Outgoing.Accept(this));
+                //Tx types only
+                if (txType != TxType.Tx)
+                {
+                    i++;
+                    continue;
+                }
+                    
+                //Target is an activity
+                if (target is ContractActivity activity)
+                {
+                    //Target is sequential multi instance activity
+                    if (activity.MultiInstance is ContractSequentialMultiInstance)
+                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
+
+                    //Target is contract call activity
+                    else if (activity is ContractCallActivity callActivity)
+                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {CallTransitionSnippet(callActivity)}"));
+
+                    //Target is contract script activity
+                    else if (activity is ContractScriptActivity scriptActivity)
+                    {
+                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {ScriptTransitionSnippet(scriptActivity, out IEnumerable<IPlutusLine> lines, $"userDefinedNewDatum{i}")}"));
+                        whereLines.AddRange(lines);
+                    }
+                        
+                    //Other activities
+                    else
+                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
+                }
+
+                //Other situations
+                else
+                    return SimpleStateTransition(element, target);
+
+                i++;
             }
 
-            //Call type
-            else if (txType == TxType.Call)
-                throw new NotImplementedException();
+            var resultFunction = new PlutusFunction(0,
+                TransitionFunctionSignature,
+                CurrentStateParams(CurrentElementName(element, Subprocess)),
+                guardLines
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusRawLine(1, "where"))
+                    .Concat(whereLines))
+                    .Append(PlutusLine.Empty);
 
-            //Unhandled type
-            else
-                throw new Exception("Unknown TxType");*/
+            foreach(var targetConnection in targets)
+                resultFunction.Append(targetConnection.Target.Accept(this));
 
-            throw new NotImplementedException();
+            return resultFunction;
         }
 
         /// <inheritdoc/>
@@ -180,75 +361,115 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            var typeVisitor = new TxTypeVisitor();
-            var txType = element.Outgoing.Accept(typeVisitor);
-
-            var currentName = CurrentElementName(element, Subprocess);
-            
-            //NonTx types
-            if (txType == TxType.Implicit || txType == TxType.Tx)
-                return PlutusCode.Empty;
-
-            //Tx type
-            else if (txType == TxType.NonTx)
-            {
-                var futureName = FutureElementName(element.Outgoing, Subprocess);
-
-                var transitionComment = new PlutusComment(0, $"{currentName} -> {futureName}");
-                var transitionFunction = new PlutusFunction(0, TransitionFunctionSignature, new string[]
-                {
-                    "dat@ContractDatum{ contractState = " + currentName + " }",
-                }, new IPlutusLine[]
-                {
-                    new PlutusRawLine(1, TransitionFunctionSignature.Name + " $ datum{ contractState = " + futureName + " }")
-                });
-
-                return new PlutusCode(new IPlutusLine[] { transitionComment })
-                    .Append(transitionFunction)
-                    .Append(PlutusLine.Empty)
-                    .Append(element.Outgoing.Accept(this));
-            }
-
-            //Call type
-            else if (txType == TxType.Call)
-            {
-                throw new NotImplementedException();
-                
-            }
-
-            //Unhandled type
-            else
-                throw new Exception("Unknown TxType");
+            var target = element.Outgoing;
+            return SingleOutputCommongTransition(element, target);
         }
 
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractCallActivity element)
         {
-            throw new NotImplementedException();
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            //Loop transition
+            var loopTransition = PlutusCode.Empty;
+            if (element.MultiInstance is ContractSequentialMultiInstance)
+            {
+                var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} (ToLoop i)");
+                var returnName = AddSubprocessPrefix(Subprocess, $"{element.Name} (toNextSeqMultiInstance i)");
+                var targetName = AddSubprocessPrefix(element.CalledProcess, element.CalledProcess.StartEvent.Name);
+
+
+
+                var codeSnippet = TransitionFunctionSignature.Name +
+                    $" $ pushState ({returnName}) $ datum " +
+                    "{ contractState = " + targetName + " }";
+
+
+                loopTransition = new PlutusFunction(0,
+                    TransitionFunctionSignature,
+                    CurrentStateParams(currentName),
+                    new IPlutusLine[]
+                    {
+                        new PlutusRawLine(1, codeSnippet),
+                    });
+            }
+
+            //Next transition
+            var nextTransition = SingleOutputCommongTransition(element, element.Outgoing);
+
+            return loopTransition
+                .Append(nextTransition);
         }
 
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractUserActivity element)
         {
-            throw new NotImplementedException();
+            // Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            var target = element.Outgoing;
+            return SingleOutputCommongTransition(element, target);
         }
 
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractScriptActivity element)
         {
-            throw new NotImplementedException();
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            //Loop transition
+            var loopTransition = PlutusCode.Empty;
+            if (element.MultiInstance is ContractSequentialMultiInstance)
+            {
+                var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} (ToLoop i)");
+                var targetName = AddSubprocessPrefix(Subprocess, $"{element.Name} (toNextSeqMultiInstance i)");
+
+                var codeSnippet = ScriptTransitionUserDefinedSnippet(element);
+
+                var resultCode = new List<IPlutusLine>
+                {
+                        new PlutusRawLine(1, TransitionFunctionSignature.Name + " $ userDefinedNewDatum datum { contractState = " + targetName + " }"),
+                        PlutusLine.Empty,
+                };
+                resultCode.AddRange(codeSnippet);
+
+                loopTransition = new PlutusFunction(0,
+                    TransitionFunctionSignature,
+                    CurrentStateParams(currentName),
+                    resultCode);
+            }
+
+            //Next transition
+            var nextTransition = SingleOutputCommongTransition(element, element.Outgoing);
+
+            return loopTransition
+                .Append(nextTransition);
         }
 
         /// <inheritdoc/>
-        public override IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent)
+        public override IPlutusCode Visit(ContractTimerBoundaryEvent element)
         {
-            throw new NotImplementedException();
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            var target = element.TimeOutDirection;
+            return SingleOutputCommongTransition(element, target);
         }
 
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractStartEvent element)
         {
-            throw new NotImplementedException();
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            var target = element.Outgoing;
+            return SingleOutputCommongTransition(element, target);
         }
         #endregion
 

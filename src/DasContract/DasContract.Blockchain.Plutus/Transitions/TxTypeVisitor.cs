@@ -10,6 +10,7 @@ using System.Linq;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Transitions.NonTx;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
@@ -23,12 +24,15 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         public TxType Visit(ContractEndEvent element) => TxType.Tx;
 
-        public TxType Visit(ContractCallActivity element) => TxType.Call;
+        public TxType Visit(ContractCallActivity element) => TxType.NonTx;
 
-        public TxType Visit(ContractUserActivity element) => TxType.Tx;
+        public TxType Visit(ContractUserActivity element) => IsSequential(element) ? TxType.NonTx : TxType.Tx;
 
         public TxType Visit(ContractScriptActivity element) => TxType.NonTx;
 
         public TxType Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent) => TxType.Tx;
+
+
+        bool IsSequential(ContractActivity activity) => activity.MultiInstance is ContractSequentialMultiInstance;
     }
 }

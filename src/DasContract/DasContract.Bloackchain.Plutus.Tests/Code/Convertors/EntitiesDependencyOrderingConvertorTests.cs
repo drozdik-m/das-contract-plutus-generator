@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DasContract.Blockchain.Plutus.Code.Convertors;
 using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
-using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 using NUnit.Framework;
 
 namespace DasContract.Bloackchain.Plutus.Tests.Code.Convertors

@@ -8,7 +8,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
     {
         Tx,
         NonTx,
-        Call,
         Implicit
     }
 }

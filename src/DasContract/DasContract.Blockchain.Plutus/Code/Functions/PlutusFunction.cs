@@ -29,7 +29,7 @@ namespace DasContract.Blockchain.Plutus.Code.Comments
 
         public IEnumerable<IPlutusLine> CodeLines { get; }
 
-        static IEnumerable<IPlutusLine> GetLinesOfCode(int indent,
+        public static IEnumerable<IPlutusLine> GetLinesOfCode(int indent,
             PlutusFunctionSignature signature, 
             IEnumerable<string> parameterNames,
             IEnumerable<IPlutusLine> codeLines)

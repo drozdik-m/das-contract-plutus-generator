@@ -20,16 +20,16 @@ namespace DasContract.Blockchain.Plutus.Data.Processes
         /// <summary>
         /// List of processes
         /// </summary>
-        public ICollection<ContractProcess> Processes { get; set; } = new List<ContractProcess>();
+        public ICollection<ContractProcess> AllProcesses { get; set; } = new List<ContractProcess>();
 
         /// <summary>
         /// The main process where the contract starts and ends
         /// </summary>
-        public ContractProcess Main => Processes.Where(e => e.IsMain).Single();
+        public ContractProcess Main => AllProcesses.Where(e => e.IsMain).Single();
 
         /// <summary>
         /// Processes without the main process
         /// </summary>
-        public IEnumerable<ContractProcess> Subprocesses => Processes.Where(e => !e.IsMain);
+        public IEnumerable<ContractProcess> Subprocesses => AllProcesses.Where(e => !e.IsMain);
     }
 }

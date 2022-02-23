@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using System;
-using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 using System.Linq;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 
 namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
 {

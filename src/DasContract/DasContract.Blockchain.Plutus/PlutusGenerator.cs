@@ -339,7 +339,7 @@ namespace DasContract.Blockchain.Plutus
             dataModels = dataModels
                     .Append(new PlutusSubsectionComment(0, "User forms"));
 
-            var userActivities = contract.Processes.Processes
+            var userActivities = contract.Processes.AllProcesses
                 .Aggregate(
                     new List<ContractUserActivity>(),
                     (acc, item) =>
@@ -652,7 +652,7 @@ namespace DasContract.Blockchain.Plutus
 
 
             //Script activities
-            var scriptActivities = contract.Processes.Processes
+            var scriptActivities = contract.Processes.AllProcesses
                 .Aggregate(
                     new List<ContractScriptActivity>(),
                     (acc, item) =>
@@ -661,16 +661,14 @@ namespace DasContract.Blockchain.Plutus
                             .Concat(item.ProcessElements.OfType<ContractScriptActivity>())
                             .ToList();
                     });
-            foreach(var scriptActivity in scriptActivities)
-            {
-                //var transitionComment = new PlutusComment(0, $"{scriptActivity.} -> {}");
-                //var transitionFunction = new PlutusFunction(0, scriptTransitionSig, );
-            }
 
-
+            var nonTxTransitionVisitor = new NonTxTransitionVisitor();
+            var nonTxTransitions = nonTxTransitionVisitor.Visit(contract.Processes.Main.StartEvent);
 
             var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
+
             onChain = onChain
+                .Append(nonTxTransitions)
                 .Append(identityTransition)
                 .Append(PlutusLine.Empty);
 
@@ -682,42 +680,6 @@ namespace DasContract.Blockchain.Plutus
                 .Append(onChain);
         }
 
-        private IPlutusCode GenerateScriptTransitions(
-            ContractProcessElement processElement, 
-            PlutusFunctionSignature scriptTransitionSignature,
-            ref HashSet<string> visitedActivities) 
-        {
-            //No double visits
-            if (visitedActivities.Contains(processElement.Id))
-                return PlutusCode.Empty;
-
-            //Mark this state as visited
-            visitedActivities.Add(processElement.Id);
-            IPlutusCode result = PlutusCode.Empty;
-
-            //This element is a merging gateway
-            if (processElement is ContractMergingExclusiveGateway mergingExclusiveGateway)
-            {
-                var target = mergingExclusiveGateway.Outgoing;
-
-                if (target is ContractMergingExclusiveGateway targetExclusiveGateway)
-                {
-                    result = result
-                        .Append(new PlutusComment(0, $"{processElement.Name} -> {target.Name}"))
-                        .Append(new PlutusFunction(0, scriptTransitionSignature, new string[]
-                        {
-                            "dat@ContractDatum{ contractState = " + processElement.Id + " }"
-                        }, new IPlutusLine[]
-                        {
-                            new PlutusRawLine(0, "doScriptTransition $ datum{ contractState = " + target.Id + " }")
-                        }))
-                        .Append(GenerateScriptTransitions(target, scriptTransitionSignature, ref visitedActivities));
-
-                }
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// Converts a process element into plutus algebraic type constructor
@@ -726,7 +688,7 @@ namespace DasContract.Blockchain.Plutus
         /// <param name="sequentialInstanceType"></param>
         /// <returns></returns>
         private PlutusAlgebraicTypeConstructor ProcessElementToAlgTypeCtor(
-            ContractProcessElement element, 
+            ContractProcessElement element,
             PlutusAlgebraicType sequentialInstanceType)
         {
             var types = new List<INamable>();

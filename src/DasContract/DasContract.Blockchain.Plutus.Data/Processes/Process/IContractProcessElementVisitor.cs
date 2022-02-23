@@ -7,7 +7,6 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
-using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process
 {

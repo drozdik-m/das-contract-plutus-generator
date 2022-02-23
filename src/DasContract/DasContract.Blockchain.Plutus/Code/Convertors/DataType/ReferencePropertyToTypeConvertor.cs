@@ -7,8 +7,8 @@ using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
-using DasContract.Editor.Entities.DataModels.Entities.Properties.Reference;
 
 namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
 {

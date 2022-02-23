@@ -36,15 +36,15 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
         }
 
 
-        const string FormValidationPragma = "{-# FORM_VALIDATION #-}";
+        public const string FormValidationPragma = "{-# FORM_VALIDATION #-}";
 
-        const string ExpectedValuePragma = "{-# EXPECTED_VALUE #-}";
+        public const string ExpectedValuePragma = "{-# EXPECTED_VALUE #-}";
 
-        const string NewValuePragma = "{-# NEW_VALUE #-}";
+        public const string NewValuePragma = "{-# NEW_VALUE #-}";
 
-        const string ConstrainsPragma = "{-# CONSTRAINS #-}";
+        public const string ConstrainsPragma = "{-# CONSTRAINS #-}";
 
-        const string TransitionPragma = "{-# TRANSITION #-}";
+        public const string TransitionPragma = "{-# TRANSITION #-}";
 
         /// <inheritdoc/>
         public override T Accept<T>(IContractProcessElementVisitor<T> visitor)

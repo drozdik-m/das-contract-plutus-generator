@@ -29,7 +29,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         protected HashSet<string> VisitedElements { get; } = new HashSet<string>();
 
-        protected string AddSubprocessPrefix(INamable subprocess, string current)
+        protected string AddSubprocessPrefix(INamable? subprocess, string current)
         {
             if (!(subprocess is null))
             {
@@ -71,7 +71,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 var toLoop = sequentialMultiInstance.LoopCardinality;
                 if (toLoop.Any(char.IsWhiteSpace))
                     toLoop = $"$ {toLoop}";
-                result = $"{result} (toNextSeqMultiInstance {toLoop})";
+                result = $"{result} (toSeqMultiInstance {toLoop})";
             }
 
             if (subprocess is null)
