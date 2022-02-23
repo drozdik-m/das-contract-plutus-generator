@@ -9,7 +9,7 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Events
     {
         public ContractProcessElement TimeOutDirection { get; set; }
 
-        public string TimerDefinitionExpr { get; set; } = string.Empty;
+        public string TimerDefinition { get; set; } = string.Empty;
 
         public override void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {

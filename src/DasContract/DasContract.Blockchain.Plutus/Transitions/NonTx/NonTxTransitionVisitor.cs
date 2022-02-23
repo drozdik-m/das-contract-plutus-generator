@@ -43,6 +43,20 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         }
 
         /// <summary>
+        /// Returns a comment that indicates transition direction with a stack-return note
+        /// </summary>
+        /// <param name="sourceName">The name of the source</param>
+        /// <param name="targetName">The name of the target</param>
+        /// <returns></returns>
+        IPlutusCode TransitionCommentWithReturn(string sourceName, string targetName, string returnName)
+        {
+            return new PlutusCode(new IPlutusLine[]
+            {
+                new PlutusComment(0, $"{sourceName} -> {targetName} / return {returnName}")
+            });
+        }
+
+        /// <summary>
         /// Returns parameter names for the current state
         /// </summary>
         /// <param name="currentStateName">The name of the current state</param>
@@ -65,8 +79,13 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
             var returnName = FutureElementName(callActivity, Subprocess);
 
-            var result = $"$ pushState ({returnName}) $ datum " + "{ "
-                + $"contractState = {futureName}" +
+            var returnNamePushedState = returnName;
+            if (returnName.Any(char.IsWhiteSpace))
+                returnNamePushedState = $"({returnNamePushedState})";
+
+            var result = TransitionFunctionSignature.Name + 
+                $" $ pushState {returnNamePushedState} $ datum " + "{ " +
+                $"contractState = {futureName}" +
                 " }";
 
             return result;
@@ -97,6 +116,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         {
             var currentName = CurrentElementName(source, Subprocess);
             var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
+            var returnName = FutureElementName(callActivity, Subprocess);
 
             //Transition to the subprocess
             var transitionFunction = new PlutusFunction(0, 
@@ -107,7 +127,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     new PlutusRawLine(1, CallTransitionSnippet(callActivity)),
                 });
 
-            return TransitionComment(currentName, futureName)
+            return TransitionCommentWithReturn(currentName, futureName, returnName)
                 .Append(transitionFunction)
                 .Append(PlutusLine.Empty);
         }
@@ -219,6 +239,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var resultCode = new List<IPlutusLine>
                 {
                         new PlutusRawLine(1, codeSnippet),
+                        PlutusLine.Empty,
                         new PlutusRawLine(1, "where"),
                 };
             resultCode.AddRange(userDefinedTransition);
@@ -373,27 +394,26 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             //Loop transition
-            var loopTransition = PlutusCode.Empty;
+            IPlutusCode loopTransition = PlutusCode.Empty;
             if (element.MultiInstance is ContractSequentialMultiInstance)
             {
                 var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} (ToLoop i)");
                 var returnName = AddSubprocessPrefix(Subprocess, $"{element.Name} (toNextSeqMultiInstance i)");
                 var targetName = AddSubprocessPrefix(element.CalledProcess, element.CalledProcess.StartEvent.Name);
 
-
-
                 var codeSnippet = TransitionFunctionSignature.Name +
                     $" $ pushState ({returnName}) $ datum " +
                     "{ contractState = " + targetName + " }";
 
-
-                loopTransition = new PlutusFunction(0,
-                    TransitionFunctionSignature,
-                    CurrentStateParams(currentName),
-                    new IPlutusLine[]
-                    {
-                        new PlutusRawLine(1, codeSnippet),
-                    });
+                loopTransition = TransitionCommentWithReturn(currentName, targetName, returnName)
+                    .Append(new PlutusFunction(0,
+                        TransitionFunctionSignature,
+                        CurrentStateParams(currentName),
+                        new IPlutusLine[]
+                        {
+                            new PlutusRawLine(1, codeSnippet),
+                            PlutusLine.Empty,
+                        }));
             }
 
             //Next transition
@@ -422,7 +442,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             //Loop transition
-            var loopTransition = PlutusCode.Empty;
+            IPlutusCode loopTransition = PlutusCode.Empty;
             if (element.MultiInstance is ContractSequentialMultiInstance)
             {
                 var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} (ToLoop i)");
@@ -432,15 +452,18 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
                 var resultCode = new List<IPlutusLine>
                 {
-                        new PlutusRawLine(1, TransitionFunctionSignature.Name + " $ userDefinedNewDatum datum { contractState = " + targetName + " }"),
+                        new PlutusRawLine(1, TransitionFunctionSignature.Name + " $ userDefinedNewDatum dat { contractState = " + targetName + " }"),
                         PlutusLine.Empty,
+                        new PlutusRawLine(1, "where"),
                 };
                 resultCode.AddRange(codeSnippet);
+                resultCode.Add(PlutusLine.Empty);
 
-                loopTransition = new PlutusFunction(0,
-                    TransitionFunctionSignature,
-                    CurrentStateParams(currentName),
-                    resultCode);
+                loopTransition = TransitionComment(currentName, targetName)
+                    .Append(new PlutusFunction(0,
+                        TransitionFunctionSignature,
+                        CurrentStateParams(currentName),
+                        resultCode));
             }
 
             //Next transition

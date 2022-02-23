@@ -82,10 +82,11 @@ namespace DasContract.Blockchain.Plutus.Transitions
         protected bool TryVisit(INamable element)
         {
             var result = false;
-            if (VisitedElements.Contains(element.Name))
-                return true;
-            else
+            if (!VisitedElements.Contains(element.Name))
+            {
+                result = true;
                 VisitedElements.Add(element.Name);
+            }
 
             return result;
         }
