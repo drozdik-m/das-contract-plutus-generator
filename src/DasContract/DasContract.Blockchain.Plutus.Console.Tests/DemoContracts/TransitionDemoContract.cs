@@ -139,11 +139,11 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                 MultiInstance = new ContractSequentialMultiInstance() { LoopCardinality = "9" }
             };
 
-            mainStart.Outgoing = callActivitySub1Loop;
+            /*mainStart.Outgoing = callActivitySub1Loop;
             callActivitySub1Loop.Outgoing = script1;
-            script1.Outgoing = mainEnd;
+            script1.Outgoing = mainEnd;*/
 
-            /*mainStart.Outgoing = exclusiveGateway1;
+            mainStart.Outgoing = exclusiveGateway1;
             exclusiveGateway1.Outgoing = new List<ContractConditionedConnection>()
             {
                 new ContractConditionedConnection() { Condition = "condition1", Target = script1 },
@@ -166,7 +166,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
             user1Timer.Outgoing = mergingGateway1;
             callActivitySub1.Outgoing = mergingGateway1;
             callActivitySub1Loop.Outgoing = mergingGateway1;
-            mergingGateway1.Outgoing = mainEnd;*/
+            mergingGateway1.Outgoing = mainEnd;
             
 
             var mainProcess = new ContractProcess()

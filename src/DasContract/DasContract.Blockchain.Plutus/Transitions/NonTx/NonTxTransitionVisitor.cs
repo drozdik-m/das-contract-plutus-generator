@@ -324,8 +324,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
             var targets = element.Outgoing;
 
-            var guardLines = new List<IPlutusLine>();
-            var whereLines = new List<IPlutusLine>();
+            var guardLines = new List<(string, string)>();
+            var userDefinedLines = new List<IPlutusLine>();
 
             if (targets.Count == 0)
                 throw new Exception("Exclusive Gateway has no outputs");
@@ -351,27 +351,28 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 {
                     //Target is sequential multi instance activity
                     if (activity.MultiInstance is ContractSequentialMultiInstance)
-                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
+                        guardLines.Add((condition, SimpleStateTransitionSnippet(target)));
 
                     //Target is contract call activity
                     else if (activity is ContractCallActivity callActivity)
-                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {CallTransitionSnippet(callActivity)}"));
+                        guardLines.Add((condition, CallTransitionSnippet(callActivity)));
 
                     //Target is contract script activity
                     else if (activity is ContractScriptActivity scriptActivity)
                     {
-                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {ScriptTransitionSnippet(scriptActivity, out IEnumerable<IPlutusLine> lines, $"userDefinedNewDatum{i}")}"));
-                        whereLines.AddRange(lines);
+                        guardLines.Add((condition, ScriptTransitionSnippet(scriptActivity, out IEnumerable<IPlutusLine> lines, $"userDefinedNewDatum{i}")));
+                        userDefinedLines.AddRange(lines);
+                        userDefinedLines.Add(PlutusLine.Empty);
                     }
                         
                     //Other activities
                     else
-                        guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
+                        guardLines.Add((condition, SimpleStateTransitionSnippet(target)));
                 }
 
                 //Other situations
                 else
-                    guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
+                    guardLines.Add((condition, SimpleStateTransitionSnippet(target)));
 
                 i++;
             }
@@ -381,18 +382,35 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             IPlutusCode resultFunction = PlutusCode.Empty;
             if (guardLines.Count != 0)
             {
-                guardLines.Add(PlutusLine.Empty);
-                if (whereLines.Count > 0)
+                var decitionFunctionSig = new PlutusFunctionSignature(2, "decitionFunction", new INamable[]
                 {
-                    guardLines.Add(new PlutusRawLine(1, "where"));
-                    guardLines.AddRange(whereLines);
-                    guardLines.Add(PlutusLine.Empty);
+                    PlutusContractDatum.Type,
+                    PlutusContractDatum.Type,
+                });
+                IPlutusCode decitionFunction = new PlutusGuardFunction(2,
+                    decitionFunctionSig,
+                    new string[] { "datum" },
+                    guardLines);
+
+                var where = decitionFunction
+                    .Prepend(decitionFunctionSig)
+                    .Prepend(new PlutusRawLine(1, "where"));
+
+                if (userDefinedLines.Count > 0)
+                {
+                    where = where.Append(PlutusLine.Empty);
+                    where = where.Append(new PlutusCode(userDefinedLines));
+                    where = where.Append(PlutusLine.Empty);
                 }
+
+                where = where.Prepend(PlutusLine.Empty);
+                where = where.Prepend(new PlutusRawLine(1, $"{decitionFunctionSig.Name} dat"));
 
                 resultFunction = new PlutusFunction(0,
                     TransitionFunctionSignature,
                     CurrentStateParams(CurrentElementName(element, Subprocess)),
-                    guardLines)
+                    Array.Empty<IPlutusLine>())
+                .Append(where)
                 .Prepend(TransitionComment(CurrentElementName(element), "/branch/"));
             }
 
