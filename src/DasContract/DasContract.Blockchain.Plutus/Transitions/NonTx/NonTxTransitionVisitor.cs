@@ -54,12 +54,10 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
             var returnName = FutureElementName(callActivity, Subprocess);
 
-            var returnNamePushedState = returnName;
-            if (returnName.Any(char.IsWhiteSpace))
-                returnNamePushedState = $"({returnNamePushedState})";
+            returnName = PlutusCode.ProperlyBracketed(returnName);
 
             var result = TransitionFunctionSignature.Name + 
-                $" $ pushState {returnNamePushedState} $ dat " + "{ " +
+                $" $ pushState {returnName} $ dat " + "{ " +
                 $"contractState = {futureName}" +
                 " }";
 

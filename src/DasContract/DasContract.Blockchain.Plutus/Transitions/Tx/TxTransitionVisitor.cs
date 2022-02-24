@@ -48,26 +48,46 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 + " }, v, " + redeemer + "))";
         }
 
+        //IEnumerable<>
+
         /// <summary>
-        /// Snippet code that transitions into the subprocess of target call activity
+        /// Constructs together the transition function return type (Just constrains state)
         /// </summary>
-        /// <param name="target">The call activity with the subprocess</param>
+        /// <param name="constrains">IEnumerable of constraints</param>
+        /// <param name="newDatumExp">New datum</param>
+        /// <param name="newValueExp">New contract value</param>
         /// <returns></returns>
-        string CallTransitionSnippet(ContractCallActivity callActivity)
+        IEnumerable<IPlutusLine> ReturningJust(IEnumerable<string> constrains, string newDatumExp, string newValueExp)
         {
-            var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
-            var returnName = FutureElementName(callActivity, Subprocess);
+            string constrainsLine = string.Join(" <> ", constrains);
 
-            var returnNamePushedState = returnName;
-            if (returnName.Any(char.IsWhiteSpace))
-                returnNamePushedState = $"({returnNamePushedState})";
+            newDatumExp = PlutusCode.ProperlyBracketed(newDatumExp);
+            newValueExp = PlutusCode.ProperlyBracketed(newValueExp);
 
-            var result = TransitionFunctionSignature.Name + 
-                $" $ pushState {returnNamePushedState} $ dat " + "{ " +
-                $"contractState = {futureName}" +
-                " }";
+            return new List<IPlutusLine>()
+            {
+                new PlutusRawLine(4, "Just ("),
+                    new PlutusRawLine(5, constrainsLine),
+                    new PlutusRawLine(5, "State " + newDatumExp),
+                    new PlutusRawLine(5, "      " + newValueExp),
+                new PlutusRawLine(4, "     )"),
+            };
+        }
 
-            return result;
+        /// <summary>
+        /// Creates transition into the end event
+        /// </summary>
+        /// <param name="endEvent"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private IPlutusCode EndEventTransition(ContractProcessElement source, ContractEndEvent endEvent)
+        {
+            var currentName = CurrentElementName(source);
+            var targetName = FutureElementName(endEvent);
+
+            var matchLine = CurrentStateMatching(currentName, targetName);
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -137,6 +157,58 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             //Already visited
             if (!TryVisit(element))
                 return PlutusCode.Empty;
+
+            var target = element.Outgoing;
+
+            var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
+            var txType = target.Accept(typeVisitor);
+
+            //NonTx types
+            if (txType == TxType.Implicit || txType == TxType.NonTx)
+                return target.Accept(this);
+
+            //Tx type
+            else if (txType == TxType.Tx)
+            {
+                //TODO end event target
+                if (target is ContractEndEvent endEvent)
+                    return EndEventTransition(element, endEvent);
+
+                //TODO call activity traget
+
+                //TODO call timeouted (non sequential) activity traget (target = timer boundary event)
+
+
+
+
+                //Target is an activity
+                /*if (target is ContractActivity activity)
+                {
+                    //Target is sequential multi instance activity
+                    if (activity.MultiInstance is ContractSequentialMultiInstance)
+                        return SimpleStateTransition(source, target);
+
+                    //Target is contract call activity
+                    else if (activity is ContractCallActivity callActivity)
+                        return CallTransition(source, callActivity);
+
+                    //Target is contract script activity
+                    else if (activity is ContractScriptActivity scriptActivity)
+                        return ScriptTransition(source, scriptActivity);
+
+                    //Other activities
+                    else
+                        return SimpleStateTransition(source, target);
+                }
+
+                //Other situations
+                else
+                    return SimpleStateTransition(source, target);*/
+            }
+
+            //Unhandled tx type
+            else
+                throw new Exception("Unknown TxType");
 
             throw new NotImplementedException();
         }

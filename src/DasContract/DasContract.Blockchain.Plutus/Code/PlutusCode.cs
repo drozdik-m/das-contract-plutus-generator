@@ -69,5 +69,12 @@ namespace DasContract.Blockchain.Plutus.Code
         public static PlutusCode Empty => new PlutusCode(Array.Empty<IPlutusLine>());
 
         public static string NewLineString = Environment.NewLine;
+
+        public static string ProperlyBracketed(string expression)
+        {
+            if (expression.Any(char.IsWhiteSpace) && !(expression.StartsWith("(") && expression.EndsWith(")")))
+                expression = $"({expression})";
+            return expression;
+        }
     }
 }
