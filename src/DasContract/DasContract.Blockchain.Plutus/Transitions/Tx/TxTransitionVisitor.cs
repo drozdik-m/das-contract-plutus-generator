@@ -13,6 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Blockchain.Plutus.Transitions.Tx;
 
 namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 {
@@ -48,7 +49,34 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 + " }, v, " + redeemer + "))";
         }
 
-        //IEnumerable<>
+        /// <summary>
+        /// Returns formulated guard line for the transition
+        /// </summary>
+        /// <param name="expectedVal"></param>
+        /// <param name="formValidation"></param>
+        /// <param name="transitionCondition"></param>
+        /// <returns></returns>
+        IPlutusLine GuardLine(bool expectedVal = false, bool formValidation = false, string transitionCondition = "")
+        {
+            string userDefinedExpectedValue = $"{UserDefinedExpectedValueSignature.Name} par dat v";
+            const string userDefinedFormValidation = "userDefinedFormValidation par dat red v";
+
+            var conditions = new List<string>();
+
+            if (expectedVal)
+                conditions.Add(userDefinedExpectedValue);
+
+            if (formValidation)
+                conditions.Add(userDefinedFormValidation);
+
+            if (!string.IsNullOrWhiteSpace(transitionCondition))
+                conditions.Add(transitionCondition);
+
+            if (conditions.Count == 0)
+                return new PlutusRawLine(3, "->");
+
+            return new PlutusRawLine(3, $"| {string.Join(" && ", conditions)} ->");
+        }
 
         /// <summary>
         /// Constructs together the transition function return type (Just constrains state)
@@ -72,6 +100,94 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     new PlutusRawLine(5, "      " + newValueExp),
                 new PlutusRawLine(4, "     )"),
             };
+        }
+
+        /// <summary>
+        /// Generate where user defined statements for a user activity
+        /// </summary>
+        /// <param name="userActivity"></param>
+        /// <param name="statements"></param>
+        /// <returns></returns>
+        IEnumerable<IPlutusLine> WhereStatements(ContractUserActivity userActivity, params TxUserDefinedStatement[] statements)
+        {
+            var result = new List<IPlutusLine>();
+
+            var commonParams = new string[]
+            {
+                "param",
+                "datum",
+                "val"
+            };
+
+            void CommonLines(PlutusFunctionSignature sig, IEnumerable<string> parameters, IEnumerable<string> codeLines, string def)
+            {
+                result.Add(sig);
+                var code = new List<IPlutusLine>();
+                if (codeLines.Count() == 0)
+                    code.Add(new PlutusRawLine(4, def));
+                else
+                {
+                    code.AddRange(PlutusFunction.GetLinesOfCode(4,
+                        sig,
+                        parameters,
+                        codeLines.Select(e => new PlutusRawLine(4, e))));
+                    code.Add(PlutusLine.Empty);
+                }
+            }
+
+            //Transition
+            if (statements.Contains(TxUserDefinedStatement.UserDefinedTransition))
+            {
+                var signature = new PlutusFunctionSignature(4,
+                    "userDefinedTransition",
+                    new INamable[]
+                    {
+                        PlutusContractParam.Type,
+                        PlutusContractDatum.Type,
+                        PlutusValue.Type,
+                        PlutusUserActivityForm.Type(userActivity),
+                        PlutusContractDatum.Type,
+                    });
+                CommonLines(signature,
+                    new string[]
+                    {
+                        "param",
+                        "datum",
+                        "val",
+                        "form",
+                    },
+                    userActivity.TransitionCodeLines,
+                    "datum");
+            }
+
+            //Expected value
+            if (statements.Contains(TxUserDefinedStatement.UserDefinedExpectedValue))
+            {
+                CommonLines(UserDefinedNewValueSignature,
+                    commonParams,
+                    userActivity.NewValueCodeLines,
+                    "val");
+            }
+
+            //New value
+            if (statements.Contains(TxUserDefinedStatement.UserDefinedNewValue))
+            {
+                CommonLines(UserDefinedNewValueSignature,
+                    commonParams,
+                    userActivity.NewValueCodeLines,
+                    "val");
+            }
+            
+            //Constraints
+            if (statements.Contains(TxUserDefinedStatement.UserDefinedConstraints))
+            {
+                CommonLines(UserDefinedConstraintsSignature,
+                    commonParams,
+                    userActivity.ContrainsCodeLines, 
+                    "mempty");
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -284,6 +400,33 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     PlutusUnspecifiedDataType.Type("TxConstraints Void Void"),
                     PlutusState.Type(PlutusContractDatum.Type))
                 ),
+            });
+
+        static PlutusFunctionSignature UserDefinedExpectedValueSignature { get; }
+            = new PlutusFunctionSignature(4, "userDefinedExpectedValue", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusContractDatum.Type,
+                PlutusValue.Type,
+                PlutusBool.Type
+            });
+
+        static PlutusFunctionSignature UserDefinedNewValueSignature { get; }
+            = new PlutusFunctionSignature(4, "userDefinedNewValue", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusContractDatum.Type,
+                PlutusValue.Type,
+                PlutusValue.Type
+            });
+
+        static PlutusFunctionSignature UserDefinedConstraintsSignature { get; }
+            = new PlutusFunctionSignature(4, "userDefinedConstraints", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusContractDatum.Type,
+                PlutusValue.Type,
+                PlutusUnspecifiedDataType.Type("TxConstraints Void Void")
             });
     }
 }
