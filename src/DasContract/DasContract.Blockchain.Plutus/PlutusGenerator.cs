@@ -378,12 +378,11 @@ namespace DasContract.Blockchain.Plutus
             }
 
             // -- Redeemers --------------------------------------
-            const string redeemerPostfix = "Redeemer";
             dataModels = dataModels
                    .Append(new PlutusSubsectionComment(0, "Redeemers"));
 
-            var contractRedeemer = new PlutusAlgebraicType("ContractRedeemer",
-                userActivities.Select(e => new PlutusAlgebraicTypeConstructor(e.Name + redeemerPostfix, new INamable[]
+            var contractRedeemer = new PlutusAlgebraicType(PlutusContractRedeemer.Type.Name,
+                userActivities.Select(e => new PlutusAlgebraicTypeConstructor(PlutusUserActivityRedeemer.Type(e).Name, new INamable[]
                     {
                         PlutusFutureDataType.Type(e.FormName)
                     }))
@@ -554,7 +553,7 @@ namespace DasContract.Blockchain.Plutus
             dataModels = dataModels
                    .Append(new PlutusSubsectionComment(0, "Contract param"));
 
-            var contractParam = new PlutusRecord("ContractParam", new PlutusRecordMember[]
+            var contractParam = new PlutusRecord(PlutusContractParam.Type.Name, new PlutusRecordMember[]
             {
                 new PlutusRecordMember("cpUsers", PlutusList.Type(user)),
                 new PlutusRecordMember("cpToken", PlutusThreadToken.Type),
@@ -619,7 +618,7 @@ namespace DasContract.Blockchain.Plutus
                 {
                     "param",
                     "datum",
-                    $"({userActivity.Name}{redeemerPostfix} form)",
+                    $"({PlutusUserActivityRedeemer.Type(userActivity).Name} form)",
                     "val",
                 },
                 validationLines.Select(e => new PlutusRawLine(1, e)));
@@ -640,9 +639,9 @@ namespace DasContract.Blockchain.Plutus
                 .Append(defaultValidation)
                 .Append(PlutusLine.Empty);
 
-            // -- Script transitions -----------------------------
+            // -- NonTx transitions ------------------------------
             onChain = onChain
-                   .Append(new PlutusSubsectionComment(0, "Script transitions"));
+                   .Append(new PlutusSubsectionComment(0, "NonTx transitions"));
 
             var scriptTransitionSig = NonTxTransitionVisitor.TransitionFunctionSignature;
 
@@ -672,6 +671,12 @@ namespace DasContract.Blockchain.Plutus
             onChain = onChain
                 .Append(identityTransition)
                 .Append(PlutusLine.Empty);
+
+            // -- Tx transition function -------------------------
+            onChain = onChain
+                  .Append(new PlutusSubsectionComment(0, "Tx transition function"));
+            var txTransitionSig = NonTxTransitionVisitor.TransitionFunctionSignature;
+
 
             //Result
             return pragmas

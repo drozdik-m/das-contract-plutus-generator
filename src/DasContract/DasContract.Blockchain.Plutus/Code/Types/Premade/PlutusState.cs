@@ -8,24 +8,23 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Code.Types.Premade
 {
-    public class PlutusMaybe : PlutusPremadeType
+    public class PlutusState : PlutusPremadeType
     {
         
 
-        public PlutusMaybe(INamable innerType)
+        public PlutusState(INamable innerType)
         {
             InnerType = innerType;
         }
 
         public INamable InnerType { get; }
 
-        private string InnerTypeString => InnerType.Name.Contains(" ") 
-                && !(InnerType.Name.StartsWith("(") && InnerType.Name.EndsWith(")"))
+        private string InnerTypeString => InnerType.Name.Contains(" ")
             ? $"({InnerType.Name})"
             : InnerType.Name;
 
-        public override string Name => $"Maybe {InnerTypeString}";
+        public override string Name => $"State {InnerTypeString}";
 
-        public static PlutusMaybe Type(INamable innerType) => new PlutusMaybe(innerType);
+        public static PlutusState Type(INamable innerType) => new PlutusState(innerType);
     }
 }

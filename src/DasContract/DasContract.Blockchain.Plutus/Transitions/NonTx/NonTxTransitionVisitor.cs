@@ -5,6 +5,8 @@ using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Types.Determined;
+using DasContract.Blockchain.Plutus.Code.Types.Premade;
+using DasContract.Blockchain.Plutus.Code.Types.Temporary;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
@@ -28,33 +30,6 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
         }
 
-        /// <summary>
-        /// Returns a comment that indicates transition direction
-        /// </summary>
-        /// <param name="sourceName">The name of the source</param>
-        /// <param name="targetName">The name of the target</param>
-        /// <returns></returns>
-        IPlutusCode TransitionComment(string sourceName, string targetName)
-        {
-            return new PlutusCode(new IPlutusLine[]
-            {
-                new PlutusComment(0, $"{sourceName} -> {targetName}")
-            });
-        }
-
-        /// <summary>
-        /// Returns a comment that indicates transition direction with a stack-return note
-        /// </summary>
-        /// <param name="sourceName">The name of the source</param>
-        /// <param name="targetName">The name of the target</param>
-        /// <returns></returns>
-        IPlutusCode TransitionCommentWithReturn(string sourceName, string targetName, string returnName)
-        {
-            return new PlutusCode(new IPlutusLine[]
-            {
-                new PlutusComment(0, $"{sourceName} -> {targetName} / return {returnName}")
-            });
-        }
 
         /// <summary>
         /// Returns parameter names for the current state
