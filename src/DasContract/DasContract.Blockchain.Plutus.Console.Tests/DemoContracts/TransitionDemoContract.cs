@@ -39,7 +39,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
 
             var callSub2 = new ContractCallActivity()
             {
-                Id = "Script1Sub",
+                Id = "CallSub2",
                 CalledProcess = subprocess2,
             };
 
@@ -57,10 +57,8 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
             var mainStart = new ContractStartEvent() { Id = "StartEvent" };
             var mainEnd = new ContractEndEvent() { Id = "EndEvent" };
 
-            var script1 = new ContractScriptActivity()
-            {
-                Id = "Script1",
-            };
+            var script1 = new ContractScriptActivity() { Id = "Script1", };
+            var script2 = new ContractScriptActivity() { Id = "Script2", };
 
             var script1Loop = new ContractScriptActivity()
             {
@@ -141,8 +139,8 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                 MultiInstance = new ContractSequentialMultiInstance() { LoopCardinality = "9" }
             };
 
-            mainStart.Outgoing = callActivitySub1;
-            callActivitySub1.Outgoing = script1;
+            mainStart.Outgoing = callActivitySub1Loop;
+            callActivitySub1Loop.Outgoing = script1;
             script1.Outgoing = mainEnd;
 
             /*mainStart.Outgoing = exclusiveGateway1;
@@ -154,14 +152,22 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                 new ContractConditionedConnection() { Condition = "condition4", Target = user1Loop },
                 new ContractConditionedConnection() { Condition = "condition5", Target = user1LoopTimer },
                 new ContractConditionedConnection() { Condition = "condition6", Target = user1Timer },
+                new ContractConditionedConnection() { Condition = "condition7", Target = callActivitySub1 },
+                new ContractConditionedConnection() { Condition = "condition8", Target = callActivitySub1Loop },
+                new ContractConditionedConnection() { Condition = "condition9", Target = script2 },
+                new ContractConditionedConnection() { Condition = "otherwise", Target = mergingGateway1 },
             };
             script1.Outgoing = mergingGateway1;
+            script2.Outgoing = mergingGateway1;
             script1Loop.Outgoing = mergingGateway1;
             user1.Outgoing = mergingGateway1;
             user1Loop.Outgoing = mergingGateway1;
             user1LoopTimer.Outgoing = mergingGateway1;
             user1Timer.Outgoing = mergingGateway1;
+            callActivitySub1.Outgoing = mergingGateway1;
+            callActivitySub1Loop.Outgoing = mergingGateway1;
             mergingGateway1.Outgoing = mainEnd;*/
+            
 
             var mainProcess = new ContractProcess()
             {
@@ -177,6 +183,8 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                        AllProcesses = new ContractProcess[]
                        {
                            mainProcess,
+                           subprocess1,
+                           subprocess2,
                        }
                  },
                  DataModel = new ContractDataModel()

@@ -84,7 +84,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 returnNamePushedState = $"({returnNamePushedState})";
 
             var result = TransitionFunctionSignature.Name + 
-                $" $ pushState {returnNamePushedState} $ datum " + "{ " +
+                $" $ pushState {returnNamePushedState} $ dat " + "{ " +
                 $"contractState = {futureName}" +
                 " }";
 
@@ -129,7 +129,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
             return TransitionCommentWithReturn(currentName, futureName, returnName)
                 .Append(transitionFunction)
-                .Append(PlutusLine.Empty);
+                .Append(PlutusLine.Empty)
+                .Append(callActivity.Accept(this));
         }
 
         /// <summary>
@@ -198,6 +199,12 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             return TransitionFunctionSignature.Name + " $ " + transformFunctionName + " dat{ contractState = " + futureName + " }";
         }
 
+        /// <summary>
+        /// Code for user defined method for script transitions (the code after "where")
+        /// </summary>
+        /// <param name="scriptActivity"></param>
+        /// <param name="transformFunctionName"></param>
+        /// <returns></returns>
         IEnumerable<IPlutusLine> ScriptTransitionUserDefinedSnippet(
             ContractScriptActivity scriptActivity, 
             string transformFunctionName = "userDefinedNewDatum")
@@ -256,9 +263,16 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 .Append(target.Accept(this));
         }
 
+        /// <summary>
+        /// Standard transition for most elements with single output
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         IPlutusCode SingleOutputCommongTransition(ContractProcessElement source, ContractProcessElement target)
         {
-            var typeVisitor = new TxTypeVisitor();
+            var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
             var txType = target.Accept(typeVisitor);
 
             //Tx types
@@ -298,6 +312,33 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 throw new Exception("Unknown TxType");
         }
 
+        /// <summary>
+        /// Transition that returns from a subprocess using the state stack
+        /// </summary>
+        /// <param name="endEvent"></param>
+        /// <returns></returns>
+        IPlutusCode ReturnFromSubprocessTransition(ContractEndEvent endEvent)
+        {
+            var sourceName = CurrentElementName(endEvent, Subprocess);
+
+            var resultCode = new List<IPlutusLine>
+                {
+                        new PlutusRawLine(1, "let"),
+                            new PlutusRawLine(2, "(newState, newDat) = popState dat"),
+                        new PlutusRawLine(1, "in"),
+                            new PlutusRawLine(2, TransitionFunctionSignature.Name +
+                            " $ newDat { contractState = newState }"),
+                        PlutusLine.Empty
+                };
+
+            var transitionFunction = new PlutusFunction(0,
+                TransitionFunctionSignature,
+                CurrentStateParams(sourceName),
+                resultCode);
+
+            return TransitionComment(sourceName, "/return/")
+                .Append(transitionFunction);
+        }
 
         #region elementTransitions
 
@@ -313,18 +354,20 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var guardLines = new List<IPlutusLine>();
             var whereLines = new List<IPlutusLine>();
 
- 
+            if (targets.Count == 0)
+                throw new Exception("Exclusive Gateway has no outputs");
+
             var i = 0;
             foreach (var targetConnection in targets)
             {
                 var target = targetConnection.Target;
                 var condition = targetConnection.Condition;
 
-                var typeVisitor = new TxTypeVisitor();
+                var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
                 var txType = target.Accept(typeVisitor);
 
-                //Tx types only
-                if (txType != TxType.Tx)
+                //NonTx types only
+                if (txType != TxType.NonTx)
                 {
                     i++;
                     continue;
@@ -355,22 +398,34 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
                 //Other situations
                 else
-                    return SimpleStateTransition(element, target);
+                    guardLines.Add(new PlutusRawLine(1, $"| {condition} = {SimpleStateTransitionSnippet(target)}"));
 
                 i++;
             }
 
-            var resultFunction = new PlutusFunction(0,
-                TransitionFunctionSignature,
-                CurrentStateParams(CurrentElementName(element, Subprocess)),
-                guardLines
-                    .Append(PlutusLine.Empty)
-                    .Append(new PlutusRawLine(1, "where"))
-                    .Concat(whereLines))
-                    .Append(PlutusLine.Empty);
 
+
+            IPlutusCode resultFunction = PlutusCode.Empty;
+            if (guardLines.Count != 0)
+            {
+                guardLines.Add(PlutusLine.Empty);
+                if (whereLines.Count > 0)
+                {
+                    guardLines.Add(new PlutusRawLine(1, "where"));
+                    guardLines.AddRange(whereLines);
+                    guardLines.Add(PlutusLine.Empty);
+                }
+
+                resultFunction = new PlutusFunction(0,
+                    TransitionFunctionSignature,
+                    CurrentStateParams(CurrentElementName(element, Subprocess)),
+                    guardLines)
+                .Prepend(TransitionComment(CurrentElementName(element), "/branch/"));
+            }
+
+            //Collect others
             foreach(var targetConnection in targets)
-                resultFunction.Append(targetConnection.Target.Accept(this));
+                resultFunction = resultFunction.Append(targetConnection.Target.Accept(this));
 
             return resultFunction;
         }
@@ -402,7 +457,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 var targetName = AddSubprocessPrefix(element.CalledProcess, element.CalledProcess.StartEvent.Name);
 
                 var codeSnippet = TransitionFunctionSignature.Name +
-                    $" $ pushState ({returnName}) $ datum " +
+                    $" $ pushState ({returnName}) $ dat " +
                     "{ contractState = " + targetName + " }";
 
                 loopTransition = TransitionCommentWithReturn(currentName, targetName, returnName)
@@ -493,6 +548,17 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
             var target = element.Outgoing;
             return SingleOutputCommongTransition(element, target);
+        }
+
+        /// <inheritdoc/>
+        public override IPlutusCode Visit(ContractEndEvent element)
+        {
+            //Main process end event
+            if (Subprocess is null)
+                return PlutusCode.Empty;
+
+            //Subprocess end event
+            return ReturnFromSubprocessTransition(element);
         }
         #endregion
 

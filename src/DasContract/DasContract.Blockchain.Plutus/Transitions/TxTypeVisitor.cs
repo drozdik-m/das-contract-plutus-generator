@@ -16,13 +16,20 @@ namespace DasContract.Blockchain.Plutus.Transitions
 {
     public class TxTypeVisitor : IContractProcessElementVisitor<TxType>
     {
+
+        public bool IsSubprocess { get; }
+        public TxTypeVisitor(bool isSubprocess)
+        {
+            IsSubprocess = isSubprocess;
+        }
+
         public TxType Visit(ContractExclusiveGateway element) => TxType.NonTx;
 
         public TxType Visit(ContractMergingExclusiveGateway element) => TxType.NonTx;
 
         public TxType Visit(ContractStartEvent element) => TxType.Implicit;
 
-        public TxType Visit(ContractEndEvent element) => TxType.Tx;
+        public TxType Visit(ContractEndEvent element) => IsSubprocess ? TxType.NonTx : TxType.Tx;
 
         public TxType Visit(ContractCallActivity element) => TxType.NonTx;
 

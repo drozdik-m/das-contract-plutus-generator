@@ -91,10 +91,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             return result;
         }
 
-        public IPlutusCode Visit(ContractEndEvent element)
-        {
-            return PlutusCode.Empty;
-        }
 
         public abstract IPlutusCode Visit(ContractExclusiveGateway element);
         public abstract IPlutusCode Visit(ContractMergingExclusiveGateway element);
@@ -103,5 +99,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
         public abstract IPlutusCode Visit(ContractScriptActivity element);
         public abstract IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
         public abstract IPlutusCode Visit(ContractStartEvent element);
+        public abstract IPlutusCode Visit(ContractEndEvent element);
     }
 }

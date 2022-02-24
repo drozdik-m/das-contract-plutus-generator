@@ -650,14 +650,26 @@ namespace DasContract.Blockchain.Plutus
                 .Append(scriptTransitionSig)
                 .Append(PlutusLine.Empty);
 
+            //Root process
             var nonTxTransitionVisitor = new NonTxTransitionVisitor();
-            var nonTxTransitions = nonTxTransitionVisitor.Visit(contract.Processes.Main.StartEvent);
-
-            //TODO subprocesses
-            var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
-
+            var nonTxTransitionsRoot = nonTxTransitionVisitor.Visit(contract.Processes.Main.StartEvent);
             onChain = onChain
-                .Append(nonTxTransitions)
+                .Append(new PlutusComment(0, "--> MAIN PROCESS"))
+                .Append(nonTxTransitionsRoot);
+
+            //Subprocesses
+            foreach(var subprocess in contract.Processes.Subprocesses)
+            {
+                var nonTxTransitionSubprocessVisitor = new NonTxTransitionVisitor(subprocess);
+                var nonTxTransitionsSubprocess = nonTxTransitionSubprocessVisitor.Visit(subprocess.StartEvent);
+                onChain = onChain
+                    .Append(new PlutusComment(0, $"--> {subprocess.Name.ToUpperInvariant()}"))
+                    .Append(nonTxTransitionsSubprocess);
+            }
+
+            //Identity transition
+            var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
+            onChain = onChain
                 .Append(identityTransition)
                 .Append(PlutusLine.Empty);
 
