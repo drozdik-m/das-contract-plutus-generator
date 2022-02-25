@@ -94,8 +94,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
 
             var user1LoopTimer = new ContractUserActivity()
             {
-                Id = "User1Loop",
-                Code = user1.Code,
+                Id = "User1LoopTimer",
                 MultiInstance = new ContractSequentialMultiInstance() { LoopCardinality = "4" },
                 BoundaryEvents = new ContractBoundaryEvent[]
                 {
@@ -110,7 +109,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
 
             var user1Timer = new ContractUserActivity()
             {
-                Id = "User1Loop",
+                Id = "User1Timer",
                 Code = user1.Code,
                 BoundaryEvents = new ContractBoundaryEvent[]
                 {
@@ -139,9 +138,8 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                 MultiInstance = new ContractSequentialMultiInstance() { LoopCardinality = "9" }
             };
 
-            /*mainStart.Outgoing = callActivitySub1Loop;
-            callActivitySub1Loop.Outgoing = script1;
-            script1.Outgoing = mainEnd;*/
+            /*mainStart.Outgoing = user1LoopTimer;
+            user1LoopTimer.Outgoing = mainEnd;*/
 
             mainStart.Outgoing = exclusiveGateway1;
             exclusiveGateway1.Outgoing = new List<ContractConditionedConnection>()

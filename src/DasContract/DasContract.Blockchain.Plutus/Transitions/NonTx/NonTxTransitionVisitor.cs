@@ -100,7 +100,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     new PlutusRawLine(1, CallTransitionSnippet(callActivity)),
                 });
 
-            return TransitionCommentWithReturn(currentName, futureName, returnName)
+            return TransitionCommentWithReturn(0, currentName, futureName, returnName)
                 .Append(transitionFunction)
                 .Append(PlutusLine.Empty)
                 .Append(callActivity.Accept(this));
@@ -151,7 +151,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                         new PlutusRawLine(1, SimpleStateTransitionSnippet(target))
                 });
 
-            return TransitionComment(sourceName, futureName)
+            return TransitionComment(0, sourceName, futureName)
                 .Append(transitionFunction)
                 .Append(PlutusLine.Empty)
                 .Append(target.Accept(this));
@@ -230,7 +230,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 CurrentStateParams(sourceName),
                 resultCode);
 
-            return TransitionComment(sourceName, futureName)
+            return TransitionComment(0, sourceName, futureName)
                 .Append(transitionFunction)
                 .Append(PlutusLine.Empty)
                 .Append(target.Accept(this));
@@ -243,7 +243,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <param name="target"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        IPlutusCode SingleOutputCommongTransition(ContractProcessElement source, ContractProcessElement target)
+        IPlutusCode SingleOutputCommonTransition(ContractProcessElement source, ContractProcessElement target)
         {
             var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
             var txType = target.Accept(typeVisitor);
@@ -309,7 +309,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 CurrentStateParams(sourceName),
                 resultCode);
 
-            return TransitionComment(sourceName, "/return/")
+            return TransitionComment(0, sourceName, "/return/")
                 .Append(transitionFunction);
         }
 
@@ -411,7 +411,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     CurrentStateParams(CurrentElementName(element, Subprocess)),
                     Array.Empty<IPlutusLine>())
                 .Append(where)
-                .Prepend(TransitionComment(CurrentElementName(element), "/branch/"));
+                .Prepend(TransitionComment(0, CurrentElementName(element), "/branch/"));
             }
 
             //Collect others
@@ -429,7 +429,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             var target = element.Outgoing;
-            return SingleOutputCommongTransition(element, target);
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -451,7 +451,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     $" $ pushState ({returnName}) $ dat " +
                     "{ contractState = " + targetName + " }";
 
-                loopTransition = TransitionCommentWithReturn(currentName, targetName, returnName)
+                loopTransition = TransitionCommentWithReturn(0, currentName, targetName, returnName)
                     .Append(new PlutusFunction(0,
                         TransitionFunctionSignature,
                         CurrentStateParams(currentName),
@@ -463,7 +463,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             }
 
             //Next transition
-            var nextTransition = SingleOutputCommongTransition(element, element.Outgoing);
+            var nextTransition = SingleOutputCommonTransition(element, element.Outgoing);
 
             return loopTransition
                 .Append(nextTransition);
@@ -477,7 +477,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             var target = element.Outgoing;
-            return SingleOutputCommongTransition(element, target);
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -505,7 +505,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 resultCode.AddRange(codeSnippet);
                 resultCode.Add(PlutusLine.Empty);
 
-                loopTransition = TransitionComment(currentName, targetName)
+                loopTransition = TransitionComment(0, currentName, targetName)
                     .Append(new PlutusFunction(0,
                         TransitionFunctionSignature,
                         CurrentStateParams(currentName),
@@ -513,7 +513,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             }
 
             //Next transition
-            var nextTransition = SingleOutputCommongTransition(element, element.Outgoing);
+            var nextTransition = SingleOutputCommonTransition(element, element.Outgoing);
 
             return loopTransition
                 .Append(nextTransition);
@@ -527,7 +527,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             var target = element.TimeOutDirection;
-            return SingleOutputCommongTransition(element, target);
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -538,7 +538,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             var target = element.Outgoing;
-            return SingleOutputCommongTransition(element, target);
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>

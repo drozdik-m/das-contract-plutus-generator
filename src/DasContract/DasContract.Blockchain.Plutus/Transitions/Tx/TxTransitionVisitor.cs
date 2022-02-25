@@ -32,11 +32,12 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         }
 
         /// <summary>
-        /// Returns parameter names for the current state
+        /// Returns line for pattern matching of this state
         /// </summary>
-        /// <param name="currentStateName">The name of the current state</param>
+        /// <param name="currentStateName"></param>
+        /// <param name="redeemerName"></param>
         /// <returns></returns>
-        string CurrentStateMatching(string currentStateName, string redeemerName)
+        IPlutusLine CurrentStateMatching(string currentStateName, string redeemerName)
         {
             string redeemer = redeemerName;
 
@@ -45,8 +46,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 redeemer = $"red@({redeemerName} f)";
 
 
-            return "(par, dat@ContractDatum { contractState = " + currentStateName
-                + " }, v, " + redeemer + "))";
+            return new PlutusRawLine(2, "(par, dat@ContractDatum { contractState = " + currentStateName
+                + " }, v, " + redeemer + "))");
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         IPlutusLine GuardLine(bool expectedVal = false, bool formValidation = false, string transitionCondition = "")
         {
             string userDefinedExpectedValue = $"{UserDefinedExpectedValueSignature.Name} par dat v";
-            const string userDefinedFormValidation = "userDefinedFormValidation par dat red v";
+            const string userDefinedFormValidation = "userDefinedFormValidation par dat v f";
 
             var conditions = new List<string>();
 
@@ -85,30 +86,34 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <param name="newDatumExp">New datum</param>
         /// <param name="newValueExp">New contract value</param>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> ReturningJust(IEnumerable<string> constrains, string newDatumExp, string newValueExp)
+        IPlutusCode ReturningJust(IEnumerable<string> constrains, string newDatumExp, string newValueExp)
         {
             string constrainsLine = string.Join(" <> ", constrains);
+            if (constrains.Count() == 0)
+                constrainsLine = "mempty";
 
             newDatumExp = PlutusCode.ProperlyBracketed(newDatumExp);
             newValueExp = PlutusCode.ProperlyBracketed(newValueExp);
 
-            return new List<IPlutusLine>()
-            {
-                new PlutusRawLine(4, "Just ("),
-                    new PlutusRawLine(5, constrainsLine),
-                    new PlutusRawLine(5, "State " + newDatumExp),
-                    new PlutusRawLine(5, "      " + newValueExp),
-                new PlutusRawLine(4, "     )"),
-            };
+            return new PlutusCode(
+                    new IPlutusLine[]
+                    {
+                        new PlutusRawLine(4, "Just ("),
+                            new PlutusRawLine(5, constrainsLine + ","),
+                            new PlutusRawLine(5, "State " + newDatumExp),
+                            new PlutusRawLine(5, "      " + newValueExp),
+                        new PlutusRawLine(4, "     )"),
+                    }
+                );
         }
 
         /// <summary>
-        /// Generate where user defined statements for a user activity
+        /// Generate "where" user defined statements for a user activity
         /// </summary>
         /// <param name="userActivity"></param>
         /// <param name="statements"></param>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> WhereStatements(ContractUserActivity userActivity, params TxUserDefinedStatement[] statements)
+        IPlutusCode WhereStatements(ContractUserActivity userActivity, params TxUserDefinedStatement[] statements)
         {
             var result = new List<IPlutusLine>();
 
@@ -122,17 +127,20 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             void CommonLines(PlutusFunctionSignature sig, IEnumerable<string> parameters, IEnumerable<string> codeLines, string def)
             {
                 result.Add(sig);
-                var code = new List<IPlutusLine>();
+
+
+
                 if (codeLines.Count() == 0)
-                    code.Add(new PlutusRawLine(4, def));
-                else
-                {
-                    code.AddRange(PlutusFunction.GetLinesOfCode(4,
+                    codeLines = new List<string>
+                    {
+                        def
+                    };
+
+                result.AddRange(PlutusFunction.GetLinesOfCode(4,
                         sig,
                         parameters,
-                        codeLines.Select(e => new PlutusRawLine(4, e))));
-                    code.Add(PlutusLine.Empty);
-                }
+                        codeLines.Select(e => new PlutusRawLine(5, e))));
+                result.Add(PlutusLine.Empty);
             }
 
             //Transition
@@ -163,10 +171,10 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             //Expected value
             if (statements.Contains(TxUserDefinedStatement.UserDefinedExpectedValue))
             {
-                CommonLines(UserDefinedNewValueSignature,
+                CommonLines(UserDefinedExpectedValueSignature,
                     commonParams,
-                    userActivity.NewValueCodeLines,
-                    "val");
+                    userActivity.ExpectedValueCodeLines,
+                    "True");
             }
 
             //New value
@@ -187,95 +195,140 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     "mempty");
             }
 
-            return result;
+
+            IPlutusCode resCode = new PlutusCode(result);
+
+            if (result.Count > 0)
+                resCode = resCode.Prepend(new PlutusRawLine(3, "where"));
+
+            return resCode;
         }
 
         /// <summary>
-        /// Creates transition into the end event
+        /// Creates transition into the final contract end event
         /// </summary>
         /// <param name="endEvent"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private IPlutusCode EndEventTransition(ContractProcessElement source, ContractEndEvent endEvent)
+        IPlutusCode EndEventTransition(ContractProcessElement source, ContractEndEvent endEvent, string condition = "")
         {
             var currentName = CurrentElementName(source);
-            var targetName = FutureElementName(endEvent);
+            var targetName = PlutusContractFinished.Type.Name;
 
-            var matchLine = CurrentStateMatching(currentName, targetName);
+            var comment = TransitionComment(2, currentName, targetName);
+            var matchLine = CurrentStateMatching(currentName, PlutusContractFinishedRedeemer.Type.Name);
+            var guardLine = GuardLine(transitionCondition: condition);
+            var returningJust = ReturningJust(
+                Array.Empty<string>(),
+                "dat { contractState = " + targetName + " }",
+                "lovelaceValueOf 0");
 
-            throw new NotImplementedException();
+            return comment
+                .Append(matchLine)
+                .Append(guardLine)
+                .Append(returningJust)
+                .Append(PlutusLine.Empty);
         }
 
         /// <summary>
-        /// Standard transition for most elements with single output
+        ///  Creates transition into a user activity
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="userActivity"></param>
+        /// <returns></returns>
+        IPlutusCode UserActivityTransition(ContractProcessElement source, ContractUserActivity userActivity, string condition = "")
+        {
+            
+            var currentName = CurrentElementName(source);
+
+            IPlutusCode resultCode = PlutusCode.Empty;
+            var boundaryTimerEvent = userActivity.BoundaryEvents.OfType<ContractTimerBoundaryEvent>().FirstOrDefault();
+            
+
+            //Regular transition
+            {
+                var targetName = FutureElementName(userActivity);
+
+                var constraints = new List<string>
+                {
+                    UserDefinedConstraintsSignature.Name + " par dat v",
+                    "TODO" //TODO user signature
+                };
+
+                if (!(boundaryTimerEvent is null))
+                    constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
+
+                var comment = TransitionComment(2, currentName, targetName);
+                var matchLine = CurrentStateMatching(currentName, PlutusUserActivityRedeemer.Type(userActivity).Name);
+                var guardLine = GuardLine(expectedVal: true, formValidation: true, transitionCondition: condition);
+                var returningJust = ReturningJust(
+                    constraints,
+                    NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                        " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
+                    UserDefinedNewValueSignature.Name + " par dat v");
+                var whereStatements = WhereStatements(userActivity,
+                    TxUserDefinedStatement.UserDefinedTransition,
+                    TxUserDefinedStatement.UserDefinedExpectedValue,
+                    TxUserDefinedStatement.UserDefinedNewValue,
+                    TxUserDefinedStatement.UserDefinedConstraints);
+
+                resultCode = resultCode
+                    .Append(comment)
+                    .Append(matchLine)
+                    .Append(guardLine)
+                    .Append(returningJust)
+                    .Append(whereStatements)
+                    .Append(PlutusLine.Empty);
+            }
+
+            //Timeout transition
+            if (!(boundaryTimerEvent is null))
+            {
+                var targetName = FutureElementName(boundaryTimerEvent);
+
+                var comment = TransitionCommentWithTimeout(2, currentName, targetName);
+                var matchLine = CurrentStateMatching(currentName, PlutusTimeoutRedeemer.Type.Name);
+                var guardLine = GuardLine(expectedVal: true, transitionCondition: condition);
+                var returningJust = ReturningJust(
+                    new string[]
+                    {
+                        $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
+                    },
+                    NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                        " $ datum { contractState = " + targetName + " }",
+                    "v");
+                var whereStatements = WhereStatements(userActivity,
+                    TxUserDefinedStatement.UserDefinedExpectedValue);
+
+                resultCode = resultCode
+                    .Append(comment)
+                    .Append(matchLine)
+                    .Append(guardLine)
+                    .Append(returningJust)
+                    .Append(whereStatements)
+                    .Append(PlutusLine.Empty);
+            }
+
+            resultCode = resultCode
+                .Append(userActivity.Accept(this));
+
+             if (!(boundaryTimerEvent is null))
+                resultCode = resultCode
+                    .Append(boundaryTimerEvent.Accept(this));
+
+            return resultCode;
+        }
+
+
+        /// <summary>
+        /// Standard tx transition for most elements with single output
         /// </summary>
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        /*IPlutusCode SingleOutputCommongTransition(ContractProcessElement source, ContractProcessElement target)
+        IPlutusCode SingleOutputCommonTransition(ContractProcessElement source, ContractProcessElement target, string condition = "")
         {
-            var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
-            var txType = target.Accept(typeVisitor);
-
-            //Tx types
-            if (txType == TxType.Implicit || txType == TxType.Tx)
-                return target.Accept(this);
-
-            //NonTx type
-            else if (txType == TxType.NonTx)
-            {
-                //Target is an activity
-                if (target is ContractActivity activity)
-                {
-                    //Target is sequential multi instance activity
-                    if (activity.MultiInstance is ContractSequentialMultiInstance)
-                        return SimpleStateTransition(source, target);
-
-                    //Target is contract call activity
-                    else if (activity is ContractCallActivity callActivity)
-                        return CallTransition(source, callActivity);
-
-                    //Target is contract script activity
-                    else if (activity is ContractScriptActivity scriptActivity)
-                        return ScriptTransition(source, scriptActivity);
-
-                    //Other activities
-                    else
-                        return SimpleStateTransition(source, target);
-                }
-
-                //Other situations
-                else
-                    return SimpleStateTransition(source, target);
-            }
-
-            //Unhandled tx type
-            else
-                throw new Exception("Unknown TxType");
-        }*/
-
-        #region elementTransitions
-
-        /// <inheritdoc/>
-        public override IPlutusCode Visit(ContractExclusiveGateway element)
-        {
-            //Already visited
-            if (!TryVisit(element))
-                return PlutusCode.Empty;
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public override IPlutusCode Visit(ContractMergingExclusiveGateway element)
-        {
-            //Already visited
-            if (!TryVisit(element))
-                return PlutusCode.Empty;
-
-            var target = element.Outgoing;
-
             var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
             var txType = target.Accept(typeVisitor);
 
@@ -286,47 +339,52 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             //Tx type
             else if (txType == TxType.Tx)
             {
-                //TODO end event target
+                //End event
                 if (target is ContractEndEvent endEvent)
-                    return EndEventTransition(element, endEvent);
+                    return EndEventTransition(source, endEvent, condition);
 
-                //TODO call activity traget
+                //User activity
+                if (target is ContractUserActivity userActivity)
+                    return UserActivityTransition(source, userActivity, condition);
 
-                //TODO call timeouted (non sequential) activity traget (target = timer boundary event)
-
-
-
-
-                //Target is an activity
-                /*if (target is ContractActivity activity)
-                {
-                    //Target is sequential multi instance activity
-                    if (activity.MultiInstance is ContractSequentialMultiInstance)
-                        return SimpleStateTransition(source, target);
-
-                    //Target is contract call activity
-                    else if (activity is ContractCallActivity callActivity)
-                        return CallTransition(source, callActivity);
-
-                    //Target is contract script activity
-                    else if (activity is ContractScriptActivity scriptActivity)
-                        return ScriptTransition(source, scriptActivity);
-
-                    //Other activities
-                    else
-                        return SimpleStateTransition(source, target);
-                }
-
-                //Other situations
+                //Unhandled tx element
                 else
-                    return SimpleStateTransition(source, target);*/
+                    throw new Exception("Unhandled Tx element");
             }
 
             //Unhandled tx type
             else
                 throw new Exception("Unknown TxType");
+        }
 
-            throw new NotImplementedException();
+        #region elementTransitions
+
+        /// <inheritdoc/>
+        public override IPlutusCode Visit(ContractExclusiveGateway element)
+        {
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            IPlutusCode result = PlutusCode.Empty;
+            foreach(var target in element.Outgoing)
+            {
+                result = result
+                    .Append(SingleOutputCommonTransition(element, target.Target, target.Condition));
+            }
+
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public override IPlutusCode Visit(ContractMergingExclusiveGateway element)
+        {
+            //Already visited
+            if (!TryVisit(element))
+                return PlutusCode.Empty;
+
+            var target = element.Outgoing;
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -336,7 +394,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            throw new NotImplementedException();
+            var target = element.Outgoing;
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -346,7 +405,84 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            throw new NotImplementedException();
+            IPlutusCode resultCode = PlutusCode.Empty;
+
+            //Sequential multi instance
+            if (element.MultiInstance is ContractSequentialMultiInstance sequentialMultiInstance)
+            {
+                var boundaryTimerEvent = element.BoundaryEvents.OfType<ContractTimerBoundaryEvent>().FirstOrDefault();
+
+                //Loop transition
+                {
+                    var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} (ToLoop i)");
+                    var targetName = AddSubprocessPrefix(Subprocess, $"{element.Name} (toNextSeqMultiInstance i)");
+
+                    var constraints = new List<string>
+                    {
+                        UserDefinedConstraintsSignature.Name + " par dat v",
+                        "TODO" //TODO user signature
+                    };
+
+                    if (!(boundaryTimerEvent is null))
+                        constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
+
+                    var comment = TransitionComment(2, currentName, targetName);
+                    var matchLine = CurrentStateMatching(currentName, PlutusUserActivityRedeemer.Type(element).Name);
+                    var guardLine = GuardLine(expectedVal: true, formValidation: true);
+                    var returningJust = ReturningJust(
+                        constraints,
+                        NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                            " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
+                        UserDefinedNewValueSignature.Name + " par dat v");
+                    var whereStatements = WhereStatements(element,
+                        TxUserDefinedStatement.UserDefinedTransition,
+                        TxUserDefinedStatement.UserDefinedExpectedValue,
+                        TxUserDefinedStatement.UserDefinedNewValue,
+                        TxUserDefinedStatement.UserDefinedConstraints);
+
+                    resultCode = resultCode
+                        .Append(comment)
+                        .Append(matchLine)
+                        .Append(guardLine)
+                        .Append(returningJust)
+                        .Append(whereStatements)
+                        .Append(PlutusLine.Empty);
+                }
+
+                //Loop timeout transition
+                if (!(boundaryTimerEvent is null))
+                {
+                    var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} _");
+                    var targetName = FutureElementName(boundaryTimerEvent);
+
+                    var comment = TransitionCommentWithTimeout(2, currentName, targetName);
+                    var matchLine = CurrentStateMatching(currentName, PlutusTimeoutRedeemer.Type.Name);
+                    var guardLine = GuardLine(expectedVal: true);
+                    var returningJust = ReturningJust(
+                        new string[]
+                        {
+                            $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
+                        },
+                        NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                            " $ datum { contractState = " + targetName + " }",
+                        "v");
+                    var whereStatements = WhereStatements(element,
+                        TxUserDefinedStatement.UserDefinedExpectedValue);
+
+                    resultCode = resultCode
+                        .Append(comment)
+                        .Append(matchLine)
+                        .Append(guardLine)
+                        .Append(returningJust)
+                        .Append(whereStatements)
+                        .Append(PlutusLine.Empty);
+                }
+            }
+
+            //Continue
+            var target = element.Outgoing;
+            return resultCode
+                .Append(SingleOutputCommonTransition(element, target));
         }
 
         /// <inheritdoc/>
@@ -356,7 +492,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            throw new NotImplementedException();
+            var target = element.Outgoing;
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -366,7 +503,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            throw new NotImplementedException();
+            var target = element.TimeOutDirection;
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
@@ -376,17 +514,14 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            throw new NotImplementedException();
+            var target = element.Outgoing;
+            return SingleOutputCommonTransition(element, target);
         }
 
         /// <inheritdoc/>
         public override IPlutusCode Visit(ContractEndEvent element)
         {
-            //Already visited
-            if (!TryVisit(element))
-                return PlutusCode.Empty;
-
-            throw new NotImplementedException();
+            return PlutusCode.Empty;
         }
         #endregion
 

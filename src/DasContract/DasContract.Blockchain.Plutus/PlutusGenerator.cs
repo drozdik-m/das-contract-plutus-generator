@@ -209,6 +209,9 @@ namespace DasContract.Blockchain.Plutus
                                 e
                             }))
                          )
+                        .Append(new PlutusAlgebraicTypeConstructor(
+                            PlutusContractFinished.Type.Name, 
+                            Array.Empty<INamable>()))
                 , new List<string>()
                 {
                     "Show",
@@ -385,8 +388,8 @@ namespace DasContract.Blockchain.Plutus
                     {
                         PlutusFutureDataType.Type(e.FormName)
                     }))
-                .Append(new PlutusAlgebraicTypeConstructor("ContractFinishedRedeemer", Array.Empty<INamable>()))
-                .Append(new PlutusAlgebraicTypeConstructor("TimeoutRedeemer", Array.Empty<INamable>())),
+                .Append(new PlutusAlgebraicTypeConstructor(PlutusContractFinishedRedeemer.Type.Name, Array.Empty<INamable>()))
+                .Append(new PlutusAlgebraicTypeConstructor(PlutusTimeoutRedeemer.Type.Name, Array.Empty<INamable>())),
             new List<string>()
             {
                 "Show",
@@ -668,13 +671,52 @@ namespace DasContract.Blockchain.Plutus
             //Identity transition
             var identityTransition = new PlutusOnelineFunction(0, scriptTransitionSig, new string[] { "d" }, "d");
             onChain = onChain
+                .Append(new PlutusComment(0, "--> DEFAULT"))
                 .Append(identityTransition)
                 .Append(PlutusLine.Empty);
 
             // -- Tx transition function -------------------------
             onChain = onChain
                   .Append(new PlutusSubsectionComment(0, "Tx transition function"));
-            var txTransitionSig = NonTxTransitionVisitor.TransitionFunctionSignature;
+            
+            var txTransitionSig = TxTransitionVisitor.TransitionFunctionSignature;
+            IPlutusCode txTransition = new PlutusFunction(0, txTransitionSig, new string[]
+            {
+                "cParam",
+                "cState",
+                "cRedeemer"
+            }, new IPlutusLine[]
+            {
+                PlutusLine.Empty,
+                new PlutusComment(1, "  (ContractParam, ContractDatum   , Value            , ContractRedeemer )"),
+                new PlutusRawLine(1, "case (cParam       , stateData cState, stateValue cState, cRedeemer        ) of"),
+                PlutusLine.Empty,
+            });
+            txTransition = txTransition.Prepend(txTransitionSig);
+
+            //Root process
+            var txTransitionVisitor = new TxTransitionVisitor();
+            var txTransitionsRoot = txTransitionVisitor.Visit(contract.Processes.Main.StartEvent);
+            txTransition = txTransition
+                .Append(new PlutusComment(2, "--> MAIN PROCESS"))
+                .Append(txTransitionsRoot);
+
+            //Subprocesses
+            foreach (var subprocess in contract.Processes.Subprocesses)
+            {
+                var txTransitionSubprocessVisitor = new TxTransitionVisitor(subprocess);
+                var txTransitionsSubprocess = txTransitionSubprocessVisitor.Visit(subprocess.StartEvent);
+                txTransition = txTransition
+                    .Append(new PlutusComment(2, $"--> {subprocess.Name.ToUpperInvariant()}"))
+                    .Append(txTransitionsSubprocess);
+            }
+
+            //Default case
+            txTransition = txTransition
+                .Append(new PlutusComment(2, "--> DEFAULT"))
+                .Append(new PlutusRawLine(2, "_ -> Nothing"));
+
+            onChain = onChain.Append(txTransition);
 
 
             //Result

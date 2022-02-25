@@ -96,11 +96,11 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// <param name="sourceName">The name of the source</param>
         /// <param name="targetName">The name of the target</param>
         /// <returns></returns>
-        protected IPlutusCode TransitionComment(string sourceName, string targetName)
+        protected IPlutusCode TransitionComment(int indent, string sourceName, string targetName)
         {
             return new PlutusCode(new IPlutusLine[]
             {
-                new PlutusComment(0, $"{sourceName} -> {targetName}")
+                new PlutusComment(indent, $"{sourceName} -> {targetName}")
             });
         }
 
@@ -110,11 +110,25 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// <param name="sourceName">The name of the source</param>
         /// <param name="targetName">The name of the target</param>
         /// <returns></returns>
-        protected IPlutusCode TransitionCommentWithReturn(string sourceName, string targetName, string returnName)
+        protected IPlutusCode TransitionCommentWithReturn(int indent, string sourceName, string targetName, string returnName)
         {
             return new PlutusCode(new IPlutusLine[]
             {
-                new PlutusComment(0, $"{sourceName} -> {targetName} / return {returnName}")
+                new PlutusComment(indent, $"{sourceName} -> {targetName} / return {returnName}")
+            });
+        }
+
+        /// <summary>
+        /// Returns a comment that indicates transition direction with a timeout note
+        /// </summary>
+        /// <param name="sourceName">The name of the source</param>
+        /// <param name="targetName">The name of the target</param>
+        /// <returns></returns>
+        protected IPlutusCode TransitionCommentWithTimeout(int indent, string sourceName, string targetName)
+        {
+            return new PlutusCode(new IPlutusLine[]
+            {
+                new PlutusComment(indent, $"{sourceName} -> {targetName} /timeout/")
             });
         }
 
