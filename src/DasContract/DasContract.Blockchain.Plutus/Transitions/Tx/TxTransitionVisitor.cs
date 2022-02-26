@@ -13,6 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Blockchain.Plutus.Data.Users;
 using DasContract.Blockchain.Plutus.Transitions.Tx;
 
 namespace DasContract.Blockchain.Plutus.Transitions.NonTx
@@ -205,6 +206,27 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         }
 
         /// <summary>
+        /// Generates "must be signed by" constraint for a user activity
+        /// </summary>
+        /// <param name="userActivity"></param>
+        /// <returns></returns>
+        string MustBeSignedByConstraint(ContractUserActivity userActivity)
+        {
+            IEnumerable<ContractUser> candidateUsers = userActivity.CandidateUsers;
+            if (!(userActivity.Assignee is null))
+                candidateUsers = candidateUsers.Append(userActivity.Assignee);
+            candidateUsers = candidateUsers.Distinct();
+
+            var candidateUsersString = string.Join(", ", candidateUsers.Select(e => $"\"{e.Name}\""));
+
+            var candidateRoles = userActivity.CandidateRoles;
+            var candidateRolesString = string.Join(", ", candidateRoles.Select(e => $"\"{e.Name}\""));
+
+
+            return $"candidateUsersAndRolesConstraint cParam [{candidateUsersString}] [{candidateRolesString}]";
+        }
+
+        /// <summary>
         /// Creates transition into the final contract end event
         /// </summary>
         /// <param name="endEvent"></param>
@@ -252,7 +274,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 var constraints = new List<string>
                 {
                     UserDefinedConstraintsSignature.Name + " par dat v",
-                    "TODO" //TODO user signature
+                    MustBeSignedByConstraint(userActivity),
                 };
 
                 if (!(boundaryTimerEvent is null))
@@ -420,7 +442,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     var constraints = new List<string>
                     {
                         UserDefinedConstraintsSignature.Name + " par dat v",
-                        "TODO" //TODO user signature
+                        MustBeSignedByConstraint(element),
                     };
 
                     if (!(boundaryTimerEvent is null))

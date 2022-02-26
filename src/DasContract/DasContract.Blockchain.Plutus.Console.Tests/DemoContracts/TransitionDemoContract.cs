@@ -12,6 +12,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Blockchain.Plutus.Data.Users;
 
 namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
 {
@@ -19,6 +20,40 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
     {
         public static PlutusContract Get()
         {
+            //--- USERS ---
+            var cRole1 = new ContractRole()
+            {
+                Id = "Role1",
+                Description = "Rle 1 desc"
+            };
+
+            var cUser1 = new ContractUser()
+            {
+                Id = "User1",
+                Description = "bruh",
+                Address = "somewhere",
+                Roles = new ContractRole[]
+                {
+                    cRole1,
+                }
+            };
+
+
+            var cUser2 = new ContractUser()
+            {
+                Id = "User2",
+                Description = "bruh 2",
+                Address = "somewhere2"
+            };
+
+            var cUser3 = new ContractUser()
+            {
+                Id = "User3",
+                Description = "bruh 3",
+                Address = "somewhere3"
+            };
+
+
             //--- SUBPROCESS 2 ---
             var sub2Start = new ContractStartEvent() { Id = "StartEventSub2" };
             var sub2End = new ContractEndEvent() { Id = "EndEventSub2" };
@@ -83,6 +118,16 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                        "Toto je form validation" + Environment.NewLine +
                        ContractUserActivity.NewValuePragma + Environment.NewLine +
                        "Toto je new value" + Environment.NewLine,
+
+                //Assignee = cUser2,
+                /*CandidateRoles = new[]
+                {
+                    cRole1
+                },*/
+                /*CandidateUsers = new[]
+                {
+                    cUser3,
+                }*/
             };
 
             var user1Loop = new ContractUserActivity()
@@ -138,10 +183,10 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                 MultiInstance = new ContractSequentialMultiInstance() { LoopCardinality = "9" }
             };
 
-            /*mainStart.Outgoing = user1LoopTimer;
-            user1LoopTimer.Outgoing = mainEnd;*/
+            mainStart.Outgoing = user1;
+            user1.Outgoing = mainEnd;
 
-            mainStart.Outgoing = exclusiveGateway1;
+            /*mainStart.Outgoing = exclusiveGateway1;
             exclusiveGateway1.Outgoing = new List<ContractConditionedConnection>()
             {
                 new ContractConditionedConnection() { Condition = "condition1", Target = script1 },
@@ -164,7 +209,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
             user1Timer.Outgoing = mergingGateway1;
             callActivitySub1.Outgoing = mergingGateway1;
             callActivitySub1Loop.Outgoing = mergingGateway1;
-            mergingGateway1.Outgoing = mainEnd;
+            mergingGateway1.Outgoing = mainEnd;*/
             
 
             var mainProcess = new ContractProcess()

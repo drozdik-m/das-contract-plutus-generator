@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using DasContract.Blockchain.Plutus.Data.Forms;
+using DasContract.Blockchain.Plutus.Data.Users;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
@@ -10,8 +11,11 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
     {
         public ContractForm Form { get; set; } = new ContractForm();
 
-        public string FormName => Name + "Form";
+        public ContractUser Assignee { get; set; }
 
+        public ICollection<ContractUser> CandidateUsers { get; set; } = new List<ContractUser>();
+
+        public ICollection<ContractRole> CandidateRoles { get; set; } = new List<ContractRole>();
 
         public IEnumerable<string> FormValidationCodeLines => ReadPragma(FormValidationPragma);
 

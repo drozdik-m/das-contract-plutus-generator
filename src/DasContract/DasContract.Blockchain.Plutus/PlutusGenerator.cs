@@ -386,7 +386,7 @@ namespace DasContract.Blockchain.Plutus
             var contractRedeemer = new PlutusAlgebraicType(PlutusContractRedeemer.Type.Name,
                 userActivities.Select(e => new PlutusAlgebraicTypeConstructor(PlutusUserActivityRedeemer.Type(e).Name, new INamable[]
                     {
-                        PlutusFutureDataType.Type(e.FormName)
+                        PlutusUserActivityForm.Type(e)
                     }))
                 .Append(new PlutusAlgebraicTypeConstructor(PlutusContractFinishedRedeemer.Type.Name, Array.Empty<INamable>()))
                 .Append(new PlutusAlgebraicTypeConstructor(PlutusTimeoutRedeemer.Type.Name, Array.Empty<INamable>())),
