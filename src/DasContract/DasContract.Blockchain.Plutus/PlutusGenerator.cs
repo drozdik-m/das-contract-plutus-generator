@@ -884,7 +884,161 @@ namespace DasContract.Blockchain.Plutus
                 .Append(extraValidator)
                 .Append(PlutusLine.Empty);
 
+            //Contract finished
+            var contractFinishedSig = new PlutusFunctionSignature(0, "contractFinished", new INamable[]
+            {
+                contractDatum,
+                PlutusBool.Type
+            });
+            var contractFinishedSuccess = new PlutusOnelineFunction(0, contractFinishedSig, new string[]
+            {
+                "ContractDatum { contractState = ContractFinished }",
+            }, "True");
+            var contractFinishedFallback = new PlutusOnelineFunction(0, contractFinishedSig, new string[]
+            {
+                "_",
+            }, "False");
 
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {contractFinishedSig.Name}"))
+                .Append(contractFinishedSig)
+                .Append(contractFinishedSuccess)
+                .Append(contractFinishedFallback)
+                .Append(PlutusLine.Empty);
+
+            //State machine
+            var stateMachineSig = new PlutusFunctionSignature(0, "contractStateMachine", new INamable[]
+            {
+                contractParam,
+                PlutusStateMachine.Type(contractDatum, contractRedeemer)
+            });
+            var stateMachine = new PlutusFunction(0, stateMachineSig, new string[]
+            {
+                "param",
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(1, "StateMachine {"),
+                    new PlutusRawLine(2, $"smTransition = {txTransitionSig.Name} param,"),
+                    new PlutusRawLine(2, $"smFinal = {contractFinishedSig.Name},"),
+                    new PlutusRawLine(2, $"smCheck = {extraValidatorSig.Name} param,"),
+                    new PlutusRawLine(2, $"smThreadToken = Just $ cpToken param"),
+                new PlutusRawLine(1, "}"),
+            });
+
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {stateMachineSig.Name}"))
+                .Append(stateMachineSig)
+                .Append(stateMachine)
+                .Append(PlutusLine.Empty);
+
+            //Mk contract validator
+            var mkContractValidatorSig = new PlutusFunctionSignature(0, "mkContractValidator", new INamable[]
+            {
+                contractParam,
+                contractDatum,
+                contractRedeemer,
+                PlutusScriptContext.Type,
+                PlutusBool.Type
+            });
+            var mkContractValidator = new PlutusOnelineFunction(0, mkContractValidatorSig, new string[]
+            {
+                "param",
+            }, "mkValidator $ contractStateMachine param");
+
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {mkContractValidatorSig.Name}"))
+                .Append(mkContractValidatorSig)
+                .Append(mkContractValidator)
+                .Append(PlutusLine.Empty);
+
+            //Contract type
+            onChain = onChain
+                .Append(new PlutusRawLine(0, $"type {PlutusContractType.Type.Name} = {PlutusStateMachine.Type(contractDatum, contractRedeemer).Name}"))
+                .Append(PlutusLine.Empty);
+
+            //Typed contract validator
+            var typedContractValidatorSig = new PlutusFunctionSignature(0, "typedContractValidator", new INamable[]
+            {
+                contractParam,
+                PlutusUnspecifiedDataType.Type("Scripts.TypedValidator ContractType"),
+            });
+            var typedContractValidator = new PlutusFunction(0, typedContractValidatorSig, new string[]
+            {
+                "param",
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(1, $"Scripts.mkTypedValidator @{PlutusContractType.Type.Name}"),
+                    new PlutusRawLine(2, $"($$(PlutusTx.compile [|| {mkContractValidatorSig.Name} ||]) `PlutusTx.applyCode` PlutusTx.liftCode param)"),
+                    new PlutusRawLine(2, $"$$(PlutusTx.compile [|| wrap ||])"),
+                new PlutusRawLine(1, "where"),
+                    new PlutusRawLine(2, $"wrap = Scripts.wrapValidator @{contractDatum.Name} @{contractRedeemer.Name}"),
+            });
+
+            onChain = onChain
+                .Append(typedContractValidatorSig)
+                .Append(typedContractValidator)
+                .Append(PlutusLine.Empty);
+
+            //Contract client
+            var contractClientSig = new PlutusFunctionSignature(0, "contractClient", new INamable[]
+            {
+                contractParam,
+                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+            });
+            var contractClient = new PlutusOnelineFunction(0, contractClientSig, new string[]
+            {
+                "param",
+            }, $"mkStateMachineClient $ StateMachineInstance (contractStateMachine param) ({typedContractValidatorSig.Name} param)");
+            
+            onChain = onChain
+               .Append(contractClientSig)
+               .Append(contractClient)
+               .Append(PlutusLine.Empty);
+
+            //Validator
+            var validatorSig = new PlutusFunctionSignature(0, "validator", new INamable[]
+            {
+                contractParam,
+                PlutusValidator.Type
+            });
+            var validator = new PlutusOnelineFunction(0, validatorSig, 
+                Array.Empty<string>(),
+                $"Scripts.validatorScript . {typedContractValidatorSig.Name}");
+
+            onChain = onChain
+               .Append(validatorSig)
+               .Append(validator)
+               .Append(PlutusLine.Empty);
+
+            //valHash
+            var valHashSig = new PlutusFunctionSignature(0, "valHash", new INamable[]
+            {
+                contractParam,
+                PlutusUnspecifiedDataType.Type("Ledger.ValidatorHash"),
+            });
+            var valHash = new PlutusOnelineFunction(0, valHashSig,
+                Array.Empty<string>(),
+                $"Scripts.validatorHash . {typedContractValidatorSig.Name}");
+
+            onChain = onChain
+               .Append(valHashSig)
+               .Append(valHash)
+               .Append(PlutusLine.Empty);
+
+            //valHash
+            var scrAddressSig = new PlutusFunctionSignature(0, "scrAddress", new INamable[]
+            {
+                contractParam,
+                PlutusUnspecifiedDataType.Type("Ledger.Address"),
+            });
+            var scrAddress = new PlutusOnelineFunction(0, scrAddressSig,
+                Array.Empty<string>(),
+                $"scriptAddress . {validatorSig.Name}");
+
+            onChain = onChain
+               .Append(scrAddressSig)
+               .Append(scrAddress)
+               .Append(PlutusLine.Empty);
 
             //Result
             return pragmas
