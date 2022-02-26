@@ -92,6 +92,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusImport(0, "qualified PlutusTx.IsData as PlutusTx"),
                 new PlutusImport(0, "Plutus.V1.Ledger.Value"),
                 new PlutusImport(0, "Data.Char (GeneralCategory(CurrencySymbol))"),
+                new PlutusImport(0, "import qualified Ledger.Constraints.TxConstraints as Constraints"),
                 PlutusLine.Empty,
             });
 
