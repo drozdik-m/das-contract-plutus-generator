@@ -92,7 +92,9 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusImport(0, "qualified PlutusTx.IsData as PlutusTx"),
                 new PlutusImport(0, "Plutus.V1.Ledger.Value"),
                 new PlutusImport(0, "Data.Char (GeneralCategory(CurrencySymbol))"),
-                new PlutusImport(0, "import qualified Ledger.Constraints.TxConstraints as Constraints"),
+                new PlutusImport(0, "qualified Ledger.Constraints.TxConstraints as Constraints"),
+                new PlutusImport(0, "Plutus.V1.Ledger.Bytes (fromHex)"),
+                new PlutusImport(0, "Data.String"),
                 PlutusLine.Empty,
             });
 
@@ -820,7 +822,7 @@ namespace DasContract.Blockchain.Plutus
             }, new IPlutusLine[]
             {
                 PlutusLine.Empty,
-                new PlutusComment(1, "  (ContractParam, ContractDatum   , Value            , ContractRedeemer )"),
+                new PlutusComment(1,    "  (ContractParam, ContractDatum   , Value            , ContractRedeemer )"),
                 new PlutusRawLine(1, "case (cParam       , stateData cState, stateValue cState, cRedeemer        ) of"),
                 PlutusLine.Empty,
             });
@@ -848,7 +850,40 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusComment(2, "--> DEFAULT"))
                 .Append(new PlutusRawLine(2, "_ -> Nothing"));
 
-            onChain = onChain.Append(txTransition);
+            onChain = onChain
+                .Append(txTransition)
+                .Append(PlutusLine.Empty);
+
+
+            //Extra validator
+            var extraValidatorSig = new PlutusFunctionSignature(0, "extraValidator", new INamable[]
+            {
+                contractParam,
+                contractDatum,
+                contractRedeemer,
+                PlutusScriptContext.Type,
+                PlutusBool.Type
+            });
+
+            var extraValidatorCode = contract.GlobalValidationCodeLines
+                    .Select(e => new PlutusRawLine(1, e));
+            if (extraValidatorCode.Count() == 0)
+                extraValidatorCode = extraValidatorCode.Append(new PlutusRawLine(1, "True"));
+
+            var extraValidator = new PlutusFunction(0, extraValidatorSig, new string[]
+            {
+                "param",
+                "datum",
+                "redeemer",
+                "context"
+            }, extraValidatorCode);
+
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {extraValidatorSig.Name}"))
+                .Append(extraValidatorSig)
+                .Append(extraValidator)
+                .Append(PlutusLine.Empty);
+
 
 
             //Result

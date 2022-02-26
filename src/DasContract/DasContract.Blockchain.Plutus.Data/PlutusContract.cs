@@ -5,6 +5,7 @@ using DasContract.Blockchain.Plutus.Data.Users;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Data
@@ -16,6 +17,26 @@ namespace DasContract.Blockchain.Plutus.Data
 
         /// <inheritdoc/>
         public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Code for validation of the whole contract
+        /// </summary>
+        public string GlobalValidationCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Individual lines for validation of the whole contract
+        /// </summary>
+        public IEnumerable<string> GlobalValidationCodeLines
+        {
+            get
+            {
+                using var reader = new StringReader(GlobalValidationCode);
+                List<string> result = new List<string>();
+                for (string line = reader.ReadLine(); line != null; line = reader.ReadLine())
+                    result.Add(line);
+                return result;
+            }
+        }
 
         /// <summary>
         /// Data model of this contract

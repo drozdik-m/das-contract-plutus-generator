@@ -48,7 +48,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
 
             return new PlutusRawLine(2, "(par, dat@ContractDatum { contractState = " + currentStateName
-                + " }, v, " + redeemer + "))");
+                + " }, v, " + redeemer + ")");
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         IPlutusLine GuardLine(bool expectedVal = false, bool formValidation = false, string transitionCondition = "")
         {
             string userDefinedExpectedValue = $"{UserDefinedExpectedValueSignature.Name} par dat v";
-            const string userDefinedFormValidation = "userDefinedFormValidation par dat v f";
+            const string userDefinedFormValidation = "userDefinedFormValidation par dat red v";
 
             var conditions = new List<string>();
 
@@ -128,8 +128,6 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             void CommonLines(PlutusFunctionSignature sig, IEnumerable<string> parameters, IEnumerable<string> codeLines, string def)
             {
                 result.Add(sig);
-
-
 
                 if (codeLines.Count() == 0)
                     codeLines = new List<string>
@@ -317,7 +315,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                         $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
                     },
                     NonTxTransitionVisitor.TransitionFunctionSignature.Name +
-                        " $ datum { contractState = " + targetName + " }",
+                        " $ dat { contractState = " + targetName + " }",
                     "v");
                 var whereStatements = WhereStatements(userActivity,
                     TxUserDefinedStatement.UserDefinedExpectedValue);
@@ -486,7 +484,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                             $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
                         },
                         NonTxTransitionVisitor.TransitionFunctionSignature.Name +
-                            " $ datum { contractState = " + targetName + " }",
+                            " $ dat { contractState = " + targetName + " }",
                         "v");
                     var whereStatements = WhereStatements(element,
                         TxUserDefinedStatement.UserDefinedExpectedValue);
