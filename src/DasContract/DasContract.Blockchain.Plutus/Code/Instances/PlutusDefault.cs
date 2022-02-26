@@ -74,7 +74,7 @@ namespace DasContract.Blockchain.Plutus.Code.Types
                 return "\"00000000000000000000000000000000000000000000000000000000\"";
             else if (type.Name == PlutusBool.Type.Name)
                 return "False";
-            else if (type.Name == PlutusByteString.Type.Name)
+            else if (type.Name == PlutusBuiltinByteString.Type.Name)
                 return "\"\"";
             else if (type.Name == PlutusPOSIXTime.Type.Name)
                 return "0";

@@ -210,7 +210,7 @@ namespace DasContract.Blockchain.Plutus
                             }))
                          )
                         .Append(new PlutusAlgebraicTypeConstructor(
-                            PlutusContractFinished.Type.Name, 
+                            PlutusContractFinished.Type.Name,
                             Array.Empty<INamable>()))
                 , new List<string>()
                 {
@@ -412,8 +412,8 @@ namespace DasContract.Blockchain.Plutus
             //Role
             var role = new PlutusRecord("Role", new PlutusRecordMember[]
             {
-                new PlutusRecordMember("rName", PlutusByteString.Type),
-                new PlutusRecordMember("rDescription", PlutusByteString.Type),
+                new PlutusRecordMember("rName", PlutusBuiltinByteString.Type),
+                new PlutusRecordMember("rDescription", PlutusBuiltinByteString.Type),
             }, new string[]
             {
                 "Show",
@@ -434,9 +434,9 @@ namespace DasContract.Blockchain.Plutus
             //User
             var user = new PlutusRecord("User", new PlutusRecordMember[]
             {
-                new PlutusRecordMember("uName", PlutusByteString.Type),
+                new PlutusRecordMember("uName", PlutusBuiltinByteString.Type),
                 new PlutusRecordMember("uAddress", PlutusPubKeyHash.Type),
-                new PlutusRecordMember("uDescription", PlutusByteString.Type),
+                new PlutusRecordMember("uDescription", PlutusBuiltinByteString.Type),
                 new PlutusRecordMember("uRoles", PlutusList.Type(role)),
             }, new string[]
             {
@@ -480,7 +480,7 @@ namespace DasContract.Blockchain.Plutus
             //Role by name
             var roleByNameSig = new PlutusFunctionSignature(0, "roleByName", new INamable[]
             {
-                PlutusByteString.Type,
+                PlutusBuiltinByteString.Type,
                 role
             });
             var roleByName = new PlutusFunction(0, roleByNameSig, new string[]
@@ -502,6 +502,57 @@ namespace DasContract.Blockchain.Plutus
                 .Append(roleByName)
                 .Append(PlutusLine.Empty);
 
+            //Role by name param
+            var roleByNameParamSig = new PlutusFunctionSignature(0, "roleByNameParam", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusBuiltinByteString.Type,
+                role
+            });
+            var roleByNameParam = new PlutusFunction(0, roleByNameParamSig, new string[]
+            {
+                "param",
+                "roleName"
+            }, Array.Empty<IPlutusLine>())
+                .Append(new PlutusLetIn(1, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "searchResult = find (\\x -> rName x == roleName) (cpRoles param)")
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "case searchResult of"),
+                    new PlutusRawLine(3, "Just a -> a"),
+                    new PlutusRawLine(3, "Nothing -> cpDefRole param"),
+            }));
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {roleByNameParamSig.Name}"))
+                .Append(roleByNameParamSig)
+                .Append(roleByNameParam)
+                .Append(PlutusLine.Empty);
+
+            //Pub key string as pub key hash
+            var pubKeyStringAsPubKeyHashSig = new PlutusFunctionSignature(0, "pubKeyStringAsPubKeyHash", new INamable[]
+            {
+                PlutusString.Type,
+                PlutusPubKeyHash.Type
+            });
+            var pubKeyStringAsPubKeyHash = new PlutusFunction(0, pubKeyStringAsPubKeyHashSig, new string[]
+            {
+                "key",
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(1, "case fromHex (fromString key) of"),
+                    new PlutusRawLine(2, "Right b -> pubKeyHash $ PubKey {"),
+                        new PlutusRawLine(3, "getPubKey = b"),
+                    new PlutusRawLine(2, "}"),
+                    new PlutusRawLine(2, "Left _ -> uAddress (def :: User)"),
+            });
+               
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {pubKeyStringAsPubKeyHashSig.Name}"))
+                .Append(pubKeyStringAsPubKeyHashSig)
+                .Append(pubKeyStringAsPubKeyHash)
+                .Append(PlutusLine.Empty);
+
 
             //Users
             var usersSig = new PlutusFunctionSignature(0, "users", new INamable[]
@@ -513,7 +564,7 @@ namespace DasContract.Blockchain.Plutus
                 new PlutusRawLine(1, "[")
             }.Concat(
                 contract.Identities.Users.Select((e, i) =>
-                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = \"{e.Address}\", " +
+                        new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = {pubKeyStringAsPubKeyHashSig.Name} \"{e.Address}\", " +
                         $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"roleByName \"{e.Name}\""))}]" + "}" +
                         (i == contract.Identities.Users.Count() - 1 ? "" : ",")))
                 )
@@ -528,7 +579,7 @@ namespace DasContract.Blockchain.Plutus
             //User by name
             var userByNameSig = new PlutusFunctionSignature(0, "userByName", new INamable[]
             {
-                PlutusByteString.Type,
+                PlutusBuiltinByteString.Type,
                 user
             });
             var userByName = new PlutusFunction(0, userByNameSig, new string[]
@@ -550,6 +601,33 @@ namespace DasContract.Blockchain.Plutus
                 .Append(userByName)
                 .Append(PlutusLine.Empty);
 
+            //User by name param
+            var userByNameParamSig = new PlutusFunctionSignature(0, "userByNameParam", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusBuiltinByteString.Type,
+                user
+            });
+            var userByNameParam = new PlutusFunction(0, userByNameParamSig, new string[]
+            {
+                "param",
+                "userName"
+            }, Array.Empty<IPlutusLine>())
+                .Append(new PlutusLetIn(1, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "searchResult = find (\\x -> uName x == userName) (cpUsers param)")
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(2, "case searchResult of"),
+                    new PlutusRawLine(3, "Just a -> a"),
+                    new PlutusRawLine(3, "Nothing -> cpDefUser param"),
+            }));
+            dataModels = dataModels
+                .Append(new PlutusPragma(0, $"INLINABLE {userByNameParamSig.Name}"))
+                .Append(userByNameParamSig)
+                .Append(userByNameParam)
+                .Append(PlutusLine.Empty);
+
 
             // -- Contract param ---------------------------------
             dataModels = dataModels
@@ -558,7 +636,11 @@ namespace DasContract.Blockchain.Plutus
             var contractParam = new PlutusRecord(PlutusContractParam.Type.Name, new PlutusRecordMember[]
             {
                 new PlutusRecordMember("cpUsers", PlutusList.Type(user)),
+                new PlutusRecordMember("cpRoles", PlutusList.Type(role)),
+                new PlutusRecordMember("cpDefUser", user),
+                new PlutusRecordMember("cpDefRole", role),
                 new PlutusRecordMember("cpToken", PlutusThreadToken.Type),
+
             }, new string[]
             {
                 "Show",
@@ -592,6 +674,55 @@ namespace DasContract.Blockchain.Plutus
                 .Append(new PlutusPragma(0, $"INLINABLE {lovelacesSig.Name}"))
                 .Append(lovelacesSig)
                 .Append(lovelaces)
+                .Append(PlutusLine.Empty);
+
+            //Candidate users and roles constraint
+            var candidateUsersAndRolesConstraintSig = new PlutusFunctionSignature(0, "candidateUsersAndRolesConstraint", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusList.Type(PlutusBuiltinByteString.Type),
+                PlutusList.Type(PlutusBuiltinByteString.Type),
+                PlutusUnspecifiedDataType.Type("TxConstraints Void Void"),
+            });
+            var candidateUsersAndRolesConstraint = new PlutusFunction(0, candidateUsersAndRolesConstraintSig, new string[]
+            {
+                "param",
+                "candidateUserNames",
+                "candidateRoleNames",
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(1, "Constraints.mustSatisfyAnyOf candidatesConstraints"),
+                PlutusLine.Empty,
+
+                    new PlutusRawLine(2, "where"),
+                    
+
+                        new PlutusRawLine(3, "candidateRoles :: [Role]"),
+                        new PlutusRawLine(3, "candidateRoles = PlutusTx.Prelude.map (roleByNameParam param) candidateRoleNames"),
+                        PlutusLine.Empty,
+
+                        new PlutusRawLine(3, "candidateUsers :: [User]"),
+                        new PlutusRawLine(3, "candidateUsers = PlutusTx.Prelude.map (userByNameParam param) candidateUserNames"),
+                        PlutusLine.Empty,
+
+                        new PlutusRawLine(3, "isCandidateUser :: User -> Bool"),
+                        new PlutusRawLine(3, "isCandidateUser u ="),
+                            new PlutusRawLine(4, "u `elem` candidateUsers ||"),
+                            new PlutusRawLine(4, "any (\\cr -> cr `elem` uRoles u) candidateRoles"),
+                        PlutusLine.Empty,
+
+                        new PlutusRawLine(3, "candidates :: [User]"),
+                        new PlutusRawLine(3, "candidates = PlutusTx.Prelude.filter isCandidateUser (cpUsers param)"),
+                        PlutusLine.Empty,
+
+                        new PlutusRawLine(3, "candidatesConstraints :: [TxConstraints Void Void]"),
+                        new PlutusRawLine(3, "candidatesConstraints = PlutusTx.Prelude.map (Constraints.mustBeSignedBy . uAddress) candidates"),
+            });
+
+            onChain = onChain
+                .Append(new PlutusPragma(0, $"INLINABLE {candidateUsersAndRolesConstraintSig.Name}"))
+                .Append(candidateUsersAndRolesConstraintSig)
+                .Append(candidateUsersAndRolesConstraint)
                 .Append(PlutusLine.Empty);
 
             // -- Form validations -------------------------------

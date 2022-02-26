@@ -240,6 +240,18 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                              IsRoot = true,
                          }
                      }
+                 },
+                 Identities = new ContractUsers()
+                 {
+                      Users = new ContractUser[]
+                      {
+                          cUser1,
+                          cUser2
+                      },
+                      Roles = new ContractRole[]
+                      {
+                          cRole1
+                      }
                  }
             };
             
