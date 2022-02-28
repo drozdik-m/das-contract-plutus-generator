@@ -13,7 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
-    public abstract class TransitionVisitor : IContractProcessElementVisitor<IPlutusCode>
+    public abstract class TransitionVisitor : RecursiveElementVisitor
     {
         public TransitionVisitor()
         {
@@ -27,8 +27,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
         }
 
         public INamable? Subprocess { get; } = null;
-
-        protected HashSet<string> VisitedElements { get; } = new HashSet<string>();
 
         protected string AddSubprocessPrefix(INamable? subprocess, string current)
         {
@@ -76,18 +74,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (subprocess is null)
                 return result;
             return AddSubprocessPrefix(subprocess, result);
-        }
-
-        protected bool TryVisit(INamable element)
-        {
-            var result = false;
-            if (!VisitedElements.Contains(element.Name))
-            {
-                result = true;
-                VisitedElements.Add(element.Name);
-            }
-
-            return result;
         }
 
         /// <summary>

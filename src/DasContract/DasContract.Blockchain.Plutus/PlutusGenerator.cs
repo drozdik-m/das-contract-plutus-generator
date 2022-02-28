@@ -1257,6 +1257,11 @@ namespace DasContract.Blockchain.Plutus
                .Append(validateInputForm)
                .Append(PlutusLine.Empty);
 
+            // -- Endpoints --------------------------------------
+            onChain = onChain
+                  .Append(new PlutusSubsectionComment(0, "Endpoints"));
+
+
 
             //Result
             return pragmas
