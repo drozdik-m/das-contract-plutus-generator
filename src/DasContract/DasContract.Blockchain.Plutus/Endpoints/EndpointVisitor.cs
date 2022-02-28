@@ -26,6 +26,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         Dictionary<string, bool> isFirstTxDictionary = new Dictionary<string, bool>();
 
+        List<(string, PlutusFunctionSignature)> createdEndpoints = new List<(string, PlutusFunctionSignature)>(); 
+
         public ContractStartEvent InitialStartEvent { get; }
 
         /// <summary>
@@ -373,6 +375,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
             IPlutusCode result = new PlutusFunction(0, signature, new [] { parameter }, functionLines)
                 .Prepend(signature);
 
+            createdEndpoints.Add((element.Name.FirstCharToLowerCase(), signature));
+
             //Send flag further
             SendFlagFurther(element, element.Outgoing);
             if (!(timeoutBoundary is null))
@@ -413,6 +417,11 @@ namespace DasContract.Blockchain.Plutus.Transitions
         #endregion
 
         #region extraEndpoints
+
+        /// <summary>
+        /// Creates the timeout endpoint
+        /// </summary>
+        /// <returns></returns>
         public IPlutusCode ContinueTimeoutActivityEndpoint()
         {
             var signature = TimedOutEndpointSignature;
@@ -429,9 +438,15 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 "threadToken"
             }, code);
 
+            createdEndpoints.Add(("continueTimedoutActivity", signature));
+
             return function.Prepend(signature);
         }
 
+        /// <summary>
+        /// Creates the finish contract endpoint
+        /// </summary>
+        /// <returns></returns>
         public IPlutusCode FinishContractEndpoint()
         {
             var signature = FinishContractEndpointSignature;
@@ -450,15 +465,99 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 "threadToken"
             }, code);
 
+            createdEndpoints.Add(("finishContract", signature));
+
             return function.Prepend(signature);
         }
         #endregion
+
+
+        #region schemaAndEndpoints
+
+        /// <summary>
+        /// Takes all previously created endpoints and makes a schema out of them
+        /// </summary>
+        /// <returns></returns>
+        public IPlutusCode MakeSchema()
+        {
+            IPlutusCode result = PlutusCode.Empty;
+
+            result = result.Append(new PlutusRawLine(0, $"type {PlutusContractSchema.Type.Name} ="));
+            var first = true;
+            foreach(var endpInfo in createdEndpoints)
+            {
+                var name = endpInfo.Item1;
+                var signature = endpInfo.Item2;
+
+                if (first)
+                {
+                    result = result.Append(new PlutusRawLine(1, $"    Endpoint \"{name}\" {signature.Types.First().Name}"));
+                    first = false;
+                }
+                else
+                    result = result.Append(new PlutusRawLine(1, $".\\/ Endpoint \"{name}\" {signature.Types.First().Name}"));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Takes all previously created endpoints and make contract endpoints
+        /// </summary>
+        /// <returns></returns>
+        public IPlutusCode MakeEndpoints()
+        {
+            IPlutusCode result = PlutusCode.Empty;
+            IPlutusCode endpointDefinitions = PlutusCode.Empty;
+
+
+            result = result.Append(new PlutusRawLine(1, $"awaitPromise ("));
+            var first = true;
+            foreach (var endpInfo in createdEndpoints)
+            {
+                var name = endpInfo.Item1;
+                var signature = endpInfo.Item2;
+
+                if (first)
+                {
+                    result = result.Append(new PlutusRawLine(2, $"         {name}'"));
+                    first = false;
+                }
+                else
+                    result = result.Append(new PlutusRawLine(2, $"`select` {name}'"));
+
+                endpointDefinitions = endpointDefinitions.Append(
+                        new PlutusRawLine(2, $"{signature.Name}' = endpoint @\"{name}\" {signature.Name}")
+                    );
+            }
+            result = result.Append(new PlutusRawLine(1, $") >> endpoints"));
+
+            return result
+                .Prepend(EndpointsSignature)
+                .Append(new PlutusRawLine(1, "where"))
+                .Append(endpointDefinitions);
+        }
+
+
+        #endregion
+
+        public static PlutusFunctionSignature EndpointsSignature { get; } = new PlutusFunctionSignature(0,
+            "endpoints",
+            new INamable[]
+            {
+                PlutusContractMonad.Type(
+                        PlutusLast.Type(PlutusThreadToken.Type),
+                        PlutusContractSchema.Type,
+                        PlutusText.Type,
+                        PlutusVoid.Type
+                    )
+            });
 
         public static PlutusFunctionSignature TimedOutEndpointSignature { get; } = new PlutusFunctionSignature(0,
             "continueTimedoutActivityEndpoint",
             new INamable[]
             {
-                PlutusUnspecifiedDataType.Type("forall w s. " + PlutusThreadToken.Type.Name),
+                PlutusThreadToken.Type,
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
                     PlutusUnspecifiedDataType.Type("s"),
@@ -471,7 +570,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
            "finishContractEndpoint",
            new INamable[]
            {
-                PlutusUnspecifiedDataType.Type("forall w s. " + PlutusThreadToken.Type.Name),
+                PlutusThreadToken.Type,
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
                     PlutusUnspecifiedDataType.Type("s"),
@@ -490,7 +589,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             {
                 types = new INamable[]
                 {
-                    PlutusUnspecifiedDataType.Type("forall s. " + PlutusUserActivityForm.Type(userActivity).Name),
+                    PlutusUserActivityForm.Type(userActivity),
                     PlutusContractMonad.Type(
                         PlutusLast.Type(PlutusThreadToken.Type),
                         PlutusUnspecifiedDataType.Type("s"),
@@ -503,9 +602,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
             {
                 types = new INamable[]
                 {
-                    PlutusUnspecifiedDataType.Type("forall w s. " + PlutusTuple.Type(
+                    PlutusTuple.Type(
                             PlutusUserActivityForm.Type(userActivity),
-                            PlutusThreadToken.Type).Name),
+                            PlutusThreadToken.Type
+                            ),
                     PlutusContractMonad.Type(
                         PlutusUnspecifiedDataType.Type("w"),
                         PlutusUnspecifiedDataType.Type("s"),

@@ -1273,6 +1273,23 @@ namespace DasContract.Blockchain.Plutus
                .Append(endpoints)
                .Append(PlutusLine.Empty);
 
+            // -- Contract schema --------------------------------
+            offChain = offChain
+                  .Append(new PlutusSubsectionComment(0, "Contract schema"));
+
+            offChain = offChain
+               .Append(endpointsVisitor.MakeSchema())
+               .Append(PlutusLine.Empty);
+
+            // -- Contract endpoints -----------------------------
+            offChain = offChain
+                  .Append(new PlutusSubsectionComment(0, "Contract endpoints"));
+
+            offChain = offChain
+               .Append(endpointsVisitor.MakeEndpoints())
+               .Append(PlutusLine.Empty);
+
+
 
             //Result
             return pragmas
