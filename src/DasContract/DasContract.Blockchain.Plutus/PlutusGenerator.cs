@@ -1040,12 +1040,231 @@ namespace DasContract.Blockchain.Plutus
                .Append(scrAddress)
                .Append(PlutusLine.Empty);
 
+            //----------------------------------------------------
+            //--                OFF-CHAIN CODE                 ---
+            //----------------------------------------------------
+            IPlutusCode offChain = new PlutusSectionComment(0, "OFF-CHAIN CODE")
+                .Append(PlutusLine.Empty);
+
+            //Map err
+            var mapErrSig = new PlutusFunctionSignature(0, "mapErr", new INamable[]
+            {
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusUnspecifiedDataType.Type("SMContractError"),
+                    PlutusUnspecifiedDataType.Type("a")
+                    ),
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    PlutusUnspecifiedDataType.Type("a")
+                    ),
+            });
+            var mapErr = new PlutusOnelineFunction(0, mapErrSig,
+                Array.Empty<string>(),
+                $"mapError $ pack . show");
+
+            offChain = offChain
+               .Append(mapErrSig)
+               .Append(mapErr)
+               .Append(PlutusLine.Empty);
+
+            //Create contract param
+            var createContractParamSig = new PlutusFunctionSignature(0, "createContractParam", new INamable[]
+            {
+                PlutusThreadToken.Type,
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    contractParam
+                    ),
+            });
+            var createContractParam = new PlutusFunction(0, createContractParamSig,
+                new string[]
+                {
+                    "threadToken"
+                },
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "return ContractParam {"),
+                        new PlutusRawLine(2, $"cpUsers = {usersSig.Name},"),
+                        new PlutusRawLine(2, $"cpRoles = {rolesSig.Name},"),
+                        new PlutusRawLine(2, $"cpDefUser = def,"),
+                        new PlutusRawLine(2, $"cpDefRole = def,"),
+                        new PlutusRawLine(2, $"cpToken = threadToken"),
+                    new PlutusRawLine(1, "}"),
+                });
+
+            offChain = offChain
+               .Append(createContractParamSig)
+               .Append(createContractParam)
+               .Append(PlutusLine.Empty);
+
+            //Init contract param
+            var initContractParamSig = new PlutusFunctionSignature(0, "initContractParam", new INamable[]
+            {
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    contractParam
+                    ),
+            });
+            var initContractParam = new PlutusFunction(0, initContractParamSig,
+                Array.Empty<string>(),
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "do"),
+                        new PlutusRawLine(2, $"threadToken  <- {mapErrSig.Name} getThreadToken"),
+                        new PlutusRawLine(2, $"{createContractParamSig.Name} threadToken"),
+                });
+
+            offChain = offChain
+               .Append(initContractParamSig)
+               .Append(initContractParam)
+               .Append(PlutusLine.Empty);
+
+            //On chain datum
+            var onChainDatumSig = new PlutusFunctionSignature(0, "onChainDatum", new INamable[]
+            {
+                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    contractDatum
+                    ),
+            });
+            var onChainDatum = new PlutusFunction(0, onChainDatumSig,
+                new string[]
+                {
+                    "client"
+                },
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "do"),
+                        new PlutusRawLine(2, $"onChainState <- {mapErrSig.Name} $ getOnChainState client"),
+                        new PlutusRawLine(2, $"case onChainState of"),
+                            new PlutusRawLine(3, $"Nothing ->"),
+                                new PlutusRawLine(4, $"throwError \"On-chain state could not be found\""),
+                            new PlutusRawLine(3, $"Just (OnChainState o _ _, _) ->"),
+                                new PlutusRawLine(4, $"return $ tyTxOutData o"),
+                });
+
+            offChain = offChain
+               .Append(onChainDatumSig)
+               .Append(onChainDatum)
+               .Append(PlutusLine.Empty);
+
+            //On chain value
+            var onChainValueSig = new PlutusFunctionSignature(0, "onChainValue", new INamable[]
+            {
+                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    PlutusValue.Type
+                    ),
+            });
+            var onChainValue = new PlutusFunction(0, onChainValueSig,
+                new string[]
+                {
+                    "client"
+                },
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "do"),
+                        new PlutusRawLine(2, $"onChainState <- {mapErrSig.Name} $ getOnChainState client"),
+                        new PlutusRawLine(2, $"case onChainState of"),
+                            new PlutusRawLine(3, $"Nothing ->"),
+                                new PlutusRawLine(4, $"throwError \"On-chain state could not be found\""),
+                            new PlutusRawLine(3, $"Just (OnChainState o _ _, _) ->"),
+                                new PlutusRawLine(4, $"return $ txOutValue $ tyTxOutTxOut o"),
+                });
+
+            offChain = offChain
+               .Append(onChainValueSig)
+               .Append(onChainValue)
+               .Append(PlutusLine.Empty);
+
+            //Log on chain datum
+            var logOnChainDatumSig = new PlutusFunctionSignature(0, "logOnChainDatum", new INamable[]
+            {
+                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    PlutusVoid.Type
+                    ),
+            });
+            var logOnChainDatum = new PlutusFunction(0, logOnChainDatumSig,
+                new string[]
+                {
+                    "client"
+                },
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "do"),
+                        new PlutusRawLine(2, $"datum <- {onChainDatumSig.Name} client"),
+                        new PlutusRawLine(2, $"logInfo @String $ \"--- \" ++ show datum"),
+                });
+
+            offChain = offChain
+               .Append(logOnChainDatumSig)
+               .Append(logOnChainDatum)
+               .Append(PlutusLine.Empty);
+
+            //Log on chain datum
+            var validateInputFormSig = new PlutusFunctionSignature(0, "validateInputForm", new INamable[]
+            {
+                PlutusThreadToken.Type,
+                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusContractRedeemer.Type,
+                PlutusContractMonad.Type(
+                    PlutusUnspecifiedDataType.Type("w"),
+                    PlutusUnspecifiedDataType.Type("s"),
+                    PlutusText.Type,
+                    PlutusVoid.Type
+                    ),
+            });
+            var validateInputForm = new PlutusFunction(0, validateInputFormSig,
+                new string[]
+                {
+                    "threadToken",
+                    "client",
+                    "redeemer"
+                },
+                new IPlutusLine[]
+                {
+                    new PlutusRawLine(1, "do"),
+                        new PlutusRawLine(2, $"datum <- {onChainDatumSig.Name} client"),
+                        new PlutusRawLine(2, $"val <- {onChainValueSig.Name} client"),
+                        new PlutusRawLine(2, $"param <- {createContractParamSig.Name} threatToken"),
+                        PlutusLine.Empty,
+                        new PlutusRawLine(2, $"if {formValidationSig.Name} param datum redeemer val then"),
+                            new PlutusRawLine(3, $"logInfo @String $ \"--- form validated successfuly\""),
+                        new PlutusRawLine(2, $"else"),
+                            new PlutusRawLine(3, $"throwError \"User form failed validation\""),
+                });
+
+            offChain = offChain
+               .Append(validateInputFormSig)
+               .Append(validateInputForm)
+               .Append(PlutusLine.Empty);
+
+
             //Result
             return pragmas
                 .Append(module)
                 .Append(imports)
                 .Append(dataModels)
-                .Append(onChain);
+                .Append(onChain)
+                .Append(offChain);
         }
 
 
