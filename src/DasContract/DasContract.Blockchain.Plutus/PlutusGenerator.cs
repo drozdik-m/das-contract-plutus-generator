@@ -19,6 +19,7 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
+using DasContract.Blockchain.Plutus.Transitions;
 using DasContract.Blockchain.Plutus.Transitions.NonTx;
 using DasContract.Blockchain.Plutus.Utils;
 
@@ -1258,9 +1259,19 @@ namespace DasContract.Blockchain.Plutus
                .Append(PlutusLine.Empty);
 
             // -- Endpoints --------------------------------------
-            onChain = onChain
+            offChain = offChain
                   .Append(new PlutusSubsectionComment(0, "Endpoints"));
 
+            //Generate endpoints
+            var endpointsVisitor = new EndpointVisitor(contract.Processes.Main.StartEvent);
+            var endpoints = endpointsVisitor.Visit(contract.Processes.Main.StartEvent);
+
+            endpoints = endpoints.Append(endpointsVisitor.ContinueTimeoutActivityEndpoint());
+            endpoints = endpoints.Append(endpointsVisitor.FinishContractEndpoint());
+
+            offChain = offChain
+               .Append(endpoints)
+               .Append(PlutusLine.Empty);
 
 
             //Result

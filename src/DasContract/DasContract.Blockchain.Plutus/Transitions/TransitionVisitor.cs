@@ -118,14 +118,5 @@ namespace DasContract.Blockchain.Plutus.Transitions
             });
         }
 
-
-        public abstract IPlutusCode Visit(ContractExclusiveGateway element);
-        public abstract IPlutusCode Visit(ContractMergingExclusiveGateway element);
-        public abstract IPlutusCode Visit(ContractCallActivity element);
-        public abstract IPlutusCode Visit(ContractUserActivity element);
-        public abstract IPlutusCode Visit(ContractScriptActivity element);
-        public abstract IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
-        public abstract IPlutusCode Visit(ContractStartEvent element);
-        public abstract IPlutusCode Visit(ContractEndEvent element);
     }
 }

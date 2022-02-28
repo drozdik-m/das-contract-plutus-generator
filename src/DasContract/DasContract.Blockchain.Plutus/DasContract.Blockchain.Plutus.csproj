@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DasContract.Blockchain.Plutus.Data\DasContract.Blockchain.Plutus.Data.csproj" />
+    <ProjectReference Include="..\DasContract.String.Utils\DasContract.String.Utils.csproj" />
   </ItemGroup>
 
 </Project>
