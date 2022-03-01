@@ -5,6 +5,8 @@ using DasContract.Abstraction.Data;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 
@@ -12,15 +14,11 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
     public class ContractEntityConvertor : IConvertor<Entity, ContractEntity>
     {
-        private readonly IConvertor<Property, PrimitiveContractProperty> primitivePropertyConvertor;
-        private readonly IConvertor<Property, ReferenceContractProperty> referencePropertyConvertor;
+        private readonly IConvertor<Property, ContractProperty> propertyConvertor;
 
-        public ContractEntityConvertor(
-            IConvertor<Property, PrimitiveContractProperty> primitivePropertyConvertor,
-            IConvertor<Property, ReferenceContractProperty> referencePropertyConvertor)
+        public ContractEntityConvertor(IConvertor<Property, ContractProperty> propertyConvertor)
         {
-            this.primitivePropertyConvertor = primitivePropertyConvertor;
-            this.referencePropertyConvertor = referencePropertyConvertor;
+            this.propertyConvertor = propertyConvertor;
         }
 
         /// <inheritdoc/>
@@ -35,16 +33,26 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             //Convert properties
             foreach(var property in source.Properties)
             {
-                
+                var convProperty = propertyConvertor.Convert(property);
+
                 //Primitive data type
-                if (property.DataType != PropertyDataType.Reference && property.PropertyType != PropertyType.Dictionary)
-                    result.AddProperty(primitivePropertyConvertor.Convert(property));
+                if (convProperty is PrimitiveContractProperty pProp)
+                    result.AddProperty(pProp);
 
                 //Reference data type
-                else if (property.DataType == PropertyDataType.Reference)
-                    result.AddProperty(referencePropertyConvertor.Convert(property));
+                else if (convProperty is ReferenceContractProperty rProp)
+                    result.AddProperty(rProp);
 
-                //TODO dictionary type
+                //Dictionary type
+                else if (convProperty is DictionaryContractProperty dProp)
+                    result.AddProperty(dProp);
+
+                //Enum type
+                else if (convProperty is EnumContractProperty eProp)
+                    result.AddProperty(eProp);
+
+                else
+                    throw new Exception("Unhandled property type");
             }
 
             return result;

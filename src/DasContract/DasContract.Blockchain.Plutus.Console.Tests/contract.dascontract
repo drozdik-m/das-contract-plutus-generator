@@ -456,18 +456,61 @@
       &lt;Property Id="prop3"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Bool" /&gt;
       &lt;Property Id="prop4"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="String" /&gt;
       &lt;Property Id="prop5"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="DateTime" /&gt;
-      &lt;Property Id="prop6"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Address" /&gt;
-      &lt;Property Id="prop7"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="AddressPayable" /&gt;
-      &lt;Property Id="prop8"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Address" /&gt;
+      &lt;Property Id="prop6"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="AddressPayable" /&gt;
+      &lt;Property Id="prop7"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Address" /&gt;
 
-      &lt;Property Id="prop9"  Name="prop" IsMandatory="false" PropertyType="Single" DataType="Int" /&gt;
-      &lt;Property Id="prop10" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Uint" /&gt;
-      &lt;Property Id="prop11" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Bool" /&gt;
-      &lt;Property Id="prop12" Name="prop" IsMandatory="false" PropertyType="Single" DataType="String" /&gt;
-      &lt;Property Id="prop13" Name="prop" IsMandatory="false" PropertyType="Single" DataType="DateTime" /&gt;
+      &lt;Property Id="prop8"  Name="prop" IsMandatory="false" PropertyType="Single" DataType="Int" /&gt;
+      &lt;Property Id="prop9"  Name="prop" IsMandatory="false" PropertyType="Single" DataType="Uint" /&gt;
+      &lt;Property Id="prop10" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Bool" /&gt;
+      &lt;Property Id="prop11" Name="prop" IsMandatory="false" PropertyType="Single" DataType="String" /&gt;
+      &lt;Property Id="prop12" Name="prop" IsMandatory="false" PropertyType="Single" DataType="DateTime" /&gt;
+      &lt;Property Id="prop13" Name="prop" IsMandatory="false" PropertyType="Single" DataType="AddressPayable" /&gt;
       &lt;Property Id="prop14" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Address" /&gt;
-      &lt;Property Id="prop15" Name="prop" IsMandatory="false" PropertyType="Single" DataType="AddressPayable" /&gt;
-      &lt;Property Id="prop16" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Address" /&gt;
+
+      &lt;Property Id="prop15" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Int" /&gt;
+      &lt;Property Id="prop16" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Uint" /&gt;
+      &lt;Property Id="prop17" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Bool" /&gt;
+      &lt;Property Id="prop18" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="String" /&gt;
+      &lt;Property Id="prop19" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="DateTime" /&gt;
+      &lt;Property Id="prop20" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="AddressPayable" /&gt;
+      &lt;Property Id="prop21" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Address" /&gt;
+
+      &lt;Property Id="prop22" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Int" /&gt;
+      &lt;Property Id="prop23" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Uint" /&gt;
+      &lt;Property Id="prop24" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Bool" /&gt;
+      &lt;Property Id="prop25" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="String" /&gt;
+      &lt;Property Id="prop26" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="DateTime" /&gt;
+      &lt;Property Id="prop27" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="AddressPayable" /&gt;
+      &lt;Property Id="prop28" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Address" /&gt;
+
+      &lt;Property Id="prop29" Name="prop" IsMandatory="true" PropertyType="Single" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+      &lt;Property Id="prop30" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+
+      &lt;Property Id="prop31" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+      &lt;Property Id="prop32" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+
+      &lt;Property Id="prop33" Name="prop" IsMandatory="true" PropertyType="Single" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+      &lt;Property Id="prop34" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+      &lt;Property Id="prop35" Name="prop" IsMandatory="true" PropertyType="Collection" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+      &lt;Property Id="prop36" Name="prop" IsMandatory="false" PropertyType="Collection" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+
+      &lt;Property Id="prop37" Name="prop" IsMandatory="true" PropertyType="Dictionary" KeyType="Int" DataType="String" /&gt;
+      &lt;Property Id="prop38" Name="prop" IsMandatory="true" PropertyType="Dictionary" KeyType="Int" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+      &lt;Property Id="prop39" Name="prop" IsMandatory="true" PropertyType="Dictionary" KeyType="Int" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+      &lt;Property Id="prop40" Name="prop" IsMandatory="false" PropertyType="Dictionary" KeyType="Int" DataType="String" /&gt;
+      &lt;Property Id="prop41" Name="prop" IsMandatory="false" PropertyType="Dictionary" KeyType="Int" DataType="Reference" ReferencedDataType="SecondEntity" /&gt;
+      &lt;Property Id="prop42" Name="prop" IsMandatory="false" PropertyType="Dictionary" KeyType="Int" DataType="Enum" ReferencedDataType="Enum1" /&gt;
+
     &lt;/Entity&gt;
+
+    &lt;Entity Id="SecondEntity" Name="SecondEntity" IsRootEntity="false"&gt;
+      &lt;Property Id="propX1"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Int" /&gt;
+    &lt;/Entity&gt;
+
+    &lt;Enum Id="Enum1" Name="Enum1"&gt;
+      &lt;Value&gt;Value1&lt;/Value&gt;
+      &lt;Value&gt;Value2&lt;/Value&gt;
+      &lt;Value&gt;Value3&lt;/Value&gt;
+    &lt;/Enum&gt;
   &lt;/DataTypes&gt;</DataModelDefinition>
 </Contract>

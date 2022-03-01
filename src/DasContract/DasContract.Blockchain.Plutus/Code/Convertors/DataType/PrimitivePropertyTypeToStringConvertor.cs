@@ -20,7 +20,7 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
                 PrimitiveContractPropertyType.Integer => PlutusInteger.Type,
                 PrimitiveContractPropertyType.Address => PlutusPubKeyHash.Type,
                 PrimitiveContractPropertyType.Bool => PlutusBool.Type,
-                PrimitiveContractPropertyType.ByteString => PlutusBuiltinByteString.Type,
+                PrimitiveContractPropertyType.BuiltinByteString => PlutusBuiltinByteString.Type,
                 PrimitiveContractPropertyType.POSIXTime => PlutusPOSIXTime.Type,
                 _ => throw new Exception("No suitable string found"),
             };

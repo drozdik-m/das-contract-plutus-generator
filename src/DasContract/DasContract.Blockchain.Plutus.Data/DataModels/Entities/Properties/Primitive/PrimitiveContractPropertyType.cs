@@ -5,7 +5,7 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Prim
     {
         Integer,
         Bool,
-        ByteString,
+        BuiltinByteString,
         POSIXTime,
         Address,
     }

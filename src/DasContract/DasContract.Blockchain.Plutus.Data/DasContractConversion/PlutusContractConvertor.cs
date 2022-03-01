@@ -26,7 +26,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
         {
             var result = new PlutusContract
             {
-                DataModel = contractDataModelConvertor.Convert(source.Entities)
+                DataModel = contractDataModelConvertor.Convert((source.Entities, source.Enums))
             };
 
             return result;

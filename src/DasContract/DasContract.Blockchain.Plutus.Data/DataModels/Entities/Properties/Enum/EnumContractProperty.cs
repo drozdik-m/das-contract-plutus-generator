@@ -13,6 +13,11 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum
         /// </summary>
         public ContractEnum EnumEntity { get; set; }
 
+        /// <summary>
+        /// Id of the referenced enum
+        /// </summary>
+        public string EnumEntityId { get; set; } = string.Empty;
+
         /// <inheritdoc/>
         public override T Accept<T>(IContractPropertyVisitor<T> visitor)
             => visitor.Visit(this);

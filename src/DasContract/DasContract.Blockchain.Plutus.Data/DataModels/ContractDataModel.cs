@@ -52,5 +52,23 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels
         {
             Entities.Remove(removeEntity);
         }
+
+        /// <summary>
+        /// Adds a new enum to this data model
+        /// </summary>
+        /// <param name="newEum"></param>
+        public void AddEnum(ContractEnum newEum)
+        {
+            Enums.Add(newEum);
+        }
+
+        /// <summary>
+        /// Removes an enum from this data model
+        /// </summary>
+        /// <param name="removedEnum"></param>
+        public void RemoveEnum(ContractEnum removedEnum)
+        {
+            Enums.Remove(removedEnum);
+        }
     }
 }

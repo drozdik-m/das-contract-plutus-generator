@@ -7,6 +7,7 @@ using DasContract.Blockchain.Plutus.Code.Types.Premade;
 using DasContract.Blockchain.Plutus.Code.Types.Temporary;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
@@ -15,32 +16,35 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
 {
     public class DictionaryPropertyToTypeConvertor : IConvertor<DictionaryContractProperty, INamable>
     {
+        private IConvertor<PrimitiveContractPropertyType, PlutusPremadeType> primitiveConvertor;
+        private IConvertor<PrimitiveContractProperty, INamable> primitivePropConvertor;
+        private IConvertor<ReferenceContractProperty, INamable> referencePropConvertor;
+        private IConvertor<EnumContractProperty, INamable> enumPropConvertor;
+
         public DictionaryPropertyToTypeConvertor(
             IConvertor<PrimitiveContractPropertyType, PlutusPremadeType> primitiveConvertor,
             IConvertor<PrimitiveContractProperty, INamable> primitivePropConvertor,
-            IConvertor<ReferenceContractProperty, INamable> referencePropConvertor
+            IConvertor<ReferenceContractProperty, INamable> referencePropConvertor,
+            IConvertor<EnumContractProperty, INamable> enumPropConvertor
             )
         {
-            PrimitiveConvertor = primitiveConvertor;
-            PrimitivePropConvertor = primitivePropConvertor;
-            ReferencePropConvertor = referencePropConvertor;
+            this.primitiveConvertor = primitiveConvertor;
+            this.primitivePropConvertor = primitivePropConvertor;
+            this.referencePropConvertor = referencePropConvertor;
+            this.enumPropConvertor = enumPropConvertor;
         }
-
-        public IConvertor<PrimitiveContractPropertyType, PlutusPremadeType> PrimitiveConvertor { get; }
-
-        public IConvertor<PrimitiveContractProperty, INamable> PrimitivePropConvertor { get; }
-
-        public IConvertor<ReferenceContractProperty, INamable> ReferencePropConvertor { get; }
 
         /// <inheritdoc/>
         public INamable Convert(DictionaryContractProperty source)
         {
-            var keyType = PrimitiveConvertor.Convert(source.KeyType);
+            var keyType = primitiveConvertor.Convert(source.KeyType);
             INamable valueType;
             if (source.ValueType is PrimitiveContractProperty primitiveProp)
-                valueType = PrimitivePropConvertor.Convert(primitiveProp);
+                valueType = primitivePropConvertor.Convert(primitiveProp);
             else if (source.ValueType is ReferenceContractProperty refProp)
-                valueType = ReferencePropConvertor.Convert(refProp);
+                valueType = referencePropConvertor.Convert(refProp);
+            else if (source.ValueType is EnumContractProperty enumProp)
+                valueType = enumPropConvertor.Convert(enumProp);
             else if (source.ValueType is DictionaryContractProperty dictProp)
                 valueType = Convert(dictProp);
             else

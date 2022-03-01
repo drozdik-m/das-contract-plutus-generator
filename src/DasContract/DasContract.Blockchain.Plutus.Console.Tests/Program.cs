@@ -13,7 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 //Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(contract));
 
 //Loaded DasContract
-string path = @"../../../Testing contract.dascontract";
+string path = @"../../../contract.dascontract";
 var lines = File.ReadAllLines(path);
 var fileContent = string.Join(Environment.NewLine, lines);
 var xElement = XElement.Parse(fileContent);
@@ -28,12 +28,22 @@ var primitivePropertyConvertor = new PrimitivePropertyConvertor(
     propertyCardinalityConvertor);
 var referencePropertyConvertor = new ReferencePropertyConvertor(
     propertyCardinalityConvertor);
-var entityConvertor = new ContractEntityConvertor(
+var dictionaryPropertyConvertor = new DictionaryPropertyConvertor(
+    propertyTypeConvertor);
+var enumPropertyConvertor = new EnumPropertyConvertor(
+    propertyCardinalityConvertor);
+var propertyConvertor = new ContractPropertyConvertor(
     primitivePropertyConvertor,
-    referencePropertyConvertor);
+    referencePropertyConvertor,
+    dictionaryPropertyConvertor,
+    enumPropertyConvertor);
+var entityConvertor = new ContractEntityConvertor(
+    propertyConvertor);
+var contractEnumConvertor = new EnumConvertor();
 var plutusDataModelConvertor = new ContractDataModelConvertor(
     entityConvertor,
-    referencePropertyConvertor);
+    referencePropertyConvertor,
+    contractEnumConvertor);
 
 //Contract convertor
 var plutusContractConvertor = new PlutusContractConvertor(

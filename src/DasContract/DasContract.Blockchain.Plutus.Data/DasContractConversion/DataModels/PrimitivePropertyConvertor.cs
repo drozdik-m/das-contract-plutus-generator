@@ -30,16 +30,20 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             };
 
             //Reference data type
-            if (source.DataType == PropertyDataType.Reference)
-                throw new Exception("Data type is reference, but the convertor converts only primitives");
+            if (source.DataType == PropertyDataType.Reference ||
+                source.DataType == PropertyDataType.Enum ||
+                source.PropertyType == PropertyType.Dictionary)
+                throw new Exception($"Data type is not primitive, but the convertor converts only primitives ({source.Id})");
 
-            //Dictionary data type
-            if (source.PropertyType == PropertyType.Dictionary)
-                throw new Exception("Data type is dictionary, but the convertor converts only primitives");
+            if (source.DataType is null)
+                throw new Exception("Property data type was null");
 
             result.Type = typeConvertor.Convert(source.DataType.Value);
 
             //Cardinality
+            if (source.PropertyType is null)
+                throw new Exception("Property type was null (unknown cardinality)");
+
             result.Cardinality = cardinalityConvertor.Convert(source.PropertyType.Value);
 
             return result;

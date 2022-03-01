@@ -1379,7 +1379,8 @@ namespace DasContract.Blockchain.Plutus
                     new DictionaryPropertyToTypeConvertor(
                             primitiveConv,
                             new PrimitivePropertyToTypeConvertor(primitiveConv),
-                            new ReferencePropertyToTypeConvertor()
+                            new ReferencePropertyToTypeConvertor(),
+                            new EnumPropertyToTypeConvertor()
                         ).Convert(property)));
             }
 

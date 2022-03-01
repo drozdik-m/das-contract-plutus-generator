@@ -16,7 +16,7 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
         /// <inheritdoc/>
         public INamable Convert(EnumContractProperty source)
         {
-            var type = PlutusUnspecifiedDataType.Type(source.Name);
+            var type = PlutusUnspecifiedDataType.Type(source.EnumEntity.Name);
             INamable cardinalizedType = new TypeToCardinalizedType(source.Cardinality)
                 .Convert(type);
             INamable mandatorizedType = new TypeToMaybeType(source.IsMandatory)
