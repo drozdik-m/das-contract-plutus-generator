@@ -32,6 +32,8 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
         {
             var result = new PlutusContract
             {
+                Id = source.Id,
+                //TODO GlobalValidationCode,
                 DataModel = contractDataModelConvertor.Convert((source.Entities, source.Enums)),
                 Identities = usersConvertor.Convert((source.Users, source.Roles)),
             };
