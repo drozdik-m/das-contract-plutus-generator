@@ -471,7 +471,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
         }
         #endregion
 
-
         #region schemaAndEndpoints
 
         /// <summary>

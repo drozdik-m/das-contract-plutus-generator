@@ -1,0 +1,473 @@
+<Contract Id="7d22995c-4599-4dd4-8834-dc42dc218f84">
+  <Name>Testing contract</Name>
+  <ProcessDiagram>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"&gt;&lt;bpmn:collaboration id="Collaboration_0i0akpe"&gt;&lt;bpmn:participant id="Participant_0b3splo" name="Main" processRef="Process_1" /&gt;&lt;bpmn:participant id="Participant_0verfsu" name="Number operations" processRef="Process_0kzfodr" /&gt;&lt;bpmn:participant id="Participant_1rvu9bv" name="Add 1" processRef="Process_0wxob86" /&gt;&lt;/bpmn:collaboration&gt;&lt;bpmn:process id="Process_1" isExecutable="false"&gt;&lt;bpmn:startEvent id="Event_1szn6zl" name="Start pls mate"&gt;&lt;bpmn:outgoing&gt;Flow_18xqdps&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:sequenceFlow id="Flow_1s5g0sn" sourceRef="Activity_1cjiuby" targetRef="Gateway_18bboq3" /&gt;&lt;bpmn:sequenceFlow id="Flow_1ma4fpy" sourceRef="Activity_1l3o76w" targetRef="Gateway_18bboq3" /&gt;&lt;bpmn:sequenceFlow id="Flow_015jjl9" sourceRef="Event_1b6gdhe" targetRef="Activity_1l3o76w" /&gt;&lt;bpmn:sequenceFlow id="Flow_0i282le" sourceRef="Activity_1r6830t" targetRef="Activity_1cjiuby" /&gt;&lt;bpmn:sequenceFlow id="Flow_18xqdps" sourceRef="Event_1szn6zl" targetRef="Activity_1r6830t" /&gt;&lt;bpmn:userTask id="Activity_1r6830t" name="Set timeout"&gt;&lt;bpmn:incoming&gt;Flow_18xqdps&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0i282le&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:exclusiveGateway id="Gateway_18bboq3" name="AfterTimeoutGateway"&gt;&lt;bpmn:incoming&gt;Flow_1ma4fpy&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_1s5g0sn&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0yrbbqy&lt;/bpmn:outgoing&gt;&lt;/bpmn:exclusiveGateway&gt;&lt;bpmn:userTask id="Activity_1cjiuby" name="Set a number"&gt;&lt;bpmn:incoming&gt;Flow_0i282le&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1s5g0sn&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:boundaryEvent id="Event_1b6gdhe" attachedToRef="Activity_1cjiuby"&gt;&lt;bpmn:outgoing&gt;Flow_015jjl9&lt;/bpmn:outgoing&gt;&lt;bpmn:timerEventDefinition id="TimerEventDefinition_19efw8o" /&gt;&lt;/bpmn:boundaryEvent&gt;&lt;bpmn:callActivity id="Activity_10axzmv" name="Work dat number baby"&gt;&lt;bpmn:incoming&gt;Flow_0yrbbqy&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_178qzo3&lt;/bpmn:outgoing&gt;&lt;bpmn:multiInstanceLoopCharacteristics isSequential="true" /&gt;&lt;/bpmn:callActivity&gt;&lt;bpmn:sequenceFlow id="Flow_0yrbbqy" sourceRef="Gateway_18bboq3" targetRef="Activity_10axzmv" /&gt;&lt;bpmn:sequenceFlow id="Flow_178qzo3" sourceRef="Activity_10axzmv" targetRef="Activity_1haeulk" /&gt;&lt;bpmn:scriptTask id="Activity_1l3o76w" name="Log the timeout"&gt;&lt;bpmn:incoming&gt;Flow_015jjl9&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1ma4fpy&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:sequenceFlow id="Flow_0qudkuw" sourceRef="Event_1vak4cj" targetRef="Activity_0i42khj" /&gt;&lt;bpmn:sequenceFlow id="Flow_0ti29xk" sourceRef="Activity_0i42khj" targetRef="Event_1tsn12f" /&gt;&lt;bpmn:sequenceFlow id="Flow_0t7n8y6" sourceRef="Activity_1haeulk" targetRef="Event_1tsn12f" /&gt;&lt;bpmn:endEvent id="Event_1tsn12f"&gt;&lt;bpmn:incoming&gt;Flow_0ti29xk&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_0t7n8y6&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:scriptTask id="Activity_0i42khj" name="Log the second timeout"&gt;&lt;bpmn:incoming&gt;Flow_0qudkuw&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0ti29xk&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:userTask id="Activity_1haeulk" name="Log a message"&gt;&lt;bpmn:incoming&gt;Flow_178qzo3&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0t7n8y6&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:boundaryEvent id="Event_1vak4cj" attachedToRef="Activity_1haeulk"&gt;&lt;bpmn:outgoing&gt;Flow_0qudkuw&lt;/bpmn:outgoing&gt;&lt;bpmn:timerEventDefinition id="TimerEventDefinition_15z3se6" /&gt;&lt;/bpmn:boundaryEvent&gt;&lt;/bpmn:process&gt;&lt;bpmn:process id="Process_0kzfodr"&gt;&lt;bpmn:startEvent id="Event_0dff8i2"&gt;&lt;bpmn:outgoing&gt;Flow_15c8kyz&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:scriptTask id="Activity_0siy7oy" name="Double that number"&gt;&lt;bpmn:incoming&gt;Flow_15c8kyz&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1t71x9n&lt;/bpmn:outgoing&gt;&lt;bpmn:multiInstanceLoopCharacteristics isSequential="true" /&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:exclusiveGateway id="Gateway_1skdi0w" name="BySizeGateway"&gt;&lt;bpmn:incoming&gt;Flow_1t71x9n&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0tvl06n&lt;/bpmn:outgoing&gt;&lt;bpmn:outgoing&gt;Flow_04x8tev&lt;/bpmn:outgoing&gt;&lt;/bpmn:exclusiveGateway&gt;&lt;bpmn:exclusiveGateway id="Gateway_187gde2" name="PreFinishMergeGateway"&gt;&lt;bpmn:incoming&gt;Flow_04x8tev&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_03x3ph1&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0a2nuf1&lt;/bpmn:outgoing&gt;&lt;/bpmn:exclusiveGateway&gt;&lt;bpmn:scriptTask id="Activity_0jnkz5q" name="Log the number"&gt;&lt;bpmn:incoming&gt;Flow_0a2nuf1&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0knesyz&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:endEvent id="Event_1t4nn4l"&gt;&lt;bpmn:incoming&gt;Flow_0knesyz&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:callActivity id="Activity_1jan1lk" name="Add 1"&gt;&lt;bpmn:incoming&gt;Flow_0tvl06n&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_03x3ph1&lt;/bpmn:outgoing&gt;&lt;/bpmn:callActivity&gt;&lt;bpmn:sequenceFlow id="Flow_0knesyz" sourceRef="Activity_0jnkz5q" targetRef="Event_1t4nn4l" /&gt;&lt;bpmn:sequenceFlow id="Flow_15c8kyz" sourceRef="Event_0dff8i2" targetRef="Activity_0siy7oy" /&gt;&lt;bpmn:sequenceFlow id="Flow_0a2nuf1" sourceRef="Gateway_187gde2" targetRef="Activity_0jnkz5q" /&gt;&lt;bpmn:sequenceFlow id="Flow_03x3ph1" sourceRef="Activity_1jan1lk" targetRef="Gateway_187gde2" /&gt;&lt;bpmn:sequenceFlow id="Flow_04x8tev" name="${interestingNumber datum &amp;#60; 3000000}" sourceRef="Gateway_1skdi0w" targetRef="Gateway_187gde2" /&gt;&lt;bpmn:sequenceFlow id="Flow_0tvl06n" name="${interestingNumber datum &amp;#62;= 3000000}" sourceRef="Gateway_1skdi0w" targetRef="Activity_1jan1lk" /&gt;&lt;bpmn:sequenceFlow id="Flow_1t71x9n" sourceRef="Activity_0siy7oy" targetRef="Gateway_1skdi0w" /&gt;&lt;/bpmn:process&gt;&lt;bpmn:process id="Process_0wxob86"&gt;&lt;bpmn:startEvent id="Event_1sci0fs"&gt;&lt;bpmn:outgoing&gt;Flow_1k4def9&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:scriptTask id="Activity_1t23qro" name="Add 1"&gt;&lt;bpmn:incoming&gt;Flow_1k4def9&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0dx05vf&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:endEvent id="Event_0bbaqw5"&gt;&lt;bpmn:incoming&gt;Flow_0dx05vf&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:sequenceFlow id="Flow_0dx05vf" sourceRef="Activity_1t23qro" targetRef="Event_0bbaqw5" /&gt;&lt;bpmn:sequenceFlow id="Flow_1k4def9" sourceRef="Event_1sci0fs" targetRef="Activity_1t23qro" /&gt;&lt;/bpmn:process&gt;&lt;bpmndi:BPMNDiagram id="BPMNDiagram_1"&gt;&lt;bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0i0akpe"&gt;&lt;bpmndi:BPMNShape id="Participant_0b3splo_di" bpmnElement="Participant_0b3splo" isHorizontal="true"&gt;&lt;dc:Bounds x="70" y="190" width="1030" height="320" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNEdge id="Flow_0t7n8y6_di" bpmnElement="Flow_0t7n8y6"&gt;&lt;di:waypoint x="930" y="390" /&gt;&lt;di:waypoint x="982" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0ti29xk_di" bpmnElement="Flow_0ti29xk"&gt;&lt;di:waypoint x="1000" y="310" /&gt;&lt;di:waypoint x="1000" y="372" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0qudkuw_di" bpmnElement="Flow_0qudkuw"&gt;&lt;di:waypoint x="900" y="332" /&gt;&lt;di:waypoint x="900" y="270" /&gt;&lt;di:waypoint x="950" y="270" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_178qzo3_di" bpmnElement="Flow_178qzo3"&gt;&lt;di:waypoint x="780" y="390" /&gt;&lt;di:waypoint x="830" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0yrbbqy_di" bpmnElement="Flow_0yrbbqy"&gt;&lt;di:waypoint x="585" y="390" /&gt;&lt;di:waypoint x="680" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_18xqdps_di" bpmnElement="Flow_18xqdps"&gt;&lt;di:waypoint x="158" y="390" /&gt;&lt;di:waypoint x="210" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0i282le_di" bpmnElement="Flow_0i282le"&gt;&lt;di:waypoint x="310" y="390" /&gt;&lt;di:waypoint x="350" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_015jjl9_di" bpmnElement="Flow_015jjl9"&gt;&lt;di:waypoint x="430" y="332" /&gt;&lt;di:waypoint x="430" y="270" /&gt;&lt;di:waypoint x="510" y="270" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1ma4fpy_di" bpmnElement="Flow_1ma4fpy"&gt;&lt;di:waypoint x="560" y="310" /&gt;&lt;di:waypoint x="560" y="365" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1s5g0sn_di" bpmnElement="Flow_1s5g0sn"&gt;&lt;di:waypoint x="450" y="390" /&gt;&lt;di:waypoint x="535" y="390" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="Event_1szn6zl_di" bpmnElement="Event_1szn6zl"&gt;&lt;dc:Bounds x="122" y="372" width="36" height="36" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="107" y="415" width="67" height="14" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1r6830t_di" bpmnElement="Activity_1r6830t"&gt;&lt;dc:Bounds x="210" y="350" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Gateway_18bboq3_di" bpmnElement="Gateway_18bboq3" isMarkerVisible="true"&gt;&lt;dc:Bounds x="535" y="365" width="50" height="50" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="520" y="422" width="80" height="27" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0o8xc8z_di" bpmnElement="Activity_1cjiuby"&gt;&lt;dc:Bounds x="350" y="350" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_03ssx5w_di" bpmnElement="Activity_10axzmv"&gt;&lt;dc:Bounds x="680" y="350" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_09vym11_di" bpmnElement="Activity_1l3o76w"&gt;&lt;dc:Bounds x="510" y="230" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_1tsn12f_di" bpmnElement="Event_1tsn12f"&gt;&lt;dc:Bounds x="982" y="372" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0i42khj_di" bpmnElement="Activity_0i42khj"&gt;&lt;dc:Bounds x="950" y="230" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1f90hum_di" bpmnElement="Activity_1haeulk"&gt;&lt;dc:Bounds x="830" y="350" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0dqd2ka_di" bpmnElement="Event_1vak4cj"&gt;&lt;dc:Bounds x="882" y="332" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_1b6gdhe_di" bpmnElement="Event_1b6gdhe"&gt;&lt;dc:Bounds x="412" y="332" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Participant_0verfsu_di" bpmnElement="Participant_0verfsu" isHorizontal="true"&gt;&lt;dc:Bounds x="70" y="540" width="1000" height="340" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNEdge id="Flow_1t71x9n_di" bpmnElement="Flow_1t71x9n"&gt;&lt;di:waypoint x="320" y="670" /&gt;&lt;di:waypoint x="365" y="670" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0tvl06n_di" bpmnElement="Flow_0tvl06n"&gt;&lt;di:waypoint x="390" y="645" /&gt;&lt;di:waypoint x="390" y="630" /&gt;&lt;di:waypoint x="600" y="630" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="390" y="580" width="82" height="40" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_04x8tev_di" bpmnElement="Flow_04x8tev"&gt;&lt;di:waypoint x="390" y="695" /&gt;&lt;di:waypoint x="390" y="760" /&gt;&lt;di:waypoint x="625" y="760" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="395" y="776" width="82" height="40" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_03x3ph1_di" bpmnElement="Flow_03x3ph1"&gt;&lt;di:waypoint x="650" y="670" /&gt;&lt;di:waypoint x="650" y="735" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0a2nuf1_di" bpmnElement="Flow_0a2nuf1"&gt;&lt;di:waypoint x="675" y="760" /&gt;&lt;di:waypoint x="760" y="760" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_15c8kyz_di" bpmnElement="Flow_15c8kyz"&gt;&lt;di:waypoint x="158" y="670" /&gt;&lt;di:waypoint x="220" y="670" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0knesyz_di" bpmnElement="Flow_0knesyz"&gt;&lt;di:waypoint x="860" y="760" /&gt;&lt;di:waypoint x="942" y="760" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="Event_0dff8i2_di" bpmnElement="Event_0dff8i2"&gt;&lt;dc:Bounds x="122" y="652" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0siy7oy_di" bpmnElement="Activity_0siy7oy"&gt;&lt;dc:Bounds x="220" y="630" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Gateway_1skdi0w_di" bpmnElement="Gateway_1skdi0w" isMarkerVisible="true"&gt;&lt;dc:Bounds x="365" y="645" width="50" height="50" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="420" y="673" width="80" height="14" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Gateway_187gde2_di" bpmnElement="Gateway_187gde2" isMarkerVisible="true"&gt;&lt;dc:Bounds x="625" y="735" width="50" height="50" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="609" y="792" width="83" height="27" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0jnkz5q_di" bpmnElement="Activity_0jnkz5q"&gt;&lt;dc:Bounds x="760" y="720" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_1t4nn4l_di" bpmnElement="Event_1t4nn4l"&gt;&lt;dc:Bounds x="942" y="742" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0eam0id_di" bpmnElement="Activity_1jan1lk"&gt;&lt;dc:Bounds x="600" y="590" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Participant_1rvu9bv_di" bpmnElement="Participant_1rvu9bv" isHorizontal="true"&gt;&lt;dc:Bounds x="70" y="910" width="400" height="250" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNEdge id="Flow_0dx05vf_di" bpmnElement="Flow_0dx05vf"&gt;&lt;di:waypoint x="300" y="1050" /&gt;&lt;di:waypoint x="342" y="1050" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1k4def9_di" bpmnElement="Flow_1k4def9"&gt;&lt;di:waypoint x="158" y="1050" /&gt;&lt;di:waypoint x="200" y="1050" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="Event_1sci0fs_di" bpmnElement="Event_1sci0fs"&gt;&lt;dc:Bounds x="122" y="1032" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1t23qro_di" bpmnElement="Activity_1t23qro"&gt;&lt;dc:Bounds x="200" y="1010" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0bbaqw5_di" bpmnElement="Event_0bbaqw5"&gt;&lt;dc:Bounds x="342" y="1032" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;/bpmndi:BPMNPlane&gt;&lt;/bpmndi:BPMNDiagram&gt;&lt;/bpmn:definitions&gt;</ProcessDiagram>
+  <Processes>
+    <Process Id="Process_1">
+      <Name>Main</Name>
+      <IsExecutable>true</IsExecutable>
+      <ParticipantId></ParticipantId>
+      <CustomScript></CustomScript>
+      <SequenceFlows>
+        <SequenceFlow Id="Flow_1wcjys1">
+          <Name></Name>
+          <SourceId>Activity_0306ruj</SourceId>
+          <TargetId>Activity_0feijmu</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0axek89">
+          <Name></Name>
+          <SourceId>Activity_0h7zd9h</SourceId>
+          <TargetId>Activity_0raaz4n</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_18xqdps">
+          <Name></Name>
+          <SourceId>Event_1szn6zl</SourceId>
+          <TargetId>Activity_1r6830t</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0i282le">
+          <Name></Name>
+          <SourceId>Activity_1r6830t</SourceId>
+          <TargetId>Activity_1cjiuby</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1ma4fpy">
+          <Name></Name>
+          <SourceId>Activity_1l3o76w</SourceId>
+          <TargetId>Gateway_18bboq3</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0yrbbqy">
+          <Name></Name>
+          <SourceId>Gateway_18bboq3</SourceId>
+          <TargetId>Activity_10axzmv</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1s5g0sn">
+          <Name></Name>
+          <SourceId>Activity_1cjiuby</SourceId>
+          <TargetId>Gateway_18bboq3</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_192es23">
+          <Name></Name>
+          <SourceId>Activity_0a41xrp</SourceId>
+          <TargetId>Gateway_1x55qi5</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_015jjl9">
+          <Name></Name>
+          <SourceId>Event_1b6gdhe</SourceId>
+          <TargetId>Activity_1l3o76w</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1nblzcn">
+          <Name></Name>
+          <SourceId>Gateway_0rrm14a</SourceId>
+          <TargetId>Activity_0hrkybe</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_178qzo3">
+          <Name></Name>
+          <SourceId>Activity_10axzmv</SourceId>
+          <TargetId>Activity_1haeulk</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0qudkuw">
+          <Name></Name>
+          <SourceId>Event_1vak4cj</SourceId>
+          <TargetId>Activity_0i42khj</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0ti29xk">
+          <Name></Name>
+          <SourceId>Activity_0i42khj</SourceId>
+          <TargetId>Event_1tsn12f</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0t7n8y6">
+          <Name></Name>
+          <SourceId>Activity_1haeulk</SourceId>
+          <TargetId>Event_1tsn12f</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+      </SequenceFlows>
+      <ProcessElements>
+        <CallActivity Id="Activity_10axzmv">
+          <Name>Work dat number baby</Name>
+          <Incoming>
+            <IncomingId>Flow_0yrbbqy</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_178qzo3</OutgoingId>
+          </Outgoing>
+          <InstanceType>Sequential</InstanceType>
+          <LoopCardinality>2</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <CalledElement>Process_0kzfodr</CalledElement>
+        </CallActivity>
+        <ScriptTask Id="Activity_1l3o76w">
+          <Name>Log the timeout</Name>
+          <Incoming>
+            <IncomingId>Flow_015jjl9</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1ma4fpy</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <Script></Script>
+        </ScriptTask>
+        <ScriptTask Id="Activity_0i42khj">
+          <Name>Log the second timeout</Name>
+          <Incoming>
+            <IncomingId>Flow_0qudkuw</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0ti29xk</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <Script></Script>
+        </ScriptTask>
+        <UserTask Id="Activity_1cjiuby">
+          <Name>Set a number</Name>
+          <Incoming>
+            <IncomingId>Flow_0i282le</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1s5g0sn</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>2</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression></DueDateExpression>
+          <FormDefinition></FormDefinition>
+          <ValidationScript></ValidationScript>
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <UserTask Id="Activity_1r6830t">
+          <Name>Set timeout</Name>
+          <Incoming>
+            <IncomingId>Flow_18xqdps</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0i282le</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression></DueDateExpression>
+          <FormDefinition></FormDefinition>
+          <ValidationScript></ValidationScript>
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <UserTask Id="Activity_1haeulk">
+          <Name>Log a message</Name>
+          <Incoming>
+            <IncomingId>Flow_178qzo3</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0t7n8y6</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression></DueDateExpression>
+          <FormDefinition></FormDefinition>
+          <ValidationScript></ValidationScript>
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <ExclusiveGateway Id="Gateway_18bboq3">
+          <Name>AfterTimeoutGateway</Name>
+          <Incoming>
+            <IncomingId>Flow_1ma4fpy</IncomingId>
+            <IncomingId>Flow_1s5g0sn</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0yrbbqy</OutgoingId>
+          </Outgoing>
+          <DefaultSequenceFlowId></DefaultSequenceFlowId>
+        </ExclusiveGateway>
+        <EndEvent Id="Event_1tsn12f">
+          <Name></Name>
+          <Incoming>
+            <IncomingId>Flow_0ti29xk</IncomingId>
+            <IncomingId>Flow_0t7n8y6</IncomingId>
+          </Incoming>
+          <Outgoing />
+        </EndEvent>
+        <StartEvent Id="Event_1szn6zl">
+          <Name>Start pls mate</Name>
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_18xqdps</OutgoingId>
+          </Outgoing>
+        </StartEvent>
+        <TimerBoundaryEvent Id="Event_1b6gdhe">
+          <Name></Name>
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_015jjl9</OutgoingId>
+          </Outgoing>
+          <AttachedTo>Activity_1cjiuby</AttachedTo>
+          <TimerDefinitionType>Date</TimerDefinitionType>
+          <TimerDefinition>1</TimerDefinition>
+        </TimerBoundaryEvent>
+        <TimerBoundaryEvent Id="Event_1vak4cj">
+          <Name></Name>
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_0qudkuw</OutgoingId>
+          </Outgoing>
+          <AttachedTo>Activity_1haeulk</AttachedTo>
+          <TimerDefinitionType>Date</TimerDefinitionType>
+          <TimerDefinition></TimerDefinition>
+        </TimerBoundaryEvent>
+      </ProcessElements>
+    </Process>
+    <Process Id="Process_0kzfodr">
+      <Name>Number operations</Name>
+      <IsExecutable>false</IsExecutable>
+      <ParticipantId>Participant_0verfsu</ParticipantId>
+      <CustomScript></CustomScript>
+      <SequenceFlows>
+        <SequenceFlow Id="Flow_1t71x9n">
+          <Name></Name>
+          <SourceId>Activity_0siy7oy</SourceId>
+          <TargetId>Gateway_1skdi0w</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0tvl06n">
+          <Name>${interestingNumber datum &gt;= 3000000}</Name>
+          <SourceId>Gateway_1skdi0w</SourceId>
+          <TargetId>Activity_1jan1lk</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_04x8tev">
+          <Name>${interestingNumber datum &lt; 3000000}</Name>
+          <SourceId>Gateway_1skdi0w</SourceId>
+          <TargetId>Gateway_187gde2</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_03x3ph1">
+          <Name></Name>
+          <SourceId>Activity_1jan1lk</SourceId>
+          <TargetId>Gateway_187gde2</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0a2nuf1">
+          <Name></Name>
+          <SourceId>Gateway_187gde2</SourceId>
+          <TargetId>Activity_0jnkz5q</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_15c8kyz">
+          <Name></Name>
+          <SourceId>Event_0dff8i2</SourceId>
+          <TargetId>Activity_0siy7oy</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0knesyz">
+          <Name></Name>
+          <SourceId>Activity_0jnkz5q</SourceId>
+          <TargetId>Event_1t4nn4l</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+      </SequenceFlows>
+      <ProcessElements>
+        <CallActivity Id="Activity_1jan1lk">
+          <Name>Add 1</Name>
+          <Incoming>
+            <IncomingId>Flow_0tvl06n</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_03x3ph1</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <CalledElement>Process_0wxob86</CalledElement>
+        </CallActivity>
+        <ScriptTask Id="Activity_0siy7oy">
+          <Name>Double that number</Name>
+          <Incoming>
+            <IncomingId>Flow_15c8kyz</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1t71x9n</OutgoingId>
+          </Outgoing>
+          <InstanceType>Sequential</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <Script></Script>
+        </ScriptTask>
+        <ScriptTask Id="Activity_0jnkz5q">
+          <Name>Log the number</Name>
+          <Incoming>
+            <IncomingId>Flow_0a2nuf1</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0knesyz</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <Script></Script>
+        </ScriptTask>
+        <ExclusiveGateway Id="Gateway_1skdi0w">
+          <Name>BySizeGateway</Name>
+          <Incoming>
+            <IncomingId>Flow_1t71x9n</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0tvl06n</OutgoingId>
+            <OutgoingId>Flow_04x8tev</OutgoingId>
+          </Outgoing>
+          <DefaultSequenceFlowId></DefaultSequenceFlowId>
+        </ExclusiveGateway>
+        <ExclusiveGateway Id="Gateway_187gde2">
+          <Name>PreFinishMergeGateway</Name>
+          <Incoming>
+            <IncomingId>Flow_04x8tev</IncomingId>
+            <IncomingId>Flow_03x3ph1</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0a2nuf1</OutgoingId>
+          </Outgoing>
+          <DefaultSequenceFlowId></DefaultSequenceFlowId>
+        </ExclusiveGateway>
+        <EndEvent Id="Event_1t4nn4l">
+          <Name></Name>
+          <Incoming>
+            <IncomingId>Flow_0knesyz</IncomingId>
+          </Incoming>
+          <Outgoing />
+        </EndEvent>
+        <StartEvent Id="Event_0dff8i2">
+          <Name></Name>
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_15c8kyz</OutgoingId>
+          </Outgoing>
+        </StartEvent>
+      </ProcessElements>
+    </Process>
+    <Process Id="Process_0wxob86">
+      <Name>Add 1</Name>
+      <IsExecutable>false</IsExecutable>
+      <ParticipantId>Participant_1rvu9bv</ParticipantId>
+      <CustomScript></CustomScript>
+      <SequenceFlows>
+        <SequenceFlow Id="Flow_1k4def9">
+          <Name />
+          <SourceId>Event_1sci0fs</SourceId>
+          <TargetId>Activity_1t23qro</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0dx05vf">
+          <Name />
+          <SourceId>Activity_1t23qro</SourceId>
+          <TargetId>Event_0bbaqw5</TargetId>
+          <Condition></Condition>
+        </SequenceFlow>
+      </SequenceFlows>
+      <ProcessElements>
+        <ScriptTask Id="Activity_1t23qro">
+          <Name>Add 1</Name>
+          <Incoming>
+            <IncomingId>Flow_1k4def9</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0dx05vf</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection></LoopCollection>
+          <TokenOperationType>Create</TokenOperationType>
+          <Script></Script>
+        </ScriptTask>
+        <EndEvent Id="Event_0bbaqw5">
+          <Name />
+          <Incoming>
+            <IncomingId>Flow_0dx05vf</IncomingId>
+          </Incoming>
+          <Outgoing />
+        </EndEvent>
+        <StartEvent Id="Event_1sci0fs">
+          <Name />
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_1k4def9</OutgoingId>
+          </Outgoing>
+        </StartEvent>
+      </ProcessElements>
+    </Process>
+  </Processes>
+  <Roles>
+    <ProcessRole Id="3b618d43-2eec-47c9-9f13-a07d698a0db1">
+      <Name>Money sender</Name>
+      <Description></Description>
+    </ProcessRole>
+    <ProcessRole Id="65b19756-1000-4f89-9152-6a7bc15f23a5">
+      <Name>Beneficiary</Name>
+      <Description></Description>
+    </ProcessRole>
+  </Roles>
+  <Users>
+    <ProcessUser Id="bc4522f1-8aa8-4188-8d41-4414d4b9fb47">
+      <Name>The rich guy</Name>
+      <Description>The guy that sends the $$$</Description>
+      <Address>a2c20c77887ace1cd986193e4e75babd8993cfd56995cd5cfce609c2</Address>
+      <Roles>
+        <ProcessRole>3b618d43-2eec-47c9-9f13-a07d698a0db1</ProcessRole>
+      </Roles>
+    </ProcessUser>
+    <ProcessUser Id="7a2ea629-b68e-4251-8799-a0b84f92061d">
+      <Name>The poor guy</Name>
+      <Description>Es Áj Em Pí</Description>
+      <Address>80a4f45b56b88d1139da23bc4c3c75ec6d32943c087f250b86193ca7</Address>
+      <Roles>
+        <ProcessRole>65b19756-1000-4f89-9152-6a7bc15f23a5</ProcessRole>
+      </Roles>
+    </ProcessUser>
+  </Users>
+  <DataModelDefinition>  &lt;DataTypes&gt;
+    &lt;Entity Id="Root" Name="Datum" IsRootEntity="true"&gt;
+      &lt;Property Id="prop1"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Int" /&gt;
+      &lt;Property Id="prop2"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Uint" /&gt;
+      &lt;Property Id="prop3"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Bool" /&gt;
+      &lt;Property Id="prop4"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="String" /&gt;
+      &lt;Property Id="prop5"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="DateTime" /&gt;
+      &lt;Property Id="prop6"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Address" /&gt;
+      &lt;Property Id="prop7"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="AddressPayable" /&gt;
+      &lt;Property Id="prop8"  Name="prop" IsMandatory="true" PropertyType="Single" DataType="Address" /&gt;
+
+      &lt;Property Id="prop9"  Name="prop" IsMandatory="false" PropertyType="Single" DataType="Int" /&gt;
+      &lt;Property Id="prop10" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Uint" /&gt;
+      &lt;Property Id="prop11" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Bool" /&gt;
+      &lt;Property Id="prop12" Name="prop" IsMandatory="false" PropertyType="Single" DataType="String" /&gt;
+      &lt;Property Id="prop13" Name="prop" IsMandatory="false" PropertyType="Single" DataType="DateTime" /&gt;
+      &lt;Property Id="prop14" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Address" /&gt;
+      &lt;Property Id="prop15" Name="prop" IsMandatory="false" PropertyType="Single" DataType="AddressPayable" /&gt;
+      &lt;Property Id="prop16" Name="prop" IsMandatory="false" PropertyType="Single" DataType="Address" /&gt;
+    &lt;/Entity&gt;
+  &lt;/DataTypes&gt;</DataModelDefinition>
+</Contract>

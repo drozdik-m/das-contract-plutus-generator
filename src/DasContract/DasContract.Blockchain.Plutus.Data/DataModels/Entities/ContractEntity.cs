@@ -7,6 +7,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
+using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 
 namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
 {
@@ -39,13 +40,21 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         public ICollection<DictionaryContractProperty> DictionaryProperties { get; set; } = new List<DictionaryContractProperty>();
 
         /// <summary>
+        /// Collection of enum properties of this entity
+        /// </summary>
+        public ICollection<EnumContractProperty> EnumProperties { get; set; } = new List<EnumContractProperty>();
+
+        /// <summary>
         /// Collection of all properties of this entity
         /// </summary>
         public IEnumerable<ContractProperty> Properties => new List<ContractProperty>()
             .Concat(PrimitiveProperties)
             .Concat(ReferenceProperties)
             .Concat(DictionaryProperties)
+            .Concat(EnumProperties)
             .ToList();
+
+        
 
         /// <summary>
         /// Adds a property from this entity
@@ -99,6 +108,24 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities
         public void RemoveProperty(DictionaryContractProperty removeProperty)
         {
             DictionaryProperties.Remove(removeProperty);
+        }
+
+        /// <summary>
+        /// Adds a property from this entity
+        /// </summary>
+        /// <param name="newProperty"></param>
+        public void AddProperty(EnumContractProperty newProperty)
+        {
+            EnumProperties.Add(newProperty);
+        }
+
+        /// <summary>
+        /// Removes a property from this entity
+        /// </summary>
+        /// <param name="removeProperty"></param>
+        public void RemoveProperty(EnumContractProperty removeProperty)
+        {
+            EnumProperties.Remove(removeProperty);
         }
     }
 }

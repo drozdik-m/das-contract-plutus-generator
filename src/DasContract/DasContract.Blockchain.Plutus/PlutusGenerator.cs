@@ -242,6 +242,31 @@ namespace DasContract.Blockchain.Plutus
             dataModels = dataModels
                     .Append(new PlutusSubsectionComment(0, "Datum"));
 
+            //Enums
+            foreach (var enumModel in contract.DataModel.Enums)
+            {
+
+                var enumCtors = enumModel.Values
+                    .Select(e => new PlutusAlgebraicTypeConstructor(e, Array.Empty<INamable>()));
+                var enumType = new PlutusAlgebraicType(enumModel.Name, enumCtors,
+                    new List<string>()
+                    {
+                        "Show",
+                        "Generic",
+                        "FromJSON",
+                        "ToJSON"
+                    });
+                dataModels = dataModels
+                    .Append(enumType)
+                    .Append(new PlutusMakeLift(enumModel))
+                    .Append(new PlutusUnstableMakeIsData(enumModel))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusEq(enumType))
+                    .Append(PlutusLine.Empty)
+                    .Append(new PlutusDefault(enumType, enumCtors.First()))
+                    .Append(PlutusLine.Empty);
+            }
+
             //Other models
             foreach (var entity in new EntitiesDependencyOrderingConvertor()
                 .Convert(contract.DataModel.NonRootEntities))
@@ -1356,6 +1381,14 @@ namespace DasContract.Blockchain.Plutus
                             new PrimitivePropertyToTypeConvertor(primitiveConv),
                             new ReferencePropertyToTypeConvertor()
                         ).Convert(property)));
+            }
+
+            //Enum properties
+            foreach (var property in entity.EnumProperties)
+            {
+                result.Add(new PlutusRecordMember(
+                    property.Name,
+                    new EnumPropertyToTypeConvertor().Convert(property)));
             }
 
             return result;

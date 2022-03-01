@@ -18,6 +18,11 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels
         public ICollection<ContractEntity> Entities { get; set; } = new List<ContractEntity>();
 
         /// <summary>
+        /// Collection of enums contained in this model
+        /// </summary>
+        public ICollection<ContractEnum> Enums { get; set;} = new List<ContractEnum>();
+
+        /// <summary>
         /// Returns the root entity of this data model
         /// </summary>
         public ContractEntity RootEntity => Entities

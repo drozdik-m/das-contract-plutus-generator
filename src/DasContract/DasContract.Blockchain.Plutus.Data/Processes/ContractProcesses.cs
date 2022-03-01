@@ -5,18 +5,11 @@ using System.Text;
 using System.Xml.Serialization;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
-using DasContract.Editor.Entities.Processes.Diagrams;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes
 {
     public class ContractProcesses 
     {
-
-        /// <summary>
-        /// BPMN 2.0 XML with process description and a visual process information
-        /// </summary>
-        public BPMNProcessDiagram Diagram { get; set; } = BPMNProcessDiagram.Default();
-
         /// <summary>
         /// List of processes
         /// </summary>

@@ -1,0 +1,192 @@
+<Contract Id="9379b9eb-12aa-4b27-bacd-c2e0ba015664">
+  <Name>Lock funds for time</Name>
+  <ProcessDiagram>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"&gt;&lt;bpmn:process id="Process_1" isExecutable="false"&gt;&lt;bpmn:startEvent id="StartEvent_1" /&gt;&lt;bpmn:task id="Activity_1rp9b9u" /&gt;&lt;bpmn:startEvent id="Event_0ksg1sw"&gt;&lt;bpmn:outgoing&gt;Flow_0h5n92x&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:sequenceFlow id="Flow_0h5n92x" sourceRef="Event_0ksg1sw" targetRef="Activity_0idd9fm" /&gt;&lt;bpmn:userTask id="Activity_0idd9fm" name="Set amount and deadline"&gt;&lt;bpmn:incoming&gt;Flow_0h5n92x&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0olmwpv&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:sequenceFlow id="Flow_0olmwpv" sourceRef="Activity_0idd9fm" targetRef="Activity_17tk9gc" /&gt;&lt;bpmn:userTask id="Activity_17tk9gc" name="Try to withdraw"&gt;&lt;bpmn:incoming&gt;Flow_0olmwpv&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_1hjmvhk&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0q7lqa6&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:boundaryEvent id="Event_002p5fn" attachedToRef="Activity_17tk9gc"&gt;&lt;bpmn:outgoing&gt;Flow_0mdgwbf&lt;/bpmn:outgoing&gt;&lt;bpmn:timerEventDefinition id="TimerEventDefinition_0zslwnu" /&gt;&lt;/bpmn:boundaryEvent&gt;&lt;bpmn:sequenceFlow id="Flow_0mdgwbf" sourceRef="Event_002p5fn" targetRef="Activity_1nr7toq" /&gt;&lt;bpmn:sequenceFlow id="Flow_1wcaoq1" sourceRef="Activity_1nr7toq" targetRef="Activity_12sfu0p" /&gt;&lt;bpmn:scriptTask id="Activity_12sfu0p" name="Inform success"&gt;&lt;bpmn:incoming&gt;Flow_1wcaoq1&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1e4eomm&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:endEvent id="Event_0iks6ll"&gt;&lt;bpmn:incoming&gt;Flow_1e4eomm&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:sequenceFlow id="Flow_1e4eomm" sourceRef="Activity_12sfu0p" targetRef="Event_0iks6ll" /&gt;&lt;bpmn:sequenceFlow id="Flow_0q7lqa6" sourceRef="Activity_17tk9gc" targetRef="Activity_1gl20rx" /&gt;&lt;bpmn:sequenceFlow id="Flow_1hjmvhk" sourceRef="Activity_1gl20rx" targetRef="Activity_17tk9gc" /&gt;&lt;bpmn:scriptTask id="Activity_1gl20rx" name="Record withdrawal attempt"&gt;&lt;bpmn:incoming&gt;Flow_0q7lqa6&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1hjmvhk&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:userTask id="Activity_1nr7toq" name="Withdraw"&gt;&lt;bpmn:incoming&gt;Flow_0mdgwbf&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1wcaoq1&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;/bpmn:process&gt;&lt;bpmndi:BPMNDiagram id="BPMNDiagram_1"&gt;&lt;bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1"&gt;&lt;bpmndi:BPMNEdge id="Flow_0h5n92x_di" bpmnElement="Flow_0h5n92x"&gt;&lt;di:waypoint x="258" y="840" /&gt;&lt;di:waypoint x="310" y="840" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0olmwpv_di" bpmnElement="Flow_0olmwpv"&gt;&lt;di:waypoint x="410" y="840" /&gt;&lt;di:waypoint x="460" y="840" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0mdgwbf_di" bpmnElement="Flow_0mdgwbf"&gt;&lt;di:waypoint x="530" y="782" /&gt;&lt;di:waypoint x="530" y="730" /&gt;&lt;di:waypoint x="570" y="730" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1wcaoq1_di" bpmnElement="Flow_1wcaoq1"&gt;&lt;di:waypoint x="670" y="730" /&gt;&lt;di:waypoint x="710" y="730" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1e4eomm_di" bpmnElement="Flow_1e4eomm"&gt;&lt;di:waypoint x="810" y="730" /&gt;&lt;di:waypoint x="852" y="730" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0q7lqa6_di" bpmnElement="Flow_0q7lqa6"&gt;&lt;di:waypoint x="560" y="820" /&gt;&lt;di:waypoint x="610" y="820" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1hjmvhk_di" bpmnElement="Flow_1hjmvhk"&gt;&lt;di:waypoint x="610" y="860" /&gt;&lt;di:waypoint x="560" y="860" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1"&gt;&lt;dc:Bounds x="173" y="102" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1rp9b9u_di" bpmnElement="Activity_1rp9b9u"&gt;&lt;dc:Bounds x="260" y="80" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1n6ouqs_di" bpmnElement="Activity_17tk9gc"&gt;&lt;dc:Bounds x="460" y="800" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1cb2kom_di" bpmnElement="Activity_0idd9fm"&gt;&lt;dc:Bounds x="310" y="800" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1d07axl_di" bpmnElement="Activity_12sfu0p"&gt;&lt;dc:Bounds x="710" y="690" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0iks6ll_di" bpmnElement="Event_0iks6ll"&gt;&lt;dc:Bounds x="852" y="712" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1yg4gh8_di" bpmnElement="Activity_1gl20rx"&gt;&lt;dc:Bounds x="610" y="800" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1y44nou_di" bpmnElement="Activity_1nr7toq"&gt;&lt;dc:Bounds x="570" y="690" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0ksg1sw_di" bpmnElement="Event_0ksg1sw"&gt;&lt;dc:Bounds x="222" y="822" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0xfx5ij_di" bpmnElement="Event_002p5fn"&gt;&lt;dc:Bounds x="512" y="782" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;/bpmndi:BPMNPlane&gt;&lt;/bpmndi:BPMNDiagram&gt;&lt;/bpmn:definitions&gt;</ProcessDiagram>
+  <Processes>
+    <Process Id="Process_1">
+      <Name />
+      <IsExecutable>true</IsExecutable>
+      <ParticipantId />
+      <CustomScript />
+      <SequenceFlows>
+        <SequenceFlow Id="Flow_0h5n92x">
+          <Name />
+          <SourceId>Event_0ksg1sw</SourceId>
+          <TargetId>Activity_0idd9fm</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0olmwpv">
+          <Name />
+          <SourceId>Activity_0idd9fm</SourceId>
+          <TargetId>Activity_17tk9gc</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_11ay561">
+          <Name />
+          <SourceId>Activity_17tk9gc</SourceId>
+          <TargetId>Gateway_1rz9n0x</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0q7lqa6">
+          <Name />
+          <SourceId>Activity_17tk9gc</SourceId>
+          <TargetId>Activity_1gl20rx</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0mdgwbf">
+          <Name />
+          <SourceId>Event_002p5fn</SourceId>
+          <TargetId>Activity_1nr7toq</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1wcaoq1">
+          <Name />
+          <SourceId>Activity_1nr7toq</SourceId>
+          <TargetId>Activity_12sfu0p</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1e4eomm">
+          <Name />
+          <SourceId>Activity_12sfu0p</SourceId>
+          <TargetId>Event_0iks6ll</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1hjmvhk">
+          <Name />
+          <SourceId>Activity_1gl20rx</SourceId>
+          <TargetId>Activity_17tk9gc</TargetId>
+          <Condition />
+        </SequenceFlow>
+      </SequenceFlows>
+      <ProcessElements>
+        <StartEvent Id="StartEvent_1">
+          <Name />
+          <Incoming />
+          <Outgoing />
+        </StartEvent>
+        <Task Id="Activity_1rp9b9u">
+          <Name />
+          <Incoming />
+          <Outgoing />
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+        </Task>
+        <UserTask Id="Activity_1nr7toq">
+          <Name>Withdraw</Name>
+          <Incoming>
+            <IncomingId>Flow_0mdgwbf</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1wcaoq1</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression />
+          <FormDefinition />
+          <ValidationScript />
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <StartEvent Id="Event_0ksg1sw">
+          <Name />
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_0h5n92x</OutgoingId>
+          </Outgoing>
+        </StartEvent>
+        <UserTask Id="Activity_0idd9fm">
+          <Name>Set amount and deadline</Name>
+          <Incoming>
+            <IncomingId>Flow_0h5n92x</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0olmwpv</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression />
+          <FormDefinition />
+          <ValidationScript />
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <UserTask Id="Activity_17tk9gc">
+          <Name>Try to withdraw</Name>
+          <Incoming>
+            <IncomingId>Flow_0olmwpv</IncomingId>
+            <IncomingId>Flow_1hjmvhk</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_11ay561</OutgoingId>
+            <OutgoingId>Flow_0q7lqa6</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression />
+          <FormDefinition />
+          <ValidationScript />
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
+        <TimerBoundaryEvent Id="Event_002p5fn">
+          <Name />
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_0mdgwbf</OutgoingId>
+          </Outgoing>
+          <AttachedTo>Activity_17tk9gc</AttachedTo>
+          <TimerDefinitionType>Date</TimerDefinitionType>
+          <TimerDefinition />
+        </TimerBoundaryEvent>
+        <EndEvent Id="Event_0iks6ll">
+          <Name />
+          <Incoming>
+            <IncomingId>Flow_1e4eomm</IncomingId>
+          </Incoming>
+          <Outgoing />
+        </EndEvent>
+        <ScriptTask Id="Activity_12sfu0p">
+          <Name>Inform success</Name>
+          <Incoming>
+            <IncomingId>Flow_1wcaoq1</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1e4eomm</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <Script />
+        </ScriptTask>
+        <ScriptTask Id="Activity_1gl20rx">
+          <Name>Record withdrawal attempt</Name>
+          <Incoming>
+            <IncomingId>Flow_0q7lqa6</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1hjmvhk</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <Script />
+        </ScriptTask>
+      </ProcessElements>
+    </Process>
+  </Processes>
+  <Roles />
+  <Users />
+  <DataTypes />
+</Contract>
