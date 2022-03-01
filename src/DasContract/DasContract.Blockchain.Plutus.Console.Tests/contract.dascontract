@@ -430,6 +430,10 @@
       <Name>Beneficiary</Name>
       <Description></Description>
     </ProcessRole>
+    <ProcessRole Id="41533bbc-f4b6-4e8e-a9d0-c59e67afaf13">
+      <Name>Bad ass</Name>
+      <Description />
+    </ProcessRole>
   </Roles>
   <Users>
     <ProcessUser Id="bc4522f1-8aa8-4188-8d41-4414d4b9fb47">
@@ -438,6 +442,7 @@
       <Address>a2c20c77887ace1cd986193e4e75babd8993cfd56995cd5cfce609c2</Address>
       <Roles>
         <ProcessRole>3b618d43-2eec-47c9-9f13-a07d698a0db1</ProcessRole>
+        <ProcessRole>41533bbc-f4b6-4e8e-a9d0-c59e67afaf13</ProcessRole>
       </Roles>
     </ProcessUser>
     <ProcessUser Id="7a2ea629-b68e-4251-8799-a0b84f92061d">

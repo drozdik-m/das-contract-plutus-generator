@@ -10,7 +10,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 
-namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties
 {
     public class ContractPropertyConvertor : IConvertor<Property, ContractProperty>
     {
@@ -47,7 +47,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
                 return referencePropertyConvertor.Convert(source);
 
             //Primitive data type
-            else 
+            else
                 return primitivePropertyConvertor.Convert(source);
 
             //throw new Exception("Unhandled type of property");

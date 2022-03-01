@@ -594,7 +594,7 @@ namespace DasContract.Blockchain.Plutus
             }.Concat(
                 contract.Identities.Users.Select((e, i) =>
                         new PlutusRawLine(2, "User { " + $"uName = \"{e.Name}\", uDescription = \"{e.Description}\", uAddress = {pubKeyStringAsPubKeyHashSig.Name} \"{e.Address}\", " +
-                        $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"roleByName \"{e.Name}\""))}]" + "}" +
+                        $"uRoles = [{string.Join(", ", e.Roles.Select(e => $"{roleByNameSig.Name} \"{e.Name}\""))}]" + "}" +
                         (i == contract.Identities.Users.Count() - 1 ? "" : ",")))
                 )
              .Append(new PlutusRawLine(1, "]")));

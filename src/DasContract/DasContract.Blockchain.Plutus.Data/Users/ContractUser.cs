@@ -14,5 +14,7 @@ namespace DasContract.Blockchain.Plutus.Data.Users
         public string Address { get; set; } = string.Empty;
 
         public ICollection<ContractRole> Roles { get; set; } = new List<ContractRole>();
+
+        public ICollection<string> RoleIds { get; set; } = new List<string>();
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using DasContract.Abstraction.Data;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Enum;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Reference;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Dictionary;
@@ -11,7 +13,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 
-namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Dictionary
 {
     public class DictionaryPropertyConvertor : IConvertor<Property, DictionaryContractProperty>
     {
@@ -39,7 +41,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             //Key type
             if (source.KeyType is null)
                 throw new Exception($"Key type is not defined for a dictionary {source.Id}");
-            PrimitiveContractPropertyType keyType = primTypeConvertor.Convert(source.KeyType.Value);
+            var keyType = primTypeConvertor.Convert(source.KeyType.Value);
             result.KeyType = keyType;
 
             //Value type
@@ -81,7 +83,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             return result;
         }
 
-        public static DictionaryContractProperty Bind(DictionaryContractProperty property, 
+        public static DictionaryContractProperty Bind(DictionaryContractProperty property,
             IEnumerable<ContractEntity> entities,
             IEnumerable<ContractEnum> enums)
         {

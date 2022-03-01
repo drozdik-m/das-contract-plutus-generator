@@ -6,34 +6,33 @@ using DasContract.Abstraction.Data;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
-using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Reference;
 
-namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Reference
 {
-    public class EnumPropertyConvertor : IConvertor<Property, EnumContractProperty>
+    public class ReferencePropertyConvertor : IConvertor<Property, ReferenceContractProperty>
     {
         private readonly IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor;
 
-        public EnumPropertyConvertor(IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor)
+        public ReferencePropertyConvertor(IConvertor<PropertyType, ContractPropertyCardinality> cardinalityConvertor)
         {
             this.cardinalityConvertor = cardinalityConvertor;
         }
 
         /// <inheritdoc/>
-        public EnumContractProperty Convert(Property source)
+        public ReferenceContractProperty Convert(Property source)
         {
-            var result = new EnumContractProperty
+            var result = new ReferenceContractProperty
             {
                 Id = source.Id,
                 IsMandatory = source.IsMandatory,
-                EnumEntityId = source.ReferencedDataType,
+                EntityId = source.ReferencedDataType
             };
 
             //Reference data type
-            if (source.DataType != PropertyDataType.Enum || source.PropertyType == PropertyType.Dictionary)
-                throw new Exception($"Data type {source.Id} is not enum, but the convertor converts only enums");
+            if (source.DataType != PropertyDataType.Reference || source.PropertyType == PropertyType.Dictionary)
+                throw new Exception($"Data type {source.Id} is not reference, but the convertor converts only references");
 
             //Cardinality
             if (source.PropertyType is null)
@@ -43,15 +42,15 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             return result;
         }
 
-        public static EnumContractProperty Bind (EnumContractProperty property, IEnumerable<ContractEnum> enums)
+        public static ReferenceContractProperty Bind(ReferenceContractProperty property, IEnumerable<ContractEntity> entities)
         {
-            var suitableEntities = enums
-                .Where(e => e.Id == property.EnumEntityId);
+            var suitableEntities = entities
+                .Where(e => e.Id == property.EntityId);
 
             if (suitableEntities.Count() != 1)
-                throw new Exception($"Too much or none enums with id {property.EnumEntityId} found");
+                throw new Exception($"Too much or none entities with id {property.EntityId} found");
 
-            property.EnumEntity = suitableEntities.Single();
+            property.Entity = suitableEntities.Single();
             return property;
         }
     }

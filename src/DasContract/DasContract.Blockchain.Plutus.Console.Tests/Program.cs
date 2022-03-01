@@ -4,6 +4,11 @@ using DasContract.Abstraction;
 using DasContract.Blockchain.Plutus;
 using DasContract.Blockchain.Plutus.Console.Tests.DemoContracts;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Dictionary;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Enum;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Primitive;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Reference;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
@@ -45,9 +50,17 @@ var plutusDataModelConvertor = new ContractDataModelConvertor(
     referencePropertyConvertor,
     contractEnumConvertor);
 
+//User convertor
+var roleConvertor = new ContractRoleConvertor();
+var userConvertor = new ContractUserConvertor();
+var usersConvertor = new ContractUsersConvertor(
+    roleConvertor,
+    userConvertor);
+
 //Contract convertor
 var plutusContractConvertor = new PlutusContractConvertor(
-    plutusDataModelConvertor);
+    plutusDataModelConvertor,
+    usersConvertor);
 
 var plutusContract = plutusContractConvertor.Convert(contract);
 plutusContract.Processes = new ContractProcesses()

@@ -5,7 +5,7 @@ using DasContract.Abstraction.Data;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 
-namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
+namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Primitive
 {
     public class PrimitivePropertyTypeConvertor : IConvertor<PropertyDataType, PrimitiveContractPropertyType>
     {
