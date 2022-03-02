@@ -1009,7 +1009,7 @@ namespace DasContract.Blockchain.Plutus
             var contractClientSig = new PlutusFunctionSignature(0, "contractClient", new INamable[]
             {
                 contractParam,
-                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusStateMachineClient.Type(contractDatum, contractRedeemer),
             });
             var contractClient = new PlutusOnelineFunction(0, contractClientSig, new string[]
             {
@@ -1156,7 +1156,7 @@ namespace DasContract.Blockchain.Plutus
             //On chain datum
             var onChainDatumSig = new PlutusFunctionSignature(0, "onChainDatum", new INamable[]
             {
-                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusStateMachineClient.Type(contractDatum, contractRedeemer),
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
                     PlutusUnspecifiedDataType.Type("s"),
@@ -1188,7 +1188,7 @@ namespace DasContract.Blockchain.Plutus
             //On chain value
             var onChainValueSig = new PlutusFunctionSignature(0, "onChainValue", new INamable[]
             {
-                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusStateMachineClient.Type(contractDatum, contractRedeemer),
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
                     PlutusUnspecifiedDataType.Type("s"),
