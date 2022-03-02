@@ -1270,7 +1270,7 @@ namespace DasContract.Blockchain.Plutus
                     new PlutusRawLine(1, "do"),
                         new PlutusRawLine(2, $"datum <- {onChainDatumSig.Name} client"),
                         new PlutusRawLine(2, $"val <- {onChainValueSig.Name} client"),
-                        new PlutusRawLine(2, $"param <- {createContractParamSig.Name} threatToken"),
+                        new PlutusRawLine(2, $"param <- {createContractParamSig.Name} threadToken"),
                         PlutusLine.Empty,
                         new PlutusRawLine(2, $"if {formValidationSig.Name} param datum redeemer val then"),
                             new PlutusRawLine(3, $"logInfo @String $ \"--- form validated successfuly\""),
