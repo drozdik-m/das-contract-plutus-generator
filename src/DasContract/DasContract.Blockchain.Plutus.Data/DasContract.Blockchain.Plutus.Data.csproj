@@ -9,4 +9,8 @@
     <ProjectReference Include="..\DasContract.Abstraction\DasContract.Abstraction.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DasContractConversion\Processes\Activities\" />
+  </ItemGroup>
+
 </Project>
