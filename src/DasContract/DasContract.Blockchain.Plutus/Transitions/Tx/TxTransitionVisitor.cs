@@ -240,7 +240,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var guardLine = GuardLine(transitionCondition: condition);
             var returningJust = ReturningJust(
                 Array.Empty<string>(),
-                "dat { contractState = " + targetName + " }",
+                NonTxTransitionVisitor.TransitionFunctionSignature.Name + 
+                    " $ dat { contractState = " + targetName + " }",
                 "lovelaceValueOf 0");
 
             return comment

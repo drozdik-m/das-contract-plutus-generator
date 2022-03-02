@@ -26,7 +26,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         Dictionary<string, bool> isFirstTxDictionary = new Dictionary<string, bool>();
 
-        List<(string, PlutusFunctionSignature)> createdEndpoints = new List<(string, PlutusFunctionSignature)>(); 
+        List<(string, PlutusFunctionSignature)> createdEndpoints = new List<(string, PlutusFunctionSignature)>();
+
+        Stack<ContractProcess> processStack = new Stack<ContractProcess>();
 
         public ContractStartEvent InitialStartEvent { get; }        
 
@@ -190,14 +192,22 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// Lines that transition the contract state
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> StateTransition(int indent) => new IPlutusLine[]
-           {
+        IEnumerable<IPlutusLine> StateTransition(int indent, bool logState = true)
+        {
+            var result = new List<IPlutusLine>
+            {
                 new PlutusComment(indent, "State transition"),
-                new PlutusRawLine(indent, $"void $ mapErr $ runStep client redeemer"),
-                new PlutusRawLine(indent, $"logOnChainDatum client"),
-                new PlutusRawLine(indent, $"logInfo @String \"--- transition finished\""),
-                PlutusLine.Empty,
-           };
+                new PlutusRawLine(indent, $"void $ mapErr $ runStep client redeemer")
+            };
+
+            if (logState)
+                result.Add(new PlutusRawLine(indent, $"logOnChainDatum client"));
+
+            result.Add(new PlutusRawLine(indent, $"logInfo @String \"--- transition finished\""));
+            result.Add(PlutusLine.Empty);
+
+            return result;
+        }
 
         /// <summary>
         /// Lines that begin the endpoint
@@ -306,10 +316,48 @@ namespace DasContract.Blockchain.Plutus.Transitions
         public override IPlutusCode Visit(ContractEndEvent element)
         {
             //Already visited
-            if (!TryVisit(element))
+            if (!TryVisit(element) || processStack.Any())
                 return PlutusCode.Empty;
 
-            return PlutusCode.Empty;
+            PlutusFunctionSignature signature;
+            string parameter = string.Empty;
+
+            var functionLines = Do(1).ToList();
+            functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
+
+            //Is this first endpoint?
+            if (HasFirstFlag(element))
+            {
+                signature = FinishContractEndpointSignature(isFirst: true);
+                parameter = string.Empty;
+                functionLines.AddRange(InitialClientSetup(1));
+                functionLines.AddRange(ContractInit(1));
+
+                ThisHasNotFirstFlag(element);
+            }
+
+            //This is not the first endpoint
+            else
+            {
+                signature = FinishContractEndpointSignature(isFirst: false);
+                functionLines.AddRange(ClientSetup(1));
+                parameter = "threadToken";
+            }
+
+            functionLines.AddRange(CreateRedeemer(1, PlutusContractFinishedRedeemer.Type.Name));
+            functionLines.AddRange(StateTransition(1, logState: false));
+            functionLines.AddRange(EndpointEnded(1, signature.Name));
+            functionLines.Add(new PlutusRawLine(1, "logInfo @String \"CONTRACT ENDED\""));
+            functionLines.Add(PlutusLine.Empty);
+
+            var function = new PlutusFunction(0, 
+                signature,
+                string.IsNullOrWhiteSpace(parameter) ? Array.Empty<string>() : new string[] { parameter }, 
+                functionLines);
+
+            createdEndpoints.Add(("finishContract", signature));
+
+            return function.Prepend(signature);
         }
 
         public override IPlutusCode Visit(ContractCallActivity element)
@@ -318,13 +366,18 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
+            //Go deepah!
+            processStack.Push(element.CalledProcess);
+            SendFlagFurther(element, element.CalledProcess.StartEvent);
+            var subprocessResult = element.CalledProcess.StartEvent.Accept(this);
+            processStack.Pop();
+
             //Send flag further
             SendFlagFurther(element, element.Outgoing);
-            SendFlagFurther(element, element.CalledProcess.StartEvent);
 
             //Evaluate further elements
             return element.Outgoing.Accept(this)
-                .Append(element.CalledProcess.StartEvent.Accept(this));
+                .Append(subprocessResult);
         }
 
         public override IPlutusCode Visit(ContractUserActivity element)
@@ -357,6 +410,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             else
             {
                 signature = EndpointSignature(element, isFirst: false);
+                functionLines.AddRange(ClientSetup(1));
                 parameter = "(form, threadToken)";
             }
 
@@ -455,32 +509,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             return function.Prepend(signature);
         }
 
-        /// <summary>
-        /// Creates the finish contract endpoint
-        /// </summary>
-        /// <returns></returns>
-        public IPlutusCode FinishContractEndpoint()
-        {
-            var signature = FinishContractEndpointSignature;
-
-            var code = Do(1).ToList();
-            code.AddRange(EndpointBegun(1, signature.Name));
-            code.AddRange(ClientSetup(1));
-            code.AddRange(CreateRedeemer(1, PlutusContractFinishedRedeemer.Type.Name));
-            code.AddRange(StateTransition(1));
-            code.AddRange(EndpointEnded(1, signature.Name));
-            code.Add(new PlutusRawLine(1, "logInfo @String \"CONTRACT ENDED\""));
-            code.Add(PlutusLine.Empty);
-
-            var function = new PlutusFunction(0, signature, new string[]
-            {
-                "threadToken"
-            }, code);
-
-            createdEndpoints.Add(("finishContract", signature));
-
-            return function.Prepend(signature);
-        }
         #endregion
 
         #region schemaAndEndpoints
@@ -500,13 +528,17 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 var name = endpInfo.Item1;
                 var signature = endpInfo.Item2;
 
+                var param = "()";
+                if (signature.Types.Count() > 1)
+                    param = signature.Types.First().Name;
+
                 if (first)
                 {
-                    result = result.Append(new PlutusRawLine(1, $"    Endpoint \"{name}\" {signature.Types.First().Name}"));
+                    result = result.Append(new PlutusRawLine(1, $"    Endpoint \"{name}\" {param}"));
                     first = false;
                 }
                 else
-                    result = result.Append(new PlutusRawLine(1, $".\\/ Endpoint \"{name}\" {signature.Types.First().Name}"));
+                    result = result.Append(new PlutusRawLine(1, $".\\/ Endpoint \"{name}\" {param}"));
             }
 
             return result;
@@ -536,9 +568,14 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 else
                     result.Add(new PlutusRawLine(2, $"`select` {signature.Name}'"));
 
+                var namePrefix = string.Empty;
+                if (signature.Types.Count() == 1)
+                    namePrefix = "$ const ";
+
                 endpointDefinitions.Add(
-                        new PlutusRawLine(2, $"{signature.Name}' = endpoint @\"{name}\" {signature.Name}")
-                    );
+                            new PlutusRawLine(2, $"{signature.Name}' = endpoint @\"{name}\" {namePrefix}{signature.Name}")
+                        );
+
             }
             result.Add(new PlutusRawLine(1, $") >> endpoints"));
 
@@ -582,18 +619,40 @@ namespace DasContract.Blockchain.Plutus.Transitions
                     )
             });
 
-        public static PlutusFunctionSignature FinishContractEndpointSignature { get; } = new PlutusFunctionSignature(0,
-           "finishContractEndpoint",
-           new INamable[]
-           {
-                PlutusThreadToken.Type,
-                PlutusContractMonad.Type(
-                    PlutusUnspecifiedDataType.Type("w"),
-                    PlutusUnspecifiedDataType.Type("s"),
-                    PlutusText.Type,
-                    PlutusVoid.Type
-                    )
-           });
+        public static PlutusFunctionSignature FinishContractEndpointSignature(bool isFirst)
+        {
+            IEnumerable<INamable> types = new List<INamable>();
+            if (isFirst)
+            {
+                types = new INamable[]
+                {
+                     PlutusContractMonad.Type(
+                         PlutusUnspecifiedDataType.Type("w"),
+                         PlutusUnspecifiedDataType.Type("s"),
+                         PlutusText.Type,
+                         PlutusVoid.Type
+                         )
+                };
+            }
+            else
+            {
+                types = new INamable[]
+                {
+                     PlutusThreadToken.Type,
+                     PlutusContractMonad.Type(
+                         PlutusUnspecifiedDataType.Type("w"),
+                         PlutusUnspecifiedDataType.Type("s"),
+                         PlutusText.Type,
+                         PlutusVoid.Type
+                         )
+                };
+            }
+
+
+           return new PlutusFunctionSignature(0,
+               "finishContractEndpoint",
+               types);
+        }
 
         public static string EndpointName(INamable element)
             => element.Name.FirstCharToLowerCase() + "Endpoint";

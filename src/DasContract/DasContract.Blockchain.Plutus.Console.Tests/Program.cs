@@ -13,6 +13,7 @@ using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
+using TextCopy;
 
 //Preprogrammed contract
 //var contract = TransitionDemoContract.Get();
@@ -92,5 +93,8 @@ var plutusContract = plutusContractConvertor.Convert(contract);
 };*/
 
 //Generate
-Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(plutusContract));
+var contractCode = new PlutusGenerator().GeneratePlutusContract(plutusContract);
+Console.WriteLine(contractCode.InString());
+Console.WriteLine("COPIED TO CLIPBOARD");
+new Clipboard().SetText(contractCode.InString());
 
