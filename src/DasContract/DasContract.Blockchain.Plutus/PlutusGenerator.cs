@@ -1220,7 +1220,7 @@ namespace DasContract.Blockchain.Plutus
             //Log on chain datum
             var logOnChainDatumSig = new PlutusFunctionSignature(0, "logOnChainDatum", new INamable[]
             {
-                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusStateMachineClient.Type(contractDatum, contractRedeemer),
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
                     PlutusUnspecifiedDataType.Type("s"),
@@ -1249,7 +1249,7 @@ namespace DasContract.Blockchain.Plutus
             var validateInputFormSig = new PlutusFunctionSignature(0, "validateInputForm", new INamable[]
             {
                 PlutusThreadToken.Type,
-                PlutusStateMachine.Type(contractDatum, contractRedeemer),
+                PlutusStateMachineClient.Type(contractDatum, contractRedeemer),
                 PlutusContractRedeemer.Type,
                 PlutusContractMonad.Type(
                     PlutusUnspecifiedDataType.Type("w"),
