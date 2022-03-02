@@ -530,11 +530,11 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
                 if (first)
                 {
-                    result.Add(new PlutusRawLine(2, $"         {name}'"));
+                    result.Add(new PlutusRawLine(2, $"         {signature.Name}'"));
                     first = false;
                 }
                 else
-                    result.Add(new PlutusRawLine(2, $"`select` {name}'"));
+                    result.Add(new PlutusRawLine(2, $"`select` {signature.Name}'"));
 
                 endpointDefinitions.Add(
                         new PlutusRawLine(2, $"{signature.Name}' = endpoint @\"{name}\" {signature.Name}")
