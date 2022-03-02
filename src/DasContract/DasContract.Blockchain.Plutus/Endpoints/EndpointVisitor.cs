@@ -28,7 +28,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         List<(string, PlutusFunctionSignature)> createdEndpoints = new List<(string, PlutusFunctionSignature)>(); 
 
-        public ContractStartEvent InitialStartEvent { get; }
+        public ContractStartEvent InitialStartEvent { get; }        
 
         /// <summary>
         /// Checks if the element has the "first" flag
@@ -89,6 +89,18 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
 
         #region snippets
+        /// <summary>
+        /// Returns the do line
+        /// </summary>
+        /// <param name="indent"></param>
+        /// <returns></returns>
+        IEnumerable<IPlutusLine> Do(int indent)
+            => new IPlutusLine[]
+            {
+                new PlutusRawLine(indent, "do"),
+                PlutusLine.Empty
+            };
+
         /// <summary>
         /// Lines that initially setup the contract client
         /// </summary>
@@ -319,11 +331,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
             var timeoutBoundary = element.BoundaryEvents.OfType<ContractBoundaryEvent>().FirstOrDefault();
 
-            var functionLines = new List<IPlutusLine>()
-            {
-                new PlutusRawLine(1, "do"),
-                PlutusLine.Empty,
-            };
+            var functionLines = Do(1).ToList();
             functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
 
             PlutusFunctionSignature signature;
@@ -426,7 +434,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
         {
             var signature = TimedOutEndpointSignature;
 
-            var code = new List<IPlutusLine>();
+            var code = Do(1).ToList();
             code.AddRange(EndpointBegun(1, signature.Name));
             code.AddRange(ClientSetup(1));
             code.AddRange(CreateRedeemer(1, PlutusTimeoutRedeemer.Type.Name));
@@ -451,7 +459,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
         {
             var signature = FinishContractEndpointSignature;
 
-            var code = new List<IPlutusLine>();
+            var code = Do(1).ToList();
             code.AddRange(EndpointBegun(1, signature.Name));
             code.AddRange(ClientSetup(1));
             code.AddRange(CreateRedeemer(1, PlutusContractFinishedRedeemer.Type.Name));
@@ -506,11 +514,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// <returns></returns>
         public IPlutusCode MakeEndpoints()
         {
-            IPlutusCode result = PlutusCode.Empty;
-            IPlutusCode endpointDefinitions = PlutusCode.Empty;
+            List<IPlutusLine> result = new List<IPlutusLine>();
+            List<IPlutusLine> endpointDefinitions = new List<IPlutusLine>();
 
-
-            result = result.Append(new PlutusRawLine(1, $"awaitPromise ("));
+            result.Add(new PlutusRawLine(1, $"awaitPromise ("));
             var first = true;
             foreach (var endpInfo in createdEndpoints)
             {
@@ -519,22 +526,28 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
                 if (first)
                 {
-                    result = result.Append(new PlutusRawLine(2, $"         {name}'"));
+                    result.Add(new PlutusRawLine(2, $"         {name}'"));
                     first = false;
                 }
                 else
-                    result = result.Append(new PlutusRawLine(2, $"`select` {name}'"));
+                    result.Add(new PlutusRawLine(2, $"`select` {name}'"));
 
-                endpointDefinitions = endpointDefinitions.Append(
+                endpointDefinitions.Add(
                         new PlutusRawLine(2, $"{signature.Name}' = endpoint @\"{name}\" {signature.Name}")
                     );
             }
-            result = result.Append(new PlutusRawLine(1, $") >> endpoints"));
+            result.Add(new PlutusRawLine(1, $") >> endpoints"));
 
-            return result
-                .Prepend(EndpointsSignature)
-                .Append(new PlutusRawLine(1, "where"))
-                .Append(endpointDefinitions);
+            var endpointsFunction = new PlutusFunction(
+                0,
+                EndpointsSignature,
+                Array.Empty<string>(),
+                result
+                    .Append(new PlutusRawLine(1, "where"))
+                    .Concat(endpointDefinitions));
+
+            return endpointsFunction
+                .Prepend(EndpointsSignature);
         }
 
 

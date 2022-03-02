@@ -153,7 +153,6 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
             var contract = new PlutusContract()
             {
                 Id = "contractId",
-                Name = "NumberContract",
                 Processes = processes,
                 DataModel = new ContractDataModel()
                 {

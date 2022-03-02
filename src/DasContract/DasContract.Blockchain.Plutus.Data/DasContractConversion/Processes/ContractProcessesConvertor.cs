@@ -16,11 +16,11 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
 {
-    public class ProcessesConvertor : IConvertor<IEnumerable<Process>, ContractProcesses>
+    public class ContractProcessesConvertor : IConvertor<IEnumerable<Process>, ContractProcesses>
     {
         private readonly IConvertor<Process, ContractProcess> processConvertor;
 
-        public ProcessesConvertor(IConvertor<Process, ContractProcess> processConvertor)
+        public ContractProcessesConvertor(IConvertor<Process, ContractProcess> processConvertor)
         {
             this.processConvertor = processConvertor;
         }

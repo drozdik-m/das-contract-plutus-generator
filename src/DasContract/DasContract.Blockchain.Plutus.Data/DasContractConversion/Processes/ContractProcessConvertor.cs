@@ -15,7 +15,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
 {
-    public class ProcessConvertor : IConvertor<Process, ContractProcess>
+    public class ContractProcessConvertor : IConvertor<Process, ContractProcess>
     {
         /// <inheritdoc/>
         public ContractProcess Convert(Process source)
@@ -42,10 +42,34 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             {
                 { myStart.Id, myStart }
             };
-            myStart.Outgoing = ConstructNext(source, start, knownElements);
+            var nextId = start.Outgoing.Single();
+            var next = GetSequenceFlowIdTarget(source, nextId);
+            myStart.Outgoing = ConstructNext(source, next, knownElements);
 
             result.StartEvent = myStart;
             return result;
+        }
+
+        /// <summary>
+        /// Takes sequence flow id and finds out the target element
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="sequenceFlowId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        ProcessElement GetSequenceFlowIdTarget(Process source, string sequenceFlowId)
+        {
+            if (!source.SequenceFlows.ContainsKey(sequenceFlowId))
+                throw new Exception($"Invalid sequence flow id {sequenceFlowId}");
+
+            var sequenceFlow = source.SequenceFlows[sequenceFlowId];
+            var targetId = sequenceFlow.TargetId;
+
+            if (!source.ProcessElements.ContainsKey(targetId))
+                throw new Exception($"Invalid sequence flow target id {targetId}");
+
+            var targetElement = source.ProcessElements[targetId];
+            return targetElement;
         }
 
         /// <summary>
@@ -64,8 +88,9 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             if (knownElements.ContainsKey(currentElement.Id))
                 return knownElements[currentElement.Id];
 
-            ContractProcessElement result = null;
+            ContractProcessElement? result = default;
 
+            //Script task
             if (currentElement is ScriptTask scriptTask)
             {
                 var scriptResult = new ContractScriptActivity()
@@ -82,10 +107,17 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                     };
                 }
                 else if (scriptTask.InstanceType == InstanceType.Parallel)
-                    throw new Exception($"Parallel multiinstances are not supporter ({scriptTask.Id})");
+                    throw new Exception($"Parallel multiinstances are not supported ({scriptTask.Id})");
+
+                var nextId = scriptTask.Outgoing.SingleOrDefault();
+                if (nextId is null)
+                    throw new Exception($"Script task {scriptTask.Id} should have exactly one output");
+                scriptResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
 
                 result = scriptResult;
             }
+
+            //End task
             else if (currentElement is EndEvent endEvent)
             {
                 var endResult = new ContractEndEvent()
@@ -96,12 +128,8 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                 result = endResult;
             }
 
-
-            //Add to known elements
-            if (result is null)
-                throw new Exception($"Unhandled type of process element: {currentElement.GetType().Name}");
             else
-                knownElements.Add(result.Id, result);
+                throw new Exception($"Unhandled type of process element: {currentElement.GetType().Name}");
 
             return result;
         }

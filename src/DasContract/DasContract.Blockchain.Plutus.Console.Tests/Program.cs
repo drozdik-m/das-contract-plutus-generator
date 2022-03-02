@@ -9,6 +9,7 @@ using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Proper
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Enum;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Reference;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
@@ -57,13 +58,19 @@ var usersConvertor = new ContractUsersConvertor(
     roleConvertor,
     userConvertor);
 
+//Process convertor
+var processConvertor = new ContractProcessConvertor();
+var processesConvertor = new ContractProcessesConvertor(
+    processConvertor);
+
 //Contract convertor
 var plutusContractConvertor = new PlutusContractConvertor(
     plutusDataModelConvertor,
-    usersConvertor);
+    usersConvertor,
+    processesConvertor);
 
 var plutusContract = plutusContractConvertor.Convert(contract);
-plutusContract.Processes = new ContractProcesses()
+/*plutusContract.Processes = new ContractProcesses()
 {
      AllProcesses = new ContractProcess[]
      {
@@ -82,7 +89,7 @@ plutusContract.Processes = new ContractProcesses()
          },
 
      }
-};
+};*/
 
 //Generate
 Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(plutusContract));
