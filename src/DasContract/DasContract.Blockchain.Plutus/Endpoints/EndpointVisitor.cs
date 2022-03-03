@@ -320,7 +320,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 return PlutusCode.Empty;
 
             PlutusFunctionSignature signature;
-            string parameter = string.Empty;
+            string parameter;
 
             var functionLines = Do(1).ToList();
             functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
