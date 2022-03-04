@@ -7,16 +7,32 @@ using DasContract.Abstraction.Processes;
 using DasContract.Abstraction.Processes.Events;
 using DasContract.Abstraction.Processes.Tasks;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.Blockchain.Plutus.Data.Users;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
 {
     public class ContractProcessConvertor : IConvertor<Process, ContractProcess>
     {
+        private readonly IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor;
+        private readonly IConvertor<UserTask, ContractUserActivity> userConvertor;
+        private readonly IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor;
+
+        public ContractProcessConvertor(
+            IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor,
+            IConvertor<UserTask, ContractUserActivity> userConvertor,
+            IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor)
+        {
+            this.scriptConvertor = scriptConvertor;
+            this.userConvertor = userConvertor;
+            this.timerBoundaryConvertor = timerBoundaryConvertor;
+        }
+
         /// <inheritdoc/>
         public ContractProcess Convert(Process source)
         {
@@ -93,28 +109,40 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             //Script task
             if (currentElement is ScriptTask scriptTask)
             {
-                var scriptResult = new ContractScriptActivity()
-                {
-                    Id = scriptTask.Id,
-                    Code = scriptTask.Script
-                };
+                var scriptResult = scriptConvertor.Convert(scriptTask);
 
-                if (scriptTask.InstanceType == InstanceType.Sequential)
-                {
-                    scriptResult.MultiInstance = new ContractSequentialMultiInstance()
-                    {
-                        LoopCardinality = scriptTask.LoopCardinality.ToString(),
-                    };
-                }
-                else if (scriptTask.InstanceType == InstanceType.Parallel)
-                    throw new Exception($"Parallel multiinstances are not supported ({scriptTask.Id})");
-
+                //Next
                 var nextId = scriptTask.Outgoing.SingleOrDefault();
                 if (nextId is null)
                     throw new Exception($"Script task {scriptTask.Id} should have exactly one output");
                 scriptResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
 
                 result = scriptResult;
+            }
+
+            //User task
+            else if (currentElement is UserTask userTask)
+            {
+                var userResult = userConvertor.Convert(userTask);
+
+                //Timer boundary event
+                var suitableTimerBoundaryEvents = source.Events
+                    .OfType<TimerBoundaryEvent>()
+                    .Where(e => e.AttachedTo == userTask.Id);
+                if (suitableTimerBoundaryEvents.Count() > 1)
+                    throw new Exception($"Only one timer boundary event at once is allowed ({userResult.Name})");
+                else if (suitableTimerBoundaryEvents.Count() == 1)
+                    userResult.BoundaryEvents.Add(
+                        timerBoundaryConvertor.Convert(suitableTimerBoundaryEvents.Single())
+                        );
+
+                //Next
+                var nextId = userTask.Outgoing.SingleOrDefault();
+                if (nextId is null)
+                    throw new Exception($"User task {userTask.Id} should have exactly one output");
+                userResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
+
+                result = userResult;
             }
 
             //End task
@@ -134,5 +162,15 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             return result;
         }
 
+        public static ContractProcess Bind(ContractProcess process, 
+            IEnumerable<ContractUser> users, 
+            IEnumerable<ContractRole> roles)
+        {
+            var userActivities = process.ProcessElements.OfType<ContractUserActivity>();
+            foreach(var userActivity in userActivities) 
+                ContractUserActivityConvertor.Bind(userActivity, users, roles);
+
+            return process;
+        }
     }
 }

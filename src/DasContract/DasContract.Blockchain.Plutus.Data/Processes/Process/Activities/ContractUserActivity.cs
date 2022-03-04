@@ -11,11 +11,17 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
     {
         public ContractForm Form { get; set; } = new ContractForm();
 
-        public ContractUser Assignee { get; set; }
+        public ContractUser? Assignee { get; set; }
+
+        public string AssigneeId { get; set; } = string.Empty;
 
         public ICollection<ContractUser> CandidateUsers { get; set; } = new List<ContractUser>();
 
+        public ICollection<string> CandidateUserIds { get; set; } = new List<string>();
+
         public ICollection<ContractRole> CandidateRoles { get; set; } = new List<ContractRole>();
+
+        public ICollection<string> CandidateRoleIds { get; set; } = new List<string>();
 
         public IEnumerable<string> FormValidationCodeLines => ReadPragma(FormValidationPragma);
 

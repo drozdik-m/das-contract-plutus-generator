@@ -19,6 +19,7 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Transitions;
 using DasContract.Blockchain.Plutus.Transitions.NonTx;
 using DasContract.Blockchain.Plutus.Utils;
@@ -720,32 +721,36 @@ namespace DasContract.Blockchain.Plutus
                 "candidateRoleNames",
             }, new IPlutusLine[]
             {
-                new PlutusRawLine(1, "Constraints.mustSatisfyAnyOf candidatesConstraints"),
+
+                new PlutusRawLine(1, "if PlutusTx.Prelude.null candidateUserNames && PlutusTx.Prelude.null candidateRoleNames then"),
+                    new PlutusRawLine(2, "mempty"),
+                new PlutusRawLine(1, "else"),
+                    new PlutusRawLine(2, "Constraints.mustSatisfyAnyOf candidatesConstraints"),
                 PlutusLine.Empty,
 
-                    new PlutusRawLine(2, "where"),
+                    new PlutusRawLine(1, "where"),
                     
 
-                        new PlutusRawLine(3, "candidateRoles :: [Role]"),
-                        new PlutusRawLine(3, "candidateRoles = PlutusTx.Prelude.map (roleByNameParam param) candidateRoleNames"),
+                        new PlutusRawLine(2, "candidateRoles :: [Role]"),
+                        new PlutusRawLine(2, "candidateRoles = PlutusTx.Prelude.map (roleByNameParam param) candidateRoleNames"),
                         PlutusLine.Empty,
 
-                        new PlutusRawLine(3, "candidateUsers :: [User]"),
-                        new PlutusRawLine(3, "candidateUsers = PlutusTx.Prelude.map (userByNameParam param) candidateUserNames"),
+                        new PlutusRawLine(2, "candidateUsers :: [User]"),
+                        new PlutusRawLine(2, "candidateUsers = PlutusTx.Prelude.map (userByNameParam param) candidateUserNames"),
                         PlutusLine.Empty,
 
-                        new PlutusRawLine(3, "isCandidateUser :: User -> Bool"),
-                        new PlutusRawLine(3, "isCandidateUser u ="),
-                            new PlutusRawLine(4, "u `elem` candidateUsers ||"),
-                            new PlutusRawLine(4, "any (\\cr -> cr `elem` uRoles u) candidateRoles"),
+                        new PlutusRawLine(2, "isCandidateUser :: User -> Bool"),
+                        new PlutusRawLine(2, "isCandidateUser u ="),
+                            new PlutusRawLine(3, "u `elem` candidateUsers ||"),
+                            new PlutusRawLine(3, "any (\\cr -> cr `elem` uRoles u) candidateRoles"),
                         PlutusLine.Empty,
 
-                        new PlutusRawLine(3, "candidates :: [User]"),
-                        new PlutusRawLine(3, "candidates = PlutusTx.Prelude.filter isCandidateUser (cpUsers param)"),
+                        new PlutusRawLine(2, "candidates :: [User]"),
+                        new PlutusRawLine(2, "candidates = PlutusTx.Prelude.filter isCandidateUser (cpUsers param)"),
                         PlutusLine.Empty,
 
-                        new PlutusRawLine(3, "candidatesConstraints :: [TxConstraints Void Void]"),
-                        new PlutusRawLine(3, "candidatesConstraints = PlutusTx.Prelude.map (Constraints.mustBeSignedBy . uAddress) candidates"),
+                        new PlutusRawLine(2, "candidatesConstraints :: [TxConstraints Void Void]"),
+                        new PlutusRawLine(2, "candidatesConstraints = PlutusTx.Prelude.map (Constraints.mustBeSignedBy . uAddress) candidates"),
             });
 
             onChain = onChain
@@ -848,8 +853,8 @@ namespace DasContract.Blockchain.Plutus
             }, new IPlutusLine[]
             {
                 PlutusLine.Empty,
-                new PlutusComment(1,    "  (ContractParam, ContractDatum   , Value            , ContractRedeemer )"),
-                new PlutusRawLine(1, "case (cParam       , stateData cState, stateValue cState, cRedeemer        ) of"),
+                new PlutusComment(1,    $"  (ContractParam, ContractDatum                       , Value            , ContractRedeemer )"),
+                new PlutusRawLine(1, $"case (cParam       , {NonTxTransitionVisitor.TransitionFunctionSignature.Name} (stateData cState), stateValue cState, cRedeemer        ) of"),
                 PlutusLine.Empty,
             });
             txTransition = txTransition.Prepend(txTransitionSig);
@@ -1268,7 +1273,8 @@ namespace DasContract.Blockchain.Plutus
                 new IPlutusLine[]
                 {
                     new PlutusRawLine(1, "do"),
-                        new PlutusRawLine(2, $"datum <- {onChainDatumSig.Name} client"),
+                        new PlutusRawLine(2, $"ocDatum <- {onChainDatumSig.Name} client"),
+                        new PlutusRawLine(2, $"let datum = {NonTxTransitionVisitor.TransitionFunctionSignature.Name} ocDatum"),
                         new PlutusRawLine(2, $"val <- {onChainValueSig.Name} client"),
                         new PlutusRawLine(2, $"param <- {createContractParamSig.Name} threadToken"),
                         PlutusLine.Empty,
@@ -1339,7 +1345,7 @@ namespace DasContract.Blockchain.Plutus
             if (element is ContractActivity)
             {
                 var contractActivity = element as ContractActivity;
-                if (!(contractActivity?.MultiInstance is null))
+                if (contractActivity?.MultiInstance is ContractSequentialMultiInstance)
                     types.Add(sequentialInstanceType);
             }
 

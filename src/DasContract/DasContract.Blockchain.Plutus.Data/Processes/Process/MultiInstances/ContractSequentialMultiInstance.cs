@@ -6,6 +6,6 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances
 {
     public class ContractSequentialMultiInstance : ContractMultiInstance
     {
-        
+        public string LoopCardinality { get; set; } = string.Empty;
     }
 }

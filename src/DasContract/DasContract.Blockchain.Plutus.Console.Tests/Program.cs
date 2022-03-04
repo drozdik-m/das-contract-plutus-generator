@@ -10,9 +10,12 @@ using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Proper
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Properties.Reference;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
+using DasContract.Blockchain.Plutus.Data.Users;
 using TextCopy;
 
 //Preprogrammed contract
@@ -49,7 +52,6 @@ var entityConvertor = new ContractEntityConvertor(
 var contractEnumConvertor = new EnumConvertor();
 var plutusDataModelConvertor = new ContractDataModelConvertor(
     entityConvertor,
-    referencePropertyConvertor,
     contractEnumConvertor);
 
 //User convertor
@@ -60,7 +62,20 @@ var usersConvertor = new ContractUsersConvertor(
     userConvertor);
 
 //Process convertor
-var processConvertor = new ContractProcessConvertor();
+var multiInstanceConvertor = new ContractSequentialMultiInstanceConvertor();
+var scriptActivityConvertor = new ContractScriptActivityConvertor(
+    multiInstanceConvertor);
+var contractFieldTypeConvertor = new ContractFieldTypeConvertor();
+var userFormConvertor = new ContractFormConvertor(
+    contractFieldTypeConvertor);
+var userActivityConvertor = new ContractUserActivityConvertor(
+    multiInstanceConvertor,
+    userFormConvertor);
+var timerBoundaryConvertor = new ContractTimerBoundaryEventConvertor();
+var processConvertor = new ContractProcessConvertor(
+    scriptActivityConvertor,
+    userActivityConvertor,
+    timerBoundaryConvertor);
 var processesConvertor = new ContractProcessesConvertor(
     processConvertor);
 
@@ -71,26 +86,23 @@ var plutusContractConvertor = new PlutusContractConvertor(
     processesConvertor);
 
 var plutusContract = plutusContractConvertor.Convert(contract);
-/*plutusContract.Processes = new ContractProcesses()
-{
-     AllProcesses = new ContractProcess[]
-     {
-         new ContractProcess()
-         {
-            Id = "Default process",
-            IsMain = true,
-            StartEvent = new ContractStartEvent()
-            {
-                Id = "Start",
-                Outgoing = new ContractEndEvent()
-                {
-                    Id = "End"
-                }
-            }
-         },
 
-     }
-};*/
+//Remove assignees for debug
+var userActivities = plutusContract.Processes.AllProcesses
+                .Aggregate(
+                    new List<ContractUserActivity>(),
+                    (acc, item) =>
+                    {
+                        return acc
+                            .Concat(item.ProcessElements.OfType<ContractUserActivity>())
+                            .ToList();
+                    });
+foreach(var userActivity in userActivities)
+{
+    userActivity.Assignee = null;
+    userActivity.CandidateUsers = new List<ContractUser>();
+    userActivity.CandidateRoles = new List<ContractRole>();
+}
 
 //Generate
 var contractCode = new PlutusGenerator().GeneratePlutusContract(plutusContract);

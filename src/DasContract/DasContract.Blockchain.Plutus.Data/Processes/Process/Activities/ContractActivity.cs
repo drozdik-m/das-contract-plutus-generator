@@ -12,9 +12,9 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 
         public ContractProcessElement Outgoing { get; set; }
 
-        public ICollection<ContractBoundaryEvent> BoundaryEvents { get; set; } = new List<ContractBoundaryEvent>(); 
+        public ICollection<ContractBoundaryEvent> BoundaryEvents { get; set; } = new List<ContractBoundaryEvent>();
 
-        public ContractMultiInstance? MultiInstance { get; set; }
+        public ContractMultiInstance MultiInstance { get; set; } = ContractSingleMultiInstance.Instance;
 
         public override void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {

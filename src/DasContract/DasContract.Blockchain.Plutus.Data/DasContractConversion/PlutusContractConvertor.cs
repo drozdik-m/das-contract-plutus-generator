@@ -6,6 +6,7 @@ using DasContract.Abstraction;
 using DasContract.Abstraction.Data;
 using DasContract.Abstraction.Processes;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes;
 using DasContract.Blockchain.Plutus.Data.DataModels;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
@@ -42,6 +43,12 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
                 Identities = usersConvertor.Convert((source.Users, source.Roles)),
                 Processes = processesConvertor.Convert(source.Processes),
             };
+
+            foreach (var process in result.Processes.AllProcesses)
+                ContractProcessConvertor.Bind(
+                    process,
+                    result.Identities.Users, 
+                    result.Identities.Roles);
 
             return result;
         }

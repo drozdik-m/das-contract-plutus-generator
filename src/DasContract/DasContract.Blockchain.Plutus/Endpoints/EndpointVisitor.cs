@@ -159,10 +159,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// Lines that create the cedeemer
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> CreateRedeemer(int indent, ContractUserActivity userActivity) => new IPlutusLine[]
+        IEnumerable<IPlutusLine> CreateRedeemer(int indent, string redeemerName) => new IPlutusLine[]
            {
                 new PlutusComment(indent, "Create redeemer"),
-                new PlutusRawLine(indent, $"let redeemer = {userActivity.Name} form"),
+                new PlutusRawLine(indent, $"let redeemer = {redeemerName}"),
                 PlutusLine.Empty,
            };
 
@@ -170,12 +170,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// Lines that create the cedeemer
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> CreateRedeemer(int indent, string redeemerName) => new IPlutusLine[]
-           {
-                new PlutusComment(indent, "Create redeemer"),
-                new PlutusRawLine(indent, $"let redeemer = {redeemerName}"),
-                PlutusLine.Empty,
-           };
+        IEnumerable<IPlutusLine> CreateRedeemer(int indent, ContractUserActivity userActivity)
+            => CreateRedeemer(indent, $"{PlutusUserActivityRedeemer.Type(userActivity).Name} form");
 
         /// <summary>
         /// Lines that validate the form
