@@ -403,6 +403,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 functionLines.AddRange(TokenShare(1));
                 functionLines.AddRange(ContractInit(1));
 
+                if (!(timeoutBoundary is null))
+                    needsTimeoutFirstEndpoint = true;
+
                 ThisHasNotFirstFlag(element);
             }
 
@@ -412,6 +415,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
                 signature = EndpointSignature(element, isFirst: false);
                 functionLines.AddRange(ClientSetup(1));
                 parameter = "(form, threadToken)";
+
+                if (!(timeoutBoundary is null))
+                    needsTimeoutEndpoint = true;
             }
 
 
@@ -426,10 +432,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             //There is a timer
             else
             {
-                if (HasFirstFlag(element))
-                    needsTimeoutFirstEndpoint = true;
-                else
-                    needsTimeoutEndpoint = true;
+                
 
                 IEnumerable<IPlutusLine> timeoutCode = TimeoutCleaning(2);
                 IEnumerable<IPlutusLine> regularCode = CreateRedeemer(2, element)
@@ -509,10 +512,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             code.AddRange(StateTransition(1));
             code.AddRange(EndpointEnded(1, signature.Name));
 
-            var function = new PlutusFunction(0, signature, new string[]
-            {
-                "threadToken"
-            }, code);
+            var function = new PlutusFunction(0, signature, Array.Empty<string>(), code);
 
             createdEndpoints.Add(("continueTimedoutActivityFirst", signature));
 
@@ -674,7 +674,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             }
 
             return new PlutusFunctionSignature(0,
-               "continueTimedoutActivityEndpoint",
+               isFirst ? "continueTimedoutActivityFirstEndpoint" : "continueTimedoutActivityEndpoint",
                types);
         }
 
