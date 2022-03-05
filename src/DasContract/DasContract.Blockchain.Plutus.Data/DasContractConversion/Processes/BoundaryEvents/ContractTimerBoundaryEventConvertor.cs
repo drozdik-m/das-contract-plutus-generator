@@ -21,6 +21,13 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
             //Timer definition
             var timerDefinition = timerBoundaryEvent.TimerDefinition;
             timerDefinition = timerDefinition.Trim();
+            
+            if (string.IsNullOrWhiteSpace(timerDefinition))
+                throw new Exception($"Timer boundary {timerBoundaryEvent.Id} has empty timer definition");
+
+            if (timerBoundaryEvent.TimerDefinitionType != TimerDefinitionType.Date)
+                throw new Exception($"Timer boundary {timerBoundaryEvent.Id} has timer type not set to \"Date\". Unfortunately, Plutus blockchain safely supports only this timer type.");
+
             if (timerDefinition.StartsWith("${") && timerDefinition.EndsWith("}"))
             {
                 timerDefinition = timerDefinition[2..^(-1)];

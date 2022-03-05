@@ -38,7 +38,9 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Act
                 CandidateRoleIds = source.CandidateRoles.Select(e => e.Name).ToList(),
                 CandidateUserIds = source.CandidateUsers.Select(e => e.Name).ToList(),
                 Code = source.ValidationScript,
-                Form = userFormConvertor.Convert(UserForm.DeserializeFormScript(source.FormDefinition))
+                Form = !string.IsNullOrEmpty(source.FormDefinition) ? 
+                    userFormConvertor.Convert(UserForm.DeserializeFormScript(source.FormDefinition)) :
+                    new ContractForm(),
             };
 
             result.MultiInstance = multiInstanceConvertor.Convert(source);

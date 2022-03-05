@@ -248,6 +248,20 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             var typeVisitor = new TxTypeVisitor(!(Subprocess is null));
             var txType = target.Accept(typeVisitor);
 
+            IPlutusCode result = PlutusCode.Empty;
+
+            //Boundary events
+            if (source is ContractActivity contractActivity)
+            {
+                foreach(var timerBoundaryEvent in contractActivity
+                    .BoundaryEvents
+                    .OfType<ContractTimerBoundaryEvent>())
+                {
+                    result = result.Append(timerBoundaryEvent.Accept(this));
+                    var tmp = result.InString();
+                }
+            }
+
             //Tx types
             if (txType == TxType.Implicit || txType == TxType.Tx)
                 return target.Accept(this);
@@ -260,24 +274,24 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 {
                     //Target is sequential multi instance activity
                     if (activity.MultiInstance is ContractSequentialMultiInstance)
-                        return SimpleStateTransition(source, target);
+                        return SimpleStateTransition(source, target).Append(result);
 
                     //Target is contract call activity
                     else if (activity is ContractCallActivity callActivity)
-                        return CallTransition(source, callActivity);
+                        return CallTransition(source, callActivity).Append(result);
 
                     //Target is contract script activity
                     else if (activity is ContractScriptActivity scriptActivity)
-                        return ScriptTransition(source, scriptActivity);
+                        return ScriptTransition(source, scriptActivity).Append(result);
 
                     //Other activities
                     else
-                        return SimpleStateTransition(source, target);
+                        return SimpleStateTransition(source, target).Append(result);
                 }
 
                 //Other situations
                 else
-                    return SimpleStateTransition(source, target);
+                    return SimpleStateTransition(source, target).Append(result);
             }
 
             //Unhandled tx type
@@ -390,7 +404,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 IPlutusCode decitionFunction = new PlutusGuardFunction(2,
                     decitionFunctionSig,
                     new string[] { "datum" },
-                    guardLines);
+                    guardLines)
+                    .Append(PlutusLine.Empty);
 
                 var where = decitionFunction
                     .Prepend(decitionFunctionSig)

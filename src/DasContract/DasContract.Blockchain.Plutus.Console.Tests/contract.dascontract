@@ -1,7 +1,7 @@
 <Contract Id="7d22995c-4599-4dd4-8834-dc42dc218f84">
   <Name>Testing contract</Name>
   <ProcessDiagram>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"&gt;&lt;bpmn:collaboration id="Collaboration_1r00ad0"&gt;&lt;bpmn:participant id="Participant_03pkqy7" name="Main" processRef="Process_0urgcsa" /&gt;&lt;/bpmn:collaboration&gt;&lt;bpmn:process id="Process_0urgcsa"&gt;&lt;bpmn:sequenceFlow id="Flow_1nh9crr" sourceRef="Activity_0qtr6ac" targetRef="Activity_0ncj62a" /&gt;&lt;bpmn:sequenceFlow id="Flow_0sh0y5a" sourceRef="Activity_0ncj62a" targetRef="Event_1ro9epw" /&gt;&lt;bpmn:endEvent id="Event_1ro9epw"&gt;&lt;bpmn:incoming&gt;Flow_0sh0y5a&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:startEvent id="Event_10fkw2q"&gt;&lt;bpmn:outgoing&gt;Flow_0npusaq&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:sequenceFlow id="Flow_0npusaq" sourceRef="Event_10fkw2q" targetRef="Activity_0bqjwkk" /&gt;&lt;bpmn:sequenceFlow id="Flow_0nt3rsj" sourceRef="Activity_0bqjwkk" targetRef="Activity_1h5knlm" /&gt;&lt;bpmn:sequenceFlow id="Flow_08zlmns" sourceRef="Activity_1h5knlm" targetRef="Activity_0qtr6ac" /&gt;&lt;bpmn:scriptTask id="Activity_0qtr6ac" name="Add 1"&gt;&lt;bpmn:incoming&gt;Flow_08zlmns&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1nh9crr&lt;/bpmn:outgoing&gt;&lt;bpmn:multiInstanceLoopCharacteristics isSequential="true" /&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:scriptTask id="Activity_0ncj62a" name="Double"&gt;&lt;bpmn:incoming&gt;Flow_1nh9crr&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0sh0y5a&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:scriptTask id="Activity_0bqjwkk" name="Set to 1"&gt;&lt;bpmn:incoming&gt;Flow_0npusaq&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0nt3rsj&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:userTask id="Activity_1h5knlm" name="Set timeout"&gt;&lt;bpmn:incoming&gt;Flow_0nt3rsj&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_08zlmns&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;/bpmn:process&gt;&lt;bpmndi:BPMNDiagram id="BPMNDiagram_1"&gt;&lt;bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1r00ad0"&gt;&lt;bpmndi:BPMNShape id="Participant_03pkqy7_di" bpmnElement="Participant_03pkqy7" isHorizontal="true"&gt;&lt;dc:Bounds x="-10" y="300" width="930" height="250" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNEdge id="Flow_08zlmns_di" bpmnElement="Flow_08zlmns"&gt;&lt;di:waypoint x="380" y="430" /&gt;&lt;di:waypoint x="510" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0nt3rsj_di" bpmnElement="Flow_0nt3rsj"&gt;&lt;di:waypoint x="220" y="430" /&gt;&lt;di:waypoint x="280" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0npusaq_di" bpmnElement="Flow_0npusaq"&gt;&lt;di:waypoint x="88" y="430" /&gt;&lt;di:waypoint x="120" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0sh0y5a_di" bpmnElement="Flow_0sh0y5a"&gt;&lt;di:waypoint x="780" y="430" /&gt;&lt;di:waypoint x="842" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1nh9crr_di" bpmnElement="Flow_1nh9crr"&gt;&lt;di:waypoint x="610" y="430" /&gt;&lt;di:waypoint x="680" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="Event_1ro9epw_di" bpmnElement="Event_1ro9epw"&gt;&lt;dc:Bounds x="842" y="412" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_10fkw2q_di" bpmnElement="Event_10fkw2q"&gt;&lt;dc:Bounds x="52" y="412" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1bvy3fm_di" bpmnElement="Activity_0qtr6ac"&gt;&lt;dc:Bounds x="510" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1tfz3ni_di" bpmnElement="Activity_0ncj62a"&gt;&lt;dc:Bounds x="680" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0bqjwkk_di" bpmnElement="Activity_0bqjwkk"&gt;&lt;dc:Bounds x="120" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_04p1r1t_di" bpmnElement="Activity_1h5knlm"&gt;&lt;dc:Bounds x="280" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;/bpmndi:BPMNPlane&gt;&lt;/bpmndi:BPMNDiagram&gt;&lt;/bpmn:definitions&gt;</ProcessDiagram>
+&lt;bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn"&gt;&lt;bpmn:collaboration id="Collaboration_1r00ad0"&gt;&lt;bpmn:participant id="Participant_03pkqy7" name="Main" processRef="Process_0urgcsa" /&gt;&lt;/bpmn:collaboration&gt;&lt;bpmn:process id="Process_0urgcsa"&gt;&lt;bpmn:sequenceFlow id="Flow_1nh9crr" sourceRef="Activity_0qtr6ac" targetRef="Activity_0ncj62a" /&gt;&lt;bpmn:sequenceFlow id="Flow_0sh0y5a" sourceRef="Activity_0ncj62a" targetRef="Event_1ro9epw" /&gt;&lt;bpmn:startEvent id="Event_10fkw2q"&gt;&lt;bpmn:outgoing&gt;Flow_0npusaq&lt;/bpmn:outgoing&gt;&lt;/bpmn:startEvent&gt;&lt;bpmn:sequenceFlow id="Flow_0npusaq" sourceRef="Event_10fkw2q" targetRef="Activity_0bqjwkk" /&gt;&lt;bpmn:sequenceFlow id="Flow_08zlmns" sourceRef="Activity_1h5knlm" targetRef="Activity_0qtr6ac" /&gt;&lt;bpmn:scriptTask id="Activity_0bqjwkk" name="Set to 1"&gt;&lt;bpmn:incoming&gt;Flow_0npusaq&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0o5in4w&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:exclusiveGateway id="Gateway_009395y"&gt;&lt;bpmn:incoming&gt;Flow_0o5in4w&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1tisacy&lt;/bpmn:outgoing&gt;&lt;bpmn:outgoing&gt;Flow_0f97r3t&lt;/bpmn:outgoing&gt;&lt;/bpmn:exclusiveGateway&gt;&lt;bpmn:sequenceFlow id="Flow_0o5in4w" sourceRef="Activity_0bqjwkk" targetRef="Gateway_009395y" /&gt;&lt;bpmn:sequenceFlow id="Flow_1tisacy" name="True" sourceRef="Gateway_009395y" targetRef="Gateway_0n2gozu" /&gt;&lt;bpmn:sequenceFlow id="Flow_0f97r3t" name="otherwise" sourceRef="Gateway_009395y" targetRef="Activity_1whfdua" /&gt;&lt;bpmn:exclusiveGateway id="Gateway_0n2gozu"&gt;&lt;bpmn:incoming&gt;Flow_1tisacy&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_17mc730&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0fsuder&lt;/bpmn:outgoing&gt;&lt;/bpmn:exclusiveGateway&gt;&lt;bpmn:sequenceFlow id="Flow_0fsuder" sourceRef="Gateway_0n2gozu" targetRef="Activity_1h5knlm" /&gt;&lt;bpmn:endEvent id="Event_1ro9epw"&gt;&lt;bpmn:incoming&gt;Flow_0sh0y5a&lt;/bpmn:incoming&gt;&lt;/bpmn:endEvent&gt;&lt;bpmn:scriptTask id="Activity_0ncj62a" name="Double"&gt;&lt;bpmn:incoming&gt;Flow_1nh9crr&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_0sh0y5a&lt;/bpmn:outgoing&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:userTask id="Activity_1h5knlm" name="Set timeout"&gt;&lt;bpmn:incoming&gt;Flow_0fsuder&lt;/bpmn:incoming&gt;&lt;bpmn:incoming&gt;Flow_04u2nhx&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_08zlmns&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:userTask id="Activity_1whfdua" name="First possible timeout"&gt;&lt;bpmn:incoming&gt;Flow_0f97r3t&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_17mc730&lt;/bpmn:outgoing&gt;&lt;/bpmn:userTask&gt;&lt;bpmn:boundaryEvent id="Event_1f9erp7" attachedToRef="Activity_1whfdua"&gt;&lt;bpmn:outgoing&gt;Flow_04u2nhx&lt;/bpmn:outgoing&gt;&lt;bpmn:timerEventDefinition id="TimerEventDefinition_0af0av3" /&gt;&lt;/bpmn:boundaryEvent&gt;&lt;bpmn:scriptTask id="Activity_0qtr6ac" name="Add 1"&gt;&lt;bpmn:incoming&gt;Flow_08zlmns&lt;/bpmn:incoming&gt;&lt;bpmn:outgoing&gt;Flow_1nh9crr&lt;/bpmn:outgoing&gt;&lt;bpmn:multiInstanceLoopCharacteristics isSequential="true" /&gt;&lt;/bpmn:scriptTask&gt;&lt;bpmn:sequenceFlow id="Flow_04u2nhx" sourceRef="Event_1f9erp7" targetRef="Activity_1h5knlm" /&gt;&lt;bpmn:sequenceFlow id="Flow_17mc730" sourceRef="Activity_1whfdua" targetRef="Gateway_0n2gozu" /&gt;&lt;/bpmn:process&gt;&lt;bpmndi:BPMNDiagram id="BPMNDiagram_1"&gt;&lt;bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1r00ad0"&gt;&lt;bpmndi:BPMNShape id="Participant_03pkqy7_di" bpmnElement="Participant_03pkqy7" isHorizontal="true"&gt;&lt;dc:Bounds x="-10" y="300" width="1160" height="410" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNEdge id="Flow_08zlmns_di" bpmnElement="Flow_08zlmns"&gt;&lt;di:waypoint x="610" y="430" /&gt;&lt;di:waypoint x="660" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0npusaq_di" bpmnElement="Flow_0npusaq"&gt;&lt;di:waypoint x="88" y="430" /&gt;&lt;di:waypoint x="120" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0sh0y5a_di" bpmnElement="Flow_0sh0y5a"&gt;&lt;di:waypoint x="910" y="430" /&gt;&lt;di:waypoint x="962" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1nh9crr_di" bpmnElement="Flow_1nh9crr"&gt;&lt;di:waypoint x="760" y="430" /&gt;&lt;di:waypoint x="810" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0o5in4w_di" bpmnElement="Flow_0o5in4w"&gt;&lt;di:waypoint x="220" y="430" /&gt;&lt;di:waypoint x="255" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_1tisacy_di" bpmnElement="Flow_1tisacy"&gt;&lt;di:waypoint x="305" y="430" /&gt;&lt;di:waypoint x="385" y="430" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="334" y="412" width="23" height="14" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0f97r3t_di" bpmnElement="Flow_0f97r3t"&gt;&lt;di:waypoint x="280" y="455" /&gt;&lt;di:waypoint x="280" y="570" /&gt;&lt;di:waypoint x="340" y="570" /&gt;&lt;bpmndi:BPMNLabel&gt;&lt;dc:Bounds x="285" y="510" width="50" height="14" /&gt;&lt;/bpmndi:BPMNLabel&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_0fsuder_di" bpmnElement="Flow_0fsuder"&gt;&lt;di:waypoint x="435" y="430" /&gt;&lt;di:waypoint x="510" y="430" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_04u2nhx_di" bpmnElement="Flow_04u2nhx"&gt;&lt;di:waypoint x="410" y="512" /&gt;&lt;di:waypoint x="410" y="460" /&gt;&lt;di:waypoint x="510" y="460" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNEdge id="Flow_17mc730_di" bpmnElement="Flow_17mc730"&gt;&lt;di:waypoint x="390" y="530" /&gt;&lt;di:waypoint x="390" y="493" /&gt;&lt;di:waypoint x="410" y="493" /&gt;&lt;di:waypoint x="410" y="455" /&gt;&lt;/bpmndi:BPMNEdge&gt;&lt;bpmndi:BPMNShape id="Event_10fkw2q_di" bpmnElement="Event_10fkw2q"&gt;&lt;dc:Bounds x="52" y="412" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_0bqjwkk_di" bpmnElement="Activity_0bqjwkk"&gt;&lt;dc:Bounds x="120" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Gateway_009395y_di" bpmnElement="Gateway_009395y" isMarkerVisible="true"&gt;&lt;dc:Bounds x="255" y="405" width="50" height="50" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Gateway_0n2gozu_di" bpmnElement="Gateway_0n2gozu" isMarkerVisible="true"&gt;&lt;dc:Bounds x="385" y="405" width="50" height="50" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_1ro9epw_di" bpmnElement="Event_1ro9epw"&gt;&lt;dc:Bounds x="962" y="412" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1tfz3ni_di" bpmnElement="Activity_0ncj62a"&gt;&lt;dc:Bounds x="810" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_04p1r1t_di" bpmnElement="Activity_1h5knlm"&gt;&lt;dc:Bounds x="510" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1mpcfw5_di" bpmnElement="Activity_1whfdua"&gt;&lt;dc:Bounds x="340" y="530" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Activity_1bvy3fm_di" bpmnElement="Activity_0qtr6ac"&gt;&lt;dc:Bounds x="660" y="390" width="100" height="80" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;bpmndi:BPMNShape id="Event_0adhl2h_di" bpmnElement="Event_1f9erp7"&gt;&lt;dc:Bounds x="392" y="512" width="36" height="36" /&gt;&lt;/bpmndi:BPMNShape&gt;&lt;/bpmndi:BPMNPlane&gt;&lt;/bpmndi:BPMNDiagram&gt;&lt;/bpmn:definitions&gt;</ProcessDiagram>
   <Processes>
     <Process Id="Process_0urgcsa">
       <Name>Main</Name>
@@ -22,13 +22,13 @@
           <Condition></Condition>
         </SequenceFlow>
         <SequenceFlow Id="Flow_1nh9crr">
-          <Name></Name>
+          <Name />
           <SourceId>Activity_0qtr6ac</SourceId>
           <TargetId>Activity_0ncj62a</TargetId>
           <Condition></Condition>
         </SequenceFlow>
         <SequenceFlow Id="Flow_0npusaq">
-          <Name />
+          <Name></Name>
           <SourceId>Event_10fkw2q</SourceId>
           <TargetId>Activity_0bqjwkk</TargetId>
           <Condition></Condition>
@@ -40,7 +40,7 @@
           <Condition></Condition>
         </SequenceFlow>
         <SequenceFlow Id="Flow_0sh0y5a">
-          <Name></Name>
+          <Name />
           <SourceId>Activity_0ncj62a</SourceId>
           <TargetId>Event_1ro9epw</TargetId>
           <Condition></Condition>
@@ -51,17 +51,47 @@
           <TargetId>Activity_0hrkybe</TargetId>
           <Condition></Condition>
         </SequenceFlow>
-        <SequenceFlow Id="Flow_0nt3rsj">
+        <SequenceFlow Id="Flow_0o5in4w">
           <Name />
           <SourceId>Activity_0bqjwkk</SourceId>
-          <TargetId>Activity_1h5knlm</TargetId>
-          <Condition></Condition>
+          <TargetId>Gateway_009395y</TargetId>
+          <Condition />
         </SequenceFlow>
         <SequenceFlow Id="Flow_08zlmns">
           <Name />
           <SourceId>Activity_1h5knlm</SourceId>
           <TargetId>Activity_0qtr6ac</TargetId>
           <Condition></Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_1tisacy">
+          <Name>True</Name>
+          <SourceId>Gateway_009395y</SourceId>
+          <TargetId>Gateway_0n2gozu</TargetId>
+          <Condition>True</Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_04u2nhx">
+          <Name />
+          <SourceId>Event_1f9erp7</SourceId>
+          <TargetId>Activity_1h5knlm</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0f97r3t">
+          <Name>otherwise</Name>
+          <SourceId>Gateway_009395y</SourceId>
+          <TargetId>Activity_1whfdua</TargetId>
+          <Condition>otherwise</Condition>
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_0fsuder">
+          <Name />
+          <SourceId>Gateway_0n2gozu</SourceId>
+          <TargetId>Activity_1h5knlm</TargetId>
+          <Condition />
+        </SequenceFlow>
+        <SequenceFlow Id="Flow_17mc730">
+          <Name />
+          <SourceId>Activity_1whfdua</SourceId>
+          <TargetId>Gateway_0n2gozu</TargetId>
+          <Condition />
         </SequenceFlow>
       </SequenceFlows>
       <ProcessElements>
@@ -105,7 +135,7 @@ datum {
             <IncomingId>Flow_0npusaq</IncomingId>
           </Incoming>
           <Outgoing>
-            <OutgoingId>Flow_0nt3rsj</OutgoingId>
+            <OutgoingId>Flow_0o5in4w</OutgoingId>
           </Outgoing>
           <InstanceType>Single</InstanceType>
           <LoopCardinality>0</LoopCardinality>
@@ -119,7 +149,8 @@ datum {
         <UserTask Id="Activity_1h5knlm">
           <Name>Set timeout</Name>
           <Incoming>
-            <IncomingId>Flow_0nt3rsj</IncomingId>
+            <IncomingId>Flow_0fsuder</IncomingId>
+            <IncomingId>Flow_04u2nhx</IncomingId>
           </Incoming>
           <Outgoing>
             <OutgoingId>Flow_08zlmns</OutgoingId>
@@ -131,7 +162,7 @@ datum {
           <Assignee>bc4522f1-8aa8-4188-8d41-4414d4b9fb47</Assignee>
           <UserForm />
           <DueDateExpression></DueDateExpression>
-          <FormDefinition>&lt;Form Label="Party registration"&gt;
+          <FormDefinition>&lt;Form Label="Set timeout for some reason"&gt;
     &lt;FieldGroup&gt;
         &lt;DateField Label="NewTimeout"/&gt;
     &lt;/FieldGroup&gt;
@@ -147,7 +178,7 @@ datum {
           <CandidateRoles />
         </UserTask>
         <EndEvent Id="Event_1ro9epw">
-          <Name></Name>
+          <Name />
           <Incoming>
             <IncomingId>Flow_0sh0y5a</IncomingId>
           </Incoming>
@@ -160,6 +191,57 @@ datum {
             <OutgoingId>Flow_0npusaq</OutgoingId>
           </Outgoing>
         </StartEvent>
+        <ExclusiveGateway Id="Gateway_009395y">
+          <Name />
+          <Incoming>
+            <IncomingId>Flow_0o5in4w</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_1tisacy</OutgoingId>
+            <OutgoingId>Flow_0f97r3t</OutgoingId>
+          </Outgoing>
+          <DefaultSequenceFlowId />
+        </ExclusiveGateway>
+        <TimerBoundaryEvent Id="Event_1f9erp7">
+          <Name />
+          <Incoming />
+          <Outgoing>
+            <OutgoingId>Flow_04u2nhx</OutgoingId>
+          </Outgoing>
+          <AttachedTo>Activity_1whfdua</AttachedTo>
+          <TimerDefinitionType>Date</TimerDefinitionType>
+          <TimerDefinition>5</TimerDefinition>
+        </TimerBoundaryEvent>
+        <ExclusiveGateway Id="Gateway_0n2gozu">
+          <Name />
+          <Incoming>
+            <IncomingId>Flow_1tisacy</IncomingId>
+            <IncomingId>Flow_17mc730</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_0fsuder</OutgoingId>
+          </Outgoing>
+          <DefaultSequenceFlowId />
+        </ExclusiveGateway>
+        <UserTask Id="Activity_1whfdua">
+          <Name>First possible timeout</Name>
+          <Incoming>
+            <IncomingId>Flow_0f97r3t</IncomingId>
+          </Incoming>
+          <Outgoing>
+            <OutgoingId>Flow_17mc730</OutgoingId>
+          </Outgoing>
+          <InstanceType>Single</InstanceType>
+          <LoopCardinality>0</LoopCardinality>
+          <LoopCollection />
+          <TokenOperationType>Create</TokenOperationType>
+          <UserForm />
+          <DueDateExpression />
+          <FormDefinition></FormDefinition>
+          <ValidationScript />
+          <CandidateUsers />
+          <CandidateRoles />
+        </UserTask>
       </ProcessElements>
     </Process>
   </Processes>

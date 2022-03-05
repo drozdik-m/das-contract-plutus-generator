@@ -72,10 +72,14 @@ var userActivityConvertor = new ContractUserActivityConvertor(
     multiInstanceConvertor,
     userFormConvertor);
 var timerBoundaryConvertor = new ContractTimerBoundaryEventConvertor();
+var mergingExclusiveGatewayConvertor = new ContractMergingExclusiveGatewayConvertor();
+var exclusiveGatewayConvertor = new ContractExclusiveGatewayConvertor();
 var processConvertor = new ContractProcessConvertor(
     scriptActivityConvertor,
     userActivityConvertor,
-    timerBoundaryConvertor);
+    timerBoundaryConvertor,
+    exclusiveGatewayConvertor,
+    mergingExclusiveGatewayConvertor);
 var processesConvertor = new ContractProcessesConvertor(
     processConvertor);
 

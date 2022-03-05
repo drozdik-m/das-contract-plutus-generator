@@ -5,6 +5,7 @@ using System.Text;
 using DasContract.Abstraction.Data;
 using DasContract.Abstraction.Processes;
 using DasContract.Abstraction.Processes.Events;
+using DasContract.Abstraction.Processes.Gateways;
 using DasContract.Abstraction.Processes.Tasks;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance;
@@ -12,6 +13,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitiv
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
+using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Data.Users;
 
@@ -22,15 +24,21 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
         private readonly IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor;
         private readonly IConvertor<UserTask, ContractUserActivity> userConvertor;
         private readonly IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor;
+        private readonly IConvertor<ExclusiveGateway, ContractExclusiveGateway> exclusiveGatewayConvertor;
+        private readonly IConvertor<ExclusiveGateway, ContractMergingExclusiveGateway> mergingExclusiveGatewayConvertor;
 
         public ContractProcessConvertor(
             IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor,
             IConvertor<UserTask, ContractUserActivity> userConvertor,
-            IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor)
+            IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor,
+            IConvertor<ExclusiveGateway, ContractExclusiveGateway> exclusiveGatewayConvertor,
+            IConvertor<ExclusiveGateway, ContractMergingExclusiveGateway> mergingExclusiveGatewayConvertor)
         {
             this.scriptConvertor = scriptConvertor;
             this.userConvertor = userConvertor;
             this.timerBoundaryConvertor = timerBoundaryConvertor;
+            this.exclusiveGatewayConvertor = exclusiveGatewayConvertor;
+            this.mergingExclusiveGatewayConvertor = mergingExclusiveGatewayConvertor;
         }
 
         /// <inheritdoc/>
@@ -104,12 +112,13 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             if (knownElements.ContainsKey(currentElement.Id))
                 return knownElements[currentElement.Id];
 
-            ContractProcessElement? result = default;
-
             //Script task
             if (currentElement is ScriptTask scriptTask)
             {
                 var scriptResult = scriptConvertor.Convert(scriptTask);
+
+                //Save
+                knownElements.Add(scriptResult.Id, scriptResult);
 
                 //Next
                 var nextId = scriptTask.Outgoing.SingleOrDefault();
@@ -117,13 +126,16 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                     throw new Exception($"Script task {scriptTask.Id} should have exactly one output");
                 scriptResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
 
-                result = scriptResult;
+                return scriptResult;
             }
 
             //User task
             else if (currentElement is UserTask userTask)
             {
                 var userResult = userConvertor.Convert(userTask);
+
+                //Save
+                knownElements.Add(userResult.Id, userResult);
 
                 //Timer boundary event
                 var suitableTimerBoundaryEvents = source.Events
@@ -132,9 +144,18 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                 if (suitableTimerBoundaryEvents.Count() > 1)
                     throw new Exception($"Only one timer boundary event at once is allowed ({userResult.Name})");
                 else if (suitableTimerBoundaryEvents.Count() == 1)
-                    userResult.BoundaryEvents.Add(
-                        timerBoundaryConvertor.Convert(suitableTimerBoundaryEvents.Single())
-                        );
+                {
+                    var suitableTimerBoundaryEvent = suitableTimerBoundaryEvents.Single();
+                    var timerBoundaryResult = timerBoundaryConvertor.Convert(suitableTimerBoundaryEvent);
+                    userResult.BoundaryEvents.Add(timerBoundaryResult);
+
+                    //Next
+                    var boundaryNextId = suitableTimerBoundaryEvent.Outgoing.SingleOrDefault();
+                    if (boundaryNextId is null)
+                        throw new Exception($"Timer boundary event {suitableTimerBoundaryEvent.Id} should have exactly one output");
+                    timerBoundaryResult.TimeOutDirection = ConstructNext(source, GetSequenceFlowIdTarget(source, boundaryNextId), knownElements);
+                }
+
 
                 //Next
                 var nextId = userTask.Outgoing.SingleOrDefault();
@@ -142,7 +163,60 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                     throw new Exception($"User task {userTask.Id} should have exactly one output");
                 userResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
 
-                result = userResult;
+                return userResult;
+            }
+
+            //Exclusive gateway
+            else if (currentElement is ExclusiveGateway exclusiveGateway)
+            {
+                //Merging exclusive gateway
+                if (exclusiveGateway.Outgoing.Count() == 1)
+                {
+                    var gatewayResult = mergingExclusiveGatewayConvertor.Convert(exclusiveGateway);
+
+                    //Save
+                    knownElements.Add(gatewayResult.Id, gatewayResult);
+
+                    //Next
+                    var nextId = exclusiveGateway.Outgoing.SingleOrDefault();
+                    gatewayResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
+
+                    return gatewayResult;
+                }
+                //Branching exclusive gateway
+                else if (exclusiveGateway.Outgoing.Count() > 1)
+                {
+                    var gatewayResult = exclusiveGatewayConvertor.Convert(exclusiveGateway);
+
+                    //Save
+                    knownElements.Add(gatewayResult.Id, gatewayResult);
+
+                    //Next
+                    var nextIds = exclusiveGateway.Outgoing;
+                    gatewayResult.Outgoing = nextIds.Select(e =>
+                    {
+                        if (!source.SequenceFlows.ContainsKey(e))
+                            throw new Exception($"Invalid sequence flow id {e}");
+                        var sequenceFlow = source.SequenceFlows[e];
+                        var targetId = sequenceFlow.TargetId;
+                        if(!source.ProcessElements.ContainsKey(targetId))
+                            throw new Exception($"Invalid sequence flow target id {targetId}");
+
+                        var targetElement = source.ProcessElements[targetId];
+                        var targetCondition = sequenceFlow.Condition;
+
+                        return new ContractConditionedConnection()
+                        {
+                            Condition = targetCondition,
+                            Target = ConstructNext(source, targetElement, knownElements),
+                        };
+                    }).ToList();
+
+                    return gatewayResult;
+                }
+                else
+                    throw new Exception($"Exclusive gateway {exclusiveGateway.Id} has zero outputs");
+
             }
 
             //End task
@@ -153,13 +227,13 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                     Id = endEvent.Id,
                 };
 
-                result = endResult;
+                //Save
+                knownElements.Add(endResult.Id, endResult);
+
+                return endResult;
             }
 
-            else
-                throw new Exception($"Unhandled type of process element: {currentElement.GetType().Name}");
-
-            return result;
+            throw new Exception($"Unhandled type of process element: {currentElement.GetType().Name}");
         }
 
         public static ContractProcess Bind(ContractProcess process, 

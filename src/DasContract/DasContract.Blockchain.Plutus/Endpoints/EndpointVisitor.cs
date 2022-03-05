@@ -30,6 +30,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         Stack<ContractProcess> processStack = new Stack<ContractProcess>();
 
+        bool needsTimeoutEndpoint = false;
+        bool needsTimeoutFirstEndpoint = false;
+
         public ContractStartEvent InitialStartEvent { get; }        
 
         /// <summary>
@@ -233,7 +236,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
            {
                 new PlutusComment(indent, "Timeout  cleaning"),
                 new PlutusRawLine(indent, $"logInfo @String \"--- activity timed out, cleaning...\""),
-                new PlutusRawLine(indent, $"{TimedOutEndpointSignature.Name} threadToken"),
+                new PlutusRawLine(indent, $"{TimedOutEndpointSignature(isFirst: false).Name} threadToken"),
                 PlutusLine.Empty,
            };
 
@@ -242,13 +245,14 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// </summary>
         /// <returns></returns>
         IEnumerable<IPlutusLine> TimeoutCheck(int indent, 
+            string timeout,
             IEnumerable<IPlutusLine> timedOut, 
             IEnumerable<IPlutusLine> regular) => new IPlutusLine[]
            {
                 new PlutusComment(indent, "Check timeout"),
                 new PlutusRawLine(indent, $"datum <- onChainDatum client"),
                 new PlutusRawLine(indent, $"now <- currentTime"),
-                new PlutusRawLine(indent, $"let timeout = setNumberTimeout datum"),
+                new PlutusRawLine(indent, $"let timeout = {timeout}"),
                 new PlutusRawLine(indent, $"if now > timeout then do"),
                 PlutusLine.Empty,
            }
@@ -382,7 +386,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            var timeoutBoundary = element.BoundaryEvents.OfType<ContractBoundaryEvent>().FirstOrDefault();
+            var timeoutBoundary = element.BoundaryEvents.OfType<ContractTimerBoundaryEvent>().FirstOrDefault();
 
             var functionLines = Do(1).ToList();
             functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
@@ -422,12 +426,17 @@ namespace DasContract.Blockchain.Plutus.Transitions
             //There is a timer
             else
             {
+                if (HasFirstFlag(element))
+                    needsTimeoutFirstEndpoint = true;
+                else
+                    needsTimeoutEndpoint = true;
+
                 IEnumerable<IPlutusLine> timeoutCode = TimeoutCleaning(2);
                 IEnumerable<IPlutusLine> regularCode = CreateRedeemer(2, element)
                     .Concat(ValidateForm(2))
                     .Concat(StateTransition(2));
 
-                functionLines.AddRange(TimeoutCheck(1, timeoutCode, regularCode));
+                functionLines.AddRange(TimeoutCheck(1, timeoutBoundary.TimerDefinition, timeoutCode, regularCode));
             }
 
             functionLines.AddRange(EndpointEnded(1, EndpointName(element)));
@@ -481,12 +490,45 @@ namespace DasContract.Blockchain.Plutus.Transitions
         #region extraEndpoints
 
         /// <summary>
+        /// Creates the timeout endpoint that is the first endpoint call
+        /// </summary>
+        /// <returns></returns>
+        public IPlutusCode ContinueTimeoutActivityFirstEndpoint()
+        {
+            if (!needsTimeoutFirstEndpoint)
+                return PlutusCode.Empty;
+
+            var signature = TimedOutEndpointSignature(isFirst: true);
+
+            var code = Do(1).ToList();
+            code.AddRange(EndpointBegun(1, signature.Name));
+            code.AddRange(InitialClientSetup(1));
+            code.AddRange(TokenShare(1));
+            code.AddRange(ContractInit(1));
+            code.AddRange(CreateRedeemer(1, PlutusTimeoutRedeemer.Type.Name));
+            code.AddRange(StateTransition(1));
+            code.AddRange(EndpointEnded(1, signature.Name));
+
+            var function = new PlutusFunction(0, signature, new string[]
+            {
+                "threadToken"
+            }, code);
+
+            createdEndpoints.Add(("continueTimedoutActivityFirst", signature));
+
+            return function.Prepend(signature);
+        }
+
+        /// <summary>
         /// Creates the timeout endpoint
         /// </summary>
         /// <returns></returns>
         public IPlutusCode ContinueTimeoutActivityEndpoint()
         {
-            var signature = TimedOutEndpointSignature;
+            if (!needsTimeoutEndpoint)
+                return PlutusCode.Empty;
+
+            var signature = TimedOutEndpointSignature(isFirst: false);
 
             var code = Do(1).ToList();
             code.AddRange(EndpointBegun(1, signature.Name));
@@ -602,22 +644,43 @@ namespace DasContract.Blockchain.Plutus.Transitions
                     )
             });
 
-        public static PlutusFunctionSignature TimedOutEndpointSignature { get; } = new PlutusFunctionSignature(0,
-            "continueTimedoutActivityEndpoint",
-            new INamable[]
+        public static PlutusFunctionSignature TimedOutEndpointSignature(bool isFirst)
+        {
+            IEnumerable<INamable> types;
+            if (isFirst)
             {
-                PlutusThreadToken.Type,
-                PlutusContractMonad.Type(
-                    PlutusUnspecifiedDataType.Type("w"),
-                    PlutusUnspecifiedDataType.Type("s"),
-                    PlutusText.Type,
-                    PlutusVoid.Type
+                types = new INamable[]
+                {
+                   PlutusContractMonad.Type(
+                        PlutusLast.Type(PlutusThreadToken.Type),
+                        PlutusUnspecifiedDataType.Type("s"),
+                        PlutusText.Type,
+                        PlutusVoid.Type
                     )
-            });
+                };
+            }
+            else
+            {
+                types = new INamable[]
+                {
+                    PlutusThreadToken.Type,
+                    PlutusContractMonad.Type(
+                        PlutusUnspecifiedDataType.Type("w"),
+                        PlutusUnspecifiedDataType.Type("s"),
+                        PlutusText.Type,
+                        PlutusVoid.Type
+                        )
+                };
+            }
+
+            return new PlutusFunctionSignature(0,
+               "continueTimedoutActivityEndpoint",
+               types);
+        }
 
         public static PlutusFunctionSignature FinishContractEndpointSignature(bool isFirst)
         {
-            IEnumerable<INamable> types = new List<INamable>();
+            IEnumerable<INamable> types;
             if (isFirst)
             {
                 types = new INamable[]

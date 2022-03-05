@@ -1298,6 +1298,7 @@ namespace DasContract.Blockchain.Plutus
             var endpoints = endpointsVisitor.Visit(contract.Processes.Main.StartEvent);
 
             endpoints = endpoints.Append(endpointsVisitor.ContinueTimeoutActivityEndpoint());
+            endpoints = endpoints.Append(endpointsVisitor.ContinueTimeoutActivityFirstEndpoint());
 
             offChain = offChain
                .Append(endpoints)
