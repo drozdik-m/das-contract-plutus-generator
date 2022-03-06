@@ -23,6 +23,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
     {
         private readonly IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor;
         private readonly IConvertor<UserTask, ContractUserActivity> userConvertor;
+        private readonly IConvertor<CallActivity, ContractCallActivity> callConvertor;
         private readonly IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor;
         private readonly IConvertor<ExclusiveGateway, ContractExclusiveGateway> exclusiveGatewayConvertor;
         private readonly IConvertor<ExclusiveGateway, ContractMergingExclusiveGateway> mergingExclusiveGatewayConvertor;
@@ -30,12 +31,14 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
         public ContractProcessConvertor(
             IConvertor<ScriptTask, ContractScriptActivity> scriptConvertor,
             IConvertor<UserTask, ContractUserActivity> userConvertor,
+            IConvertor<CallActivity, ContractCallActivity> callConvertor,
             IConvertor<TimerBoundaryEvent, ContractTimerBoundaryEvent> timerBoundaryConvertor,
             IConvertor<ExclusiveGateway, ContractExclusiveGateway> exclusiveGatewayConvertor,
             IConvertor<ExclusiveGateway, ContractMergingExclusiveGateway> mergingExclusiveGatewayConvertor)
         {
             this.scriptConvertor = scriptConvertor;
             this.userConvertor = userConvertor;
+            this.callConvertor = callConvertor;
             this.timerBoundaryConvertor = timerBoundaryConvertor;
             this.exclusiveGatewayConvertor = exclusiveGatewayConvertor;
             this.mergingExclusiveGatewayConvertor = mergingExclusiveGatewayConvertor;
@@ -46,6 +49,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
         {
             var result = new ContractProcess
             {
+                Id = source.Id,
                 IsMain = source.IsExecutable,
             };
 
@@ -164,6 +168,23 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
                 userResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
 
                 return userResult;
+            }
+
+            //Call task
+            else if (currentElement is CallActivity callActivity)
+            {
+                var callResult = callConvertor.Convert(callActivity);
+
+                //Save
+                knownElements.Add(callResult.Id, callResult);
+
+                //Next
+                var nextId = callActivity.Outgoing.SingleOrDefault();
+                if (nextId is null)
+                    throw new Exception($"Call activity {callActivity.Id} should have exactly one output");
+                callResult.Outgoing = ConstructNext(source, GetSequenceFlowIdTarget(source, nextId), knownElements);
+
+                return callResult;
             }
 
             //Exclusive gateway

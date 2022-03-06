@@ -7,6 +7,7 @@ using DasContract.Abstraction.Processes;
 using DasContract.Abstraction.Processes.Events;
 using DasContract.Abstraction.Processes.Tasks;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
+using DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Processes;
 using DasContract.Blockchain.Plutus.Data.Processes.Process;
@@ -31,6 +32,19 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes
             var processes = source
                 .Select(e => processConvertor.Convert(e))
                 .ToList();
+
+            var callActivities = processes
+                .Aggregate(
+                    new List<ContractCallActivity>(),
+                    (acc, item) =>
+                    {
+                        return acc
+                            .Concat(item.ProcessElements.OfType<ContractCallActivity>())
+                            .ToList();
+                    });
+
+            foreach(var activity in callActivities)
+                ContractCallActivityConvertor.Bind(activity, processes);
 
             return new ContractProcesses
             {

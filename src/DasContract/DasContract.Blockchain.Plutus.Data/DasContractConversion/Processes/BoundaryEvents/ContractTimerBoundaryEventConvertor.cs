@@ -30,7 +30,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 
             if (timerDefinition.StartsWith("${") && timerDefinition.EndsWith("}"))
             {
-                timerDefinition = timerDefinition[2..^(-1)];
+                timerDefinition = timerDefinition[2..^1];
                 timerDefinition = timerDefinition.Trim();
             }
             else if (DateTime.TryParse(timerDefinition, out DateTime timerDefinitionDate))
