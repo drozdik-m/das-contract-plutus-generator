@@ -1294,11 +1294,11 @@ namespace DasContract.Blockchain.Plutus
                   .Append(new PlutusSubsectionComment(0, "Endpoints"));
 
             //Generate endpoints
-            var endpointsVisitor = new EndpointVisitor(contract.Processes.Main.StartEvent);
+            var endpointsVisitor = new EndpointVisitor();
             var endpoints = endpointsVisitor.Visit(contract.Processes.Main.StartEvent);
 
             endpoints = endpoints.Append(endpointsVisitor.ContinueTimeoutActivityEndpoint());
-            endpoints = endpoints.Append(endpointsVisitor.ContinueTimeoutActivityFirstEndpoint());
+            endpoints = endpoints.Append(endpointsVisitor.InitializeContractEndpoint());
 
             offChain = offChain
                .Append(endpoints)

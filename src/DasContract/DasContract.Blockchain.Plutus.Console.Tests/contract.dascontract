@@ -86,7 +86,7 @@ datum {
           </Outgoing>
           <AttachedTo>Activity_1lid0pw</AttachedTo>
           <TimerDefinitionType>Date</TimerDefinitionType>
-          <TimerDefinition>${datum interestingTimeout}</TimerDefinition>
+          <TimerDefinition>${interestingTimeout datum}</TimerDefinition>
         </TimerBoundaryEvent>
         <UserTask Id="Activity_1lid0pw">
           <Name>Set the number</Name>
@@ -413,7 +413,7 @@ datum {
     &lt;/FieldGroup&gt;
 &lt;/Form&gt;</FormDefinition>
           <ValidationScript>{-# FORM_VALIDATION #-}
-newMessage3 form != ""
+newMessage3 form /= ""
 
 {-# TRANSITION #-}
 datum {
@@ -442,7 +442,7 @@ datum {
     &lt;/FieldGroup&gt;
 &lt;/Form&gt;</FormDefinition>
           <ValidationScript>{-# FORM_VALIDATION #-}
-newMessage2 form != ""
+newMessage2 form /= ""
 
 {-# TRANSITION #-}
 datum {

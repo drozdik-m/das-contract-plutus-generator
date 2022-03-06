@@ -204,6 +204,27 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         }
 
         /// <summary>
+        /// Generate "where" user defined statement for timeouts
+        /// </summary>
+        /// <param name="timeoutDefinition"></param>
+        /// <returns></returns>
+        IPlutusCode TimeoutWhereConstraint(string timeoutDefinition)
+        {
+            var signature = UserDefinedTimeoutConstraintSignature;
+            return new PlutusFunction(4, signature, new string[]
+            {
+                "param",
+                "datum",
+                "val"
+            }, new IPlutusLine[]
+            {
+                new PlutusRawLine(5, $"Constraints.mustValidateIn {PlutusCode.ProperlyBracketed(timeoutDefinition)}"),
+                PlutusLine.Empty,
+            })
+            .Prepend(signature);
+        }
+
+        /// <summary>
         /// Generates "must be signed by" constraint for a user activity
         /// </summary>
         /// <param name="userActivity"></param>
@@ -232,7 +253,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <exception cref="NotImplementedException"></exception>
         IPlutusCode EndEventTransition(ContractProcessElement source, ContractEndEvent endEvent, string condition = "")
         {
-            var currentName = CurrentElementName(source);
+            var currentName = CurrentElementName(source, Subprocess);
             var targetName = PlutusContractFinished.Type.Name;
 
             var comment = TransitionComment(2, currentName, targetName);
@@ -259,7 +280,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         IPlutusCode UserActivityTransition(ContractProcessElement source, ContractUserActivity userActivity, string condition = "")
         {
             
-            var currentName = CurrentElementName(source);
+            var currentName = CurrentElementName(source, Subprocess);
 
             IPlutusCode resultCode = PlutusCode.Empty;
             var boundaryTimerEvent = userActivity.BoundaryEvents.OfType<ContractTimerBoundaryEvent>().FirstOrDefault();
@@ -267,7 +288,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
             //Regular transition
             {
-                var targetName = FutureElementName(userActivity);
+                var targetName = FutureElementName(userActivity, Subprocess);
 
                 var constraints = new List<string>
                 {
@@ -275,22 +296,30 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     MustBeSignedByConstraint(userActivity),
                 };
 
-                if (!(boundaryTimerEvent is null))
-                    constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
+                    //constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
 
                 var comment = TransitionComment(2, currentName, targetName);
                 var matchLine = CurrentStateMatching(currentName, PlutusUserActivityRedeemer.Type(userActivity).Name);
                 var guardLine = GuardLine(expectedVal: true, formValidation: true, transitionCondition: condition);
-                var returningJust = ReturningJust(
-                    constraints,
-                    NonTxTransitionVisitor.TransitionFunctionSignature.Name +
-                        " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
-                    UserDefinedNewValueSignature.Name + " par dat v");
                 var whereStatements = WhereStatements(userActivity,
                     TxUserDefinedStatement.UserDefinedTransition,
                     TxUserDefinedStatement.UserDefinedExpectedValue,
                     TxUserDefinedStatement.UserDefinedNewValue,
                     TxUserDefinedStatement.UserDefinedConstraints);
+
+                if (!(boundaryTimerEvent is null))
+                {
+                    constraints.Add($"{UserDefinedTimeoutConstraintSignature.Name} par dat v");
+                    whereStatements = whereStatements.Append(
+                        TimeoutWhereConstraint($"to $ {boundaryTimerEvent.TimerDefinition}")
+                        );
+                }
+
+                var returningJust = ReturningJust(
+                    constraints,
+                    NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                        " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
+                    UserDefinedNewValueSignature.Name + " par dat v");
 
                 resultCode = resultCode
                     .Append(comment)
@@ -304,7 +333,8 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             //Timeout transition
             if (!(boundaryTimerEvent is null))
             {
-                var targetName = FutureElementName(boundaryTimerEvent);
+                //
+                var targetName = FutureElementName(boundaryTimerEvent, Subprocess);
 
                 var comment = TransitionCommentWithTimeout(2, currentName, targetName);
                 var matchLine = CurrentStateMatching(currentName, PlutusTimeoutRedeemer.Type.Name);
@@ -312,13 +342,17 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 var returningJust = ReturningJust(
                     new string[]
                     {
-                        $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
+                        $"{UserDefinedTimeoutConstraintSignature.Name} par dat v"
                     },
                     NonTxTransitionVisitor.TransitionFunctionSignature.Name +
                         " $ dat { contractState = " + targetName + " }",
                     "v");
+
                 var whereStatements = WhereStatements(userActivity,
                     TxUserDefinedStatement.UserDefinedExpectedValue);
+                whereStatements = whereStatements.Append(
+                        TimeoutWhereConstraint($"from $ 1 + {boundaryTimerEvent.TimerDefinition}")
+                        );
 
                 resultCode = resultCode
                     .Append(comment)
@@ -443,22 +477,29 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                         MustBeSignedByConstraint(element),
                     };
 
-                    if (!(boundaryTimerEvent is null))
-                        constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
-
                     var comment = TransitionComment(2, currentName, targetName);
                     var matchLine = CurrentStateMatching(currentName, PlutusUserActivityRedeemer.Type(element).Name);
                     var guardLine = GuardLine(expectedVal: true, formValidation: true);
-                    var returningJust = ReturningJust(
-                        constraints,
-                        NonTxTransitionVisitor.TransitionFunctionSignature.Name +
-                            " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
-                        UserDefinedNewValueSignature.Name + " par dat v");
                     var whereStatements = WhereStatements(element,
                         TxUserDefinedStatement.UserDefinedTransition,
                         TxUserDefinedStatement.UserDefinedExpectedValue,
                         TxUserDefinedStatement.UserDefinedNewValue,
                         TxUserDefinedStatement.UserDefinedConstraints);
+
+                    if (!(boundaryTimerEvent is null))
+                    {
+                        constraints.Add($"{UserDefinedTimeoutConstraintSignature.Name} par dat v");
+                        whereStatements = whereStatements.Append(
+                            TimeoutWhereConstraint($"to $ {boundaryTimerEvent.TimerDefinition}")
+                        );
+                    }
+
+                    var returningJust = ReturningJust(
+                        constraints,
+                        NonTxTransitionVisitor.TransitionFunctionSignature.Name +
+                            " $ (userDefinedTransition par dat v f) { contractState = " + targetName + " }",
+                        UserDefinedNewValueSignature.Name + " par dat v");
+
 
                     resultCode = resultCode
                         .Append(comment)
@@ -473,7 +514,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 if (!(boundaryTimerEvent is null))
                 {
                     var currentName = AddSubprocessPrefix(Subprocess, $"{element.Name} _");
-                    var targetName = FutureElementName(boundaryTimerEvent);
+                    var targetName = FutureElementName(boundaryTimerEvent, Subprocess);
 
                     var comment = TransitionCommentWithTimeout(2, currentName, targetName);
                     var matchLine = CurrentStateMatching(currentName, PlutusTimeoutRedeemer.Type.Name);
@@ -481,13 +522,17 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     var returningJust = ReturningJust(
                         new string[]
                         {
-                            $"Constraints.mustValidateIn (from $ 1 + {PlutusCode.ProperlyBracketed(boundaryTimerEvent.TimerDefinition)})"
+                            $"{UserDefinedTimeoutConstraintSignature.Name} par dat v"
                         },
                         NonTxTransitionVisitor.TransitionFunctionSignature.Name +
                             " $ dat { contractState = " + targetName + " }",
                         "v");
+
                     var whereStatements = WhereStatements(element,
                         TxUserDefinedStatement.UserDefinedExpectedValue);
+                    whereStatements = whereStatements.Append(
+                        TimeoutWhereConstraint($"from $ 1 + {boundaryTimerEvent.TimerDefinition}")
+                        );
 
                     resultCode = resultCode
                         .Append(comment)
@@ -577,6 +622,15 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 
         static PlutusFunctionSignature UserDefinedConstraintsSignature { get; }
             = new PlutusFunctionSignature(4, "userDefinedConstraints", new INamable[]
+            {
+                PlutusContractParam.Type,
+                PlutusContractDatum.Type,
+                PlutusValue.Type,
+                PlutusUnspecifiedDataType.Type("TxConstraints Void Void")
+            });
+
+        static PlutusFunctionSignature UserDefinedTimeoutConstraintSignature { get; }
+            = new PlutusFunctionSignature(4, "userDefinedTimeoutConstraints", new INamable[]
             {
                 PlutusContractParam.Type,
                 PlutusContractDatum.Type,

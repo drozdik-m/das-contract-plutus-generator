@@ -19,79 +19,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
 {
     public class EndpointVisitor : RecursiveElementVisitor
     {
-        public EndpointVisitor(ContractStartEvent initialStartEvent)
-        {
-            InitialStartEvent = initialStartEvent;
-        }
-
-        Dictionary<string, bool> isFirstTxDictionary = new Dictionary<string, bool>();
 
         List<(string, PlutusFunctionSignature)> createdEndpoints = new List<(string, PlutusFunctionSignature)>();
 
         Stack<ContractProcess> processStack = new Stack<ContractProcess>();
-
-        bool needsTimeoutEndpoint = false;
-        bool needsTimeoutFirstEndpoint = false;
-
-        public ContractStartEvent InitialStartEvent { get; }        
-
-        /// <summary>
-        /// Checks if the element has the "first" flag
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        bool HasFirstFlag(INamable element) 
-            => isFirstTxDictionary.ContainsKey(element.Name) && isFirstTxDictionary[element.Name];
-
-        /// <summary>
-        /// States that the element does not have the first flag
-        /// </summary>
-        /// <param name="element"></param>
-        void ThisHasNotFirstFlag(INamable element)
-        {
-            if (isFirstTxDictionary.ContainsKey(element.Name))
-                isFirstTxDictionary[element.Name] = false;
-            else
-                isFirstTxDictionary.Add(element.Name, false);
-        }
-
-        /// <summary>
-        /// States that the element does have the first flag
-        /// </summary>
-        /// <param name="element"></param>
-        void ThisHasFirstFlag(INamable element)
-        {
-            if (isFirstTxDictionary.ContainsKey(element.Name))
-                isFirstTxDictionary[element.Name] = true;
-            else
-                isFirstTxDictionary.Add(element.Name, true);   
-        }
-
-        /// <summary>
-        /// Sends flag of the source to the target
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        void SendFlagFurther(INamable source, INamable target)
-        {
-            //Send flag further
-            if (HasFirstFlag(source))
-                ThisHasFirstFlag(target);
-            else
-                ThisHasNotFirstFlag(target);
-        }
-
-        /// <summary>
-        /// Sends flag of the source to the targets
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="targets"></param>
-        void SendFlagFurther(INamable source, IEnumerable<INamable> targets)
-        {
-            foreach(var target in targets)
-                SendFlagFurther(source, target);
-        }
-
 
         #region snippets
         /// <summary>
@@ -236,7 +167,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
            {
                 new PlutusComment(indent, "Timeout  cleaning"),
                 new PlutusRawLine(indent, $"logInfo @String \"--- activity timed out, cleaning...\""),
-                new PlutusRawLine(indent, $"{TimedOutEndpointSignature(isFirst: false).Name} threadToken"),
+                new PlutusRawLine(indent, $"{TimedOutEndpointSignature.Name} threadToken"),
                 PlutusLine.Empty,
            };
 
@@ -272,9 +203,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing.Select(e => e.Target));
-
             //Evaluate further elements
             IPlutusCode result = PlutusCode.Empty;
             foreach (var target in element.Outgoing)
@@ -289,9 +217,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing);
-
             //Evaluate further elements
             return element.Outgoing.Accept(this);
         }
@@ -301,13 +226,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             //Already visited
             if (!TryVisit(element))
                 return PlutusCode.Empty;
-
-            //Check for initial start init
-            if (InitialStartEvent == element)
-                ThisHasFirstFlag(element);
-
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing);
 
             //Evaluate further elements
             return element.Outgoing.Accept(this);
@@ -319,30 +237,14 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element) || processStack.Any())
                 return PlutusCode.Empty;
 
-            PlutusFunctionSignature signature;
-            string parameter;
+            var signature = FinishContractEndpointSignature;
 
             var functionLines = Do(1).ToList();
-            functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
+            functionLines.AddRange(EndpointBegun(1, signature.Name));
 
-            //Is this first endpoint?
-            if (HasFirstFlag(element))
-            {
-                signature = FinishContractEndpointSignature(isFirst: true);
-                parameter = string.Empty;
-                functionLines.AddRange(InitialClientSetup(1));
-                functionLines.AddRange(ContractInit(1));
-
-                ThisHasNotFirstFlag(element);
-            }
-
-            //This is not the first endpoint
-            else
-            {
-                signature = FinishContractEndpointSignature(isFirst: false);
-                functionLines.AddRange(ClientSetup(1));
-                parameter = "threadToken";
-            }
+            
+            functionLines.AddRange(ClientSetup(1));
+            var parameter = "threadToken";
 
             functionLines.AddRange(CreateRedeemer(1, PlutusContractFinishedRedeemer.Type.Name));
             functionLines.AddRange(StateTransition(1, logState: false));
@@ -368,12 +270,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
             //Go deepah!
             processStack.Push(element.CalledProcess);
-            SendFlagFurther(element, element.CalledProcess.StartEvent);
             var subprocessResult = element.CalledProcess.StartEvent.Accept(this);
             processStack.Pop();
-
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing);
 
             //Evaluate further elements
             return element.Outgoing.Accept(this)
@@ -392,34 +290,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
             functionLines.AddRange(EndpointBegun(1, EndpointName(element)));
 
             PlutusFunctionSignature signature;
-            string parameter = string.Empty;
 
-            //Is this first endpoint?
-            if (HasFirstFlag(element))
-            {
-                signature = EndpointSignature(element, isFirst: true);
-                parameter = "form";
-                functionLines.AddRange(InitialClientSetup(1));
-                functionLines.AddRange(TokenShare(1));
-                functionLines.AddRange(ContractInit(1));
-
-                if (!(timeoutBoundary is null))
-                    needsTimeoutFirstEndpoint = true;
-
-                ThisHasNotFirstFlag(element);
-            }
-
-            //This is not the first endpoint
-            else
-            {
-                signature = EndpointSignature(element, isFirst: false);
-                functionLines.AddRange(ClientSetup(1));
-                parameter = "(form, threadToken)";
-
-                if (!(timeoutBoundary is null))
-                    needsTimeoutEndpoint = true;
-            }
-
+            signature = EndpointSignature(element);
+            functionLines.AddRange(ClientSetup(1));
+            var parameter = "(form, threadToken)";
 
             //No timer
             if (timeoutBoundary is null)
@@ -432,8 +306,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             //There is a timer
             else
             {
-                
-
                 IEnumerable<IPlutusLine> timeoutCode = TimeoutCleaning(2);
                 IEnumerable<IPlutusLine> regularCode = CreateRedeemer(2, element)
                     .Concat(ValidateForm(2))
@@ -451,11 +323,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
             createdEndpoints.Add((element.Name.FirstCharToLowerCase(), signature));
 
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing);
-            if (!(timeoutBoundary is null))
-                SendFlagFurther(element, timeoutBoundary);
-
             //Evaluate further elements
             result = result.Append(element.Outgoing.Accept(this));
             if (!(timeoutBoundary is null))
@@ -469,9 +336,6 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            //Send flag further
-            SendFlagFurther(element, element.Outgoing);
-
             //Evaluate further elements
             return element.Outgoing.Accept(this);
         }
@@ -482,53 +346,19 @@ namespace DasContract.Blockchain.Plutus.Transitions
             if (!TryVisit(element))
                 return PlutusCode.Empty;
 
-            //Send flag further
-            SendFlagFurther(element, element.TimeOutDirection);
-
             //Evaluate further elements
             return element.TimeOutDirection.Accept(this);
         }
         #endregion
 
         #region extraEndpoints
-
-        /// <summary>
-        /// Creates the timeout endpoint that is the first endpoint call
-        /// </summary>
-        /// <returns></returns>
-        public IPlutusCode ContinueTimeoutActivityFirstEndpoint()
-        {
-            if (!needsTimeoutFirstEndpoint)
-                return PlutusCode.Empty;
-
-            var signature = TimedOutEndpointSignature(isFirst: true);
-
-            var code = Do(1).ToList();
-            code.AddRange(EndpointBegun(1, signature.Name));
-            code.AddRange(InitialClientSetup(1));
-            code.AddRange(TokenShare(1));
-            code.AddRange(ContractInit(1));
-            code.AddRange(CreateRedeemer(1, PlutusTimeoutRedeemer.Type.Name));
-            code.AddRange(StateTransition(1));
-            code.AddRange(EndpointEnded(1, signature.Name));
-
-            var function = new PlutusFunction(0, signature, Array.Empty<string>(), code);
-
-            createdEndpoints.Add(("continueTimedoutActivityFirst", signature));
-
-            return function.Prepend(signature);
-        }
-
         /// <summary>
         /// Creates the timeout endpoint
         /// </summary>
         /// <returns></returns>
         public IPlutusCode ContinueTimeoutActivityEndpoint()
         {
-            if (!needsTimeoutEndpoint)
-                return PlutusCode.Empty;
-
-            var signature = TimedOutEndpointSignature(isFirst: false);
+            var signature = TimedOutEndpointSignature;
 
             var code = Do(1).ToList();
             code.AddRange(EndpointBegun(1, signature.Name));
@@ -543,6 +373,29 @@ namespace DasContract.Blockchain.Plutus.Transitions
             }, code);
 
             createdEndpoints.Add(("continueTimedoutActivity", signature));
+
+            return function.Prepend(signature);
+        }
+
+        /// <summary>
+        /// Creates the initialization endpoint
+        /// </summary>
+        /// <returns></returns>
+        public IPlutusCode InitializeContractEndpoint()
+        {
+            var signature = InitializeEndpointSignature;
+
+            var code = Do(1).ToList();
+
+            code.AddRange(EndpointBegun(1, signature.Name));
+            code.AddRange(InitialClientSetup(1));
+            code.AddRange(TokenShare(1));
+            code.AddRange(ContractInit(1));
+            code.AddRange(EndpointEnded(1, signature.Name));
+
+            var function = new PlutusFunction(0, signature, Array.Empty<string>(), code);
+
+            createdEndpoints.Add(("initializeContract", signature));
 
             return function.Prepend(signature);
         }
@@ -644,24 +497,10 @@ namespace DasContract.Blockchain.Plutus.Transitions
                     )
             });
 
-        public static PlutusFunctionSignature TimedOutEndpointSignature(bool isFirst)
-        {
-            IEnumerable<INamable> types;
-            if (isFirst)
-            {
-                types = new INamable[]
-                {
-                   PlutusContractMonad.Type(
-                        PlutusLast.Type(PlutusThreadToken.Type),
-                        PlutusUnspecifiedDataType.Type("s"),
-                        PlutusText.Type,
-                        PlutusVoid.Type
-                    )
-                };
-            }
-            else
-            {
-                types = new INamable[]
+        public static PlutusFunctionSignature TimedOutEndpointSignature =>
+            new PlutusFunctionSignature(0,
+               "continueTimedoutActivityEndpoint",
+               new INamable[]
                 {
                     PlutusThreadToken.Type,
                     PlutusContractMonad.Type(
@@ -670,32 +509,25 @@ namespace DasContract.Blockchain.Plutus.Transitions
                         PlutusText.Type,
                         PlutusVoid.Type
                         )
-                };
-            }
+                });
 
-            return new PlutusFunctionSignature(0,
-               isFirst ? "continueTimedoutActivityFirstEndpoint" : "continueTimedoutActivityEndpoint",
-               types);
-        }
-
-        public static PlutusFunctionSignature FinishContractEndpointSignature(bool isFirst)
-        {
-            IEnumerable<INamable> types;
-            if (isFirst)
-            {
-                types = new INamable[]
+        public static PlutusFunctionSignature InitializeEndpointSignature =>
+            new PlutusFunctionSignature(0,
+               "initializeContractEndpoint",
+               new INamable[]
                 {
-                     PlutusContractMonad.Type(
-                         PlutusUnspecifiedDataType.Type("w"),
-                         PlutusUnspecifiedDataType.Type("s"),
-                         PlutusText.Type,
-                         PlutusVoid.Type
-                         )
-                };
-            }
-            else
-            {
-                types = new INamable[]
+                    PlutusContractMonad.Type(
+                        PlutusLast.Type(PlutusThreadToken.Type),
+                        PlutusUnspecifiedDataType.Type("s"),
+                        PlutusText.Type,
+                        PlutusVoid.Type
+                        )
+                });
+
+        public static PlutusFunctionSignature FinishContractEndpointSignature => 
+            new PlutusFunctionSignature(0,
+               "finishContractEndpoint",
+               new INamable[]
                 {
                      PlutusThreadToken.Type,
                      PlutusContractMonad.Type(
@@ -704,37 +536,14 @@ namespace DasContract.Blockchain.Plutus.Transitions
                          PlutusText.Type,
                          PlutusVoid.Type
                          )
-                };
-            }
-
-
-           return new PlutusFunctionSignature(0,
-               "finishContractEndpoint",
-               types);
-        }
+                });
 
         public static string EndpointName(INamable element)
             => element.Name.FirstCharToLowerCase() + "Endpoint";
 
-        public static PlutusFunctionSignature EndpointSignature(ContractUserActivity userActivity, bool isFirst)
+        public static PlutusFunctionSignature EndpointSignature(ContractUserActivity userActivity)
         {
-            IEnumerable<INamable> types;
-            if (isFirst)
-            {
-                types = new INamable[]
-                {
-                    PlutusUserActivityForm.Type(userActivity),
-                    PlutusContractMonad.Type(
-                        PlutusLast.Type(PlutusThreadToken.Type),
-                        PlutusUnspecifiedDataType.Type("s"),
-                        PlutusText.Type,
-                        PlutusVoid.Type
-                    )
-                };
-            }
-            else
-            {
-                types = new INamable[]
+            return new PlutusFunctionSignature(0, EndpointName(userActivity), new INamable[]
                 {
                     PlutusTuple.Type(
                             PlutusUserActivityForm.Type(userActivity),
@@ -746,12 +555,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
                         PlutusText.Type,
                         PlutusVoid.Type
                     )
-                };
-            }
-
-
-            return new PlutusFunctionSignature(0, EndpointName(userActivity), types);
+                });
         }
             
     }
 }
+

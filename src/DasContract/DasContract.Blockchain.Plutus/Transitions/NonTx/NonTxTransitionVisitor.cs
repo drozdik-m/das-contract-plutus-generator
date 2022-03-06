@@ -258,13 +258,12 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     .OfType<ContractTimerBoundaryEvent>())
                 {
                     result = result.Append(timerBoundaryEvent.Accept(this));
-                    var tmp = result.InString();
                 }
             }
 
             //Tx types
             if (txType == TxType.Implicit || txType == TxType.Tx)
-                return target.Accept(this);
+                return target.Accept(this).Append(result);
 
             //NonTx type
             else if (txType == TxType.NonTx)
