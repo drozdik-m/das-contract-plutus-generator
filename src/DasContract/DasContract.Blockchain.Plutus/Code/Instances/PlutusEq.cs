@@ -8,6 +8,9 @@ using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus.Code.Types
 {
+    /// <summary>
+    /// Instance for equality
+    /// </summary>
     public class PlutusEq : PlutusCode
     {
         public PlutusEq(PlutusRecord record)
@@ -22,12 +25,22 @@ namespace DasContract.Blockchain.Plutus.Code.Types
 
         }
 
+        /// <summary>
+        /// Lines of code for a plutus record
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusRecord record)
         {
             return GetDeclaration(record)
                 .Append(GetEqualityLine(record, record.Members.Count()));
         }
 
+        /// <summary>
+        /// Lines of code for an algebraic type
+        /// </summary>
+        /// <param name="algType"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusAlgebraicType algType)
         {
             return GetDeclaration(algType)
@@ -35,6 +48,11 @@ namespace DasContract.Blockchain.Plutus.Code.Types
                 .Concat(GetOtherwise());
         }
 
+        /// <summary>
+        /// Equality lines for an algebraic type
+        /// </summary>
+        /// <param name="algType"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetEqualityLines(PlutusAlgebraicType algType)
         {
             var result = new List<IPlutusLine>();
@@ -45,6 +63,12 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             return result;
         }
 
+        /// <summary>
+        /// The equality line for an item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="memberCount"></param>
+        /// <returns></returns>
         static IPlutusLine GetEqualityLine(INamable item, int memberCount)
         {
             if (memberCount == 0)
@@ -72,6 +96,11 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             return new PlutusRawLine(1, leftSide + "== " + rightSide + comparison);
         }
 
+        /// <summary>
+        /// Returns the instance declaration
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetDeclaration(INamable item)
         {
             return new List<IPlutusLine>()

@@ -13,6 +13,9 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
+    /// <summary>
+    /// A visitor that generates transitions
+    /// </summary>
     public abstract class TransitionVisitor : RecursiveElementVisitor
     {
         public TransitionVisitor()
@@ -20,14 +23,28 @@ namespace DasContract.Blockchain.Plutus.Transitions
             
         }
 
+        /// <summary>
+        /// The visitor is visiting a subprocess
+        /// </summary>
+        /// <param name="subprocess"></param>
         public TransitionVisitor(INamable subprocess)
             :this()
         {
             Subprocess = subprocess;
         }
 
+        /// <summary>
+        /// The visited subprocess.
+        /// Null if the visitor is visiting the main process.
+        /// </summary>
         public INamable? Subprocess { get; } = null;
 
+        /// <summary>
+        /// Adds subprocess-name prefix to a state (is means that the state is a state of the subprocess)
+        /// </summary>
+        /// <param name="subprocess"></param>
+        /// <param name="current"></param>
+        /// <returns></returns>
         protected string AddSubprocessPrefix(INamable? subprocess, string current)
         {
             if (!(subprocess is null))
@@ -41,6 +58,12 @@ namespace DasContract.Blockchain.Plutus.Transitions
             return current;
         }
 
+        /// <summary>
+        /// Returns element name as if the element is the source of a transition
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="subprocess"></param>
+        /// <returns></returns>
         protected string CurrentElementName(ContractProcessElement element, INamable? subprocess = null)
         {
             var result = element.Name;
@@ -57,6 +80,12 @@ namespace DasContract.Blockchain.Plutus.Transitions
             return AddSubprocessPrefix(subprocess, result);
         }
 
+        /// <summary>
+        /// Returns element name as if the element is the target of a transition
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="subprocess"></param>
+        /// <returns></returns>
         protected string FutureElementName(ContractProcessElement element, INamable? subprocess = null)
         {
             var result = element.Name;

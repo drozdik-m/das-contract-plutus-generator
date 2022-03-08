@@ -5,6 +5,9 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Code.Comments
 {
+    /// <summary>
+    /// Plutus function with a guard syntax
+    /// </summary>
     public class PlutusGuardFunction : PlutusCode
     {
         public PlutusGuardFunction(int indent, 

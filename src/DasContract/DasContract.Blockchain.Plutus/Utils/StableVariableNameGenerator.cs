@@ -5,12 +5,17 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Utils
 {
+    /// <summary>
+    /// Stable (non-random) generator for temporaty names
+    /// </summary>
     public class StableVariableNameGenerator
     {
         string current = string.Empty;
 
-
-
+        /// <summary>
+        /// Returns the next name in queue
+        /// </summary>
+        /// <returns></returns>
         public string GetNext()
         {
             current = GetNextLetter();

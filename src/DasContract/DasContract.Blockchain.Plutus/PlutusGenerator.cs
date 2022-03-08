@@ -26,10 +26,13 @@ using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus
 {
+    /// <summary>
+    /// A generator that is capable of creating plutus code from a plutus contract data model
+    /// </summary>
     public class PlutusGenerator
     {
         /// <summary>
-        /// Generates Plutus code 
+        /// Generates plutus code from a plutus contract
         /// </summary>
         /// <param name="contract">The contract data model to translate</param>
         /// <returns>Plutus code</returns>
@@ -1353,6 +1356,11 @@ namespace DasContract.Blockchain.Plutus
             return new PlutusAlgebraicTypeConstructor(element.Id, types);
         }
 
+        /// <summary>
+        /// Translates an entity into plutus record members
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         private IEnumerable<PlutusRecordMember> EntityToRecordMembers(ContractEntity entity)
         {
             var result = new List<PlutusRecordMember>();    

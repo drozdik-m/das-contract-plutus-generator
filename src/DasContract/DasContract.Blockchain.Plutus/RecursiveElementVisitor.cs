@@ -13,6 +13,12 @@ namespace DasContract.Blockchain.Plutus
     {
         protected HashSet<string> VisitedElements { get; } = new HashSet<string>();
 
+        /// <summary>
+        /// Checks if the element has already been visited.
+        /// Automatically adds the element to visited elements if required.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns>Returns true if the element has not been visited. Else false.</returns>
         protected bool TryVisit(INamable element)
         {
             var result = false;
@@ -25,13 +31,28 @@ namespace DasContract.Blockchain.Plutus
             return result;
         }
 
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractExclusiveGateway element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractMergingExclusiveGateway element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractStartEvent element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractEndEvent element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractCallActivity element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractUserActivity element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractScriptActivity element);
+
+        /// <inheritdoc/>
         public abstract IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
     }
 }

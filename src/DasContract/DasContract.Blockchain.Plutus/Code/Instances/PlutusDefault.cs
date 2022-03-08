@@ -9,6 +9,10 @@ using DasContract.Blockchain.Plutus.Utils;
 
 namespace DasContract.Blockchain.Plutus.Code.Types
 {
+    /// <summary>
+    /// Default instance for a plutus record or plutus algebraic type.
+    /// Default values are figured out from the type name.
+    /// </summary>
     public class PlutusDefault : PlutusCode
     {
         public PlutusDefault(PlutusRecord record)
@@ -23,24 +27,46 @@ namespace DasContract.Blockchain.Plutus.Code.Types
 
         }
 
+        /// <summary>
+        /// Code lines for a record
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusRecord record)
         {
             return GetDeclaration(record)
                 .Concat(GetDefaultLines(record));
         }
 
+        /// <summary>
+        /// Code lines for an algebraic type
+        /// </summary>
+        /// <param name="algType"></param>
+        /// <param name="defaultCtor"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetLinesOfCode(PlutusAlgebraicType algType, PlutusAlgebraicTypeConstructor defaultCtor)
         {
             return GetDeclaration(algType)
                 .Append(GetDefaultLine(algType, defaultCtor));
         }
 
+        /// <summary>
+        /// Returns the default line with the default ctor
+        /// </summary>
+        /// <param name="algType"></param>
+        /// <param name="defaultCtor"></param>
+        /// <returns></returns>
         static IPlutusLine GetDefaultLine(PlutusAlgebraicType algType, PlutusAlgebraicTypeConstructor defaultCtor)
         {
             return new PlutusRawLine(1, $"def = {defaultCtor.Name} " +
                 $"{string.Join(" ", defaultCtor.Types.Select(e => GetDefValueFor(e)))}");
         }
 
+        /// <summary>
+        /// Returns the default lines for a record
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetDefaultLines(PlutusRecord record)
         {
             var result = new List<IPlutusLine>
@@ -66,6 +92,11 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             return result;
         }
 
+        /// <summary>
+        /// Tries to figure out the correct default value for the type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         static string GetDefValueFor(INamable type)
         {
             if (type.Name == PlutusInteger.Type.Name)
@@ -86,6 +117,11 @@ namespace DasContract.Blockchain.Plutus.Code.Types
                 return "def";
         }
 
+        /// <summary>
+        /// Returns the declaration of the default instance
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         static IEnumerable<IPlutusLine> GetDeclaration(INamable item)
         {
             return new List<IPlutusLine>()

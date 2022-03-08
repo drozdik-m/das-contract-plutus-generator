@@ -5,6 +5,9 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Code.Comments
 {
+    /// <summary>
+    /// Instance for makeLift of an entity
+    /// </summary>
     public class PlutusMakeLift : PlutusLine
     {
         public PlutusMakeLift(INamable item): base(0)

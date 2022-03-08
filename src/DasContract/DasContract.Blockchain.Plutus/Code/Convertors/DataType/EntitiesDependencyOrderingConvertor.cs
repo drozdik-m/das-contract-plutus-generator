@@ -50,8 +50,7 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
         static void Visit<T>(T item, Func<T, IEnumerable<T>> getDependencies,
                            List<T> sorted, Dictionary<T, bool> visited)
         {
-            bool inProcess;
-            var alreadyVisited = visited.TryGetValue(item, out inProcess);
+            var alreadyVisited = visited.TryGetValue(item, out var inProcess);
 
             if (alreadyVisited)
             {

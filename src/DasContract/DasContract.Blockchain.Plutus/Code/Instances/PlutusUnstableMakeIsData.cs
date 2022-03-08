@@ -5,6 +5,9 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Code.Comments
 {
+    /// <summary>
+    /// Instance for unstableMakeIsData of an entity
+    /// </summary>
     public class PlutusUnstableMakeIsData : PlutusLine
     {
         public PlutusUnstableMakeIsData(INamable item): base(0)

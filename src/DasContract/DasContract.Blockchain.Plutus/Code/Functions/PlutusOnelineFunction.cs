@@ -5,6 +5,9 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Code.Comments
 {
+    /// <summary>
+    /// Shorter version of the plutus function that is just a one-liner
+    /// </summary>
     public class PlutusOnelineFunction : PlutusLine
     {
         public PlutusOnelineFunction(int indent, 

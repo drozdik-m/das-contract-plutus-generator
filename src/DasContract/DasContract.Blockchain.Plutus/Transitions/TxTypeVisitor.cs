@@ -14,32 +14,47 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
+    /// <summary>
+    /// Visitor that figues out the TxType if a process element 
+    /// </summary>
     public class TxTypeVisitor : IContractProcessElementVisitor<TxType>
     {
-
         public bool IsSubprocess { get; }
+
         public TxTypeVisitor(bool isSubprocess)
         {
             IsSubprocess = isSubprocess;
         }
 
+        /// <inheritdoc/>
         public TxType Visit(ContractExclusiveGateway element) => TxType.NonTx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractMergingExclusiveGateway element) => TxType.NonTx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractStartEvent element) => TxType.Implicit;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractEndEvent element) => IsSubprocess ? TxType.NonTx : TxType.Tx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractCallActivity element) => TxType.NonTx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractUserActivity element) => IsSequential(element) ? TxType.NonTx : TxType.Tx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractScriptActivity element) => TxType.NonTx;
 
+        /// <inheritdoc/>
         public TxType Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent) => TxType.Tx;
 
-
+        /// <summary>
+        /// Checks is the contract activity is a sequential multi instance activity
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <returns></returns>
         bool IsSequential(ContractActivity activity) => activity.MultiInstance is ContractSequentialMultiInstance;
     }
 }

@@ -18,6 +18,10 @@ using DasContract.Blockchain.Plutus.Transitions.Tx;
 
 namespace DasContract.Blockchain.Plutus.Transitions.NonTx
 {
+    /// <summary>
+    /// A visitor the recursively traverses a process (not its subprocesses)
+    ///  to put together a code for plutus contract transactional transitions. 
+    /// </summary>
     public class TxTransitionVisitor : TransitionVisitor
     {
         public TxTransitionVisitor()

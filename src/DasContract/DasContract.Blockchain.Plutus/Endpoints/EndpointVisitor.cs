@@ -17,6 +17,12 @@ using DasContract.String.Utils;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
+    /// <summary>
+    /// A visitor the recursively traverses a process and its subprocesses 
+    ///  to put together a code for plutus contract endpoints. 
+    /// The visitor keeps track of created endpoint and is able to make a schema and the final endpoint. 
+    /// The visitor also contains common endpoints for timeouts, init and closing the contract.
+    /// </summary>
     public class EndpointVisitor : RecursiveElementVisitor
     {
 

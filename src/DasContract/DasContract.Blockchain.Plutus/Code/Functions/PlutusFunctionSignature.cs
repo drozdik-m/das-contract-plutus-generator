@@ -6,6 +6,9 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Code.Comments
 {
+    /// <summary>
+    /// Signature of a plutus function
+    /// </summary>
     public class PlutusFunctionSignature : PlutusLine, INamable
     {
         public PlutusFunctionSignature(int indent, string name, IEnumerable<INamable> types): base(indent)
