@@ -10,6 +10,9 @@ using System.Text;
 
 namespace DasContract.Blockchain.Plutus.Data
 {
+    /// <summary>
+    /// Plutus contract 
+    /// </summary>
     public class PlutusContract : IIdentifiable, INamable
     {
         /// <inheritdoc/>

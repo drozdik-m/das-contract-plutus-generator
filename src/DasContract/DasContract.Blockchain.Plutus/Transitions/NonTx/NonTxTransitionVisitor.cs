@@ -343,6 +343,10 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             if (targets.Count == 0)
                 throw new Exception("Exclusive Gateway has no outputs");
 
+            var otherwiseTargets = targets.Where(e => e.Condition.Trim() == "otherwise");
+            var remainingTargets = targets.Where(e => e.Condition.Trim() != "otherwise");
+            targets = remainingTargets.Concat(otherwiseTargets).ToList();
+
             var i = 0;
             foreach (var targetConnection in targets)
             {
