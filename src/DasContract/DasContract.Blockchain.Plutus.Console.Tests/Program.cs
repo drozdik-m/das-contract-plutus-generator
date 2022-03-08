@@ -16,6 +16,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Users;
+using DasContract.Blockchain.Plutus.Generators;
 using TextCopy;
 
 //Preprogrammed contract
@@ -29,70 +30,7 @@ var fileContent = string.Join(Environment.NewLine, lines);
 var xElement = XElement.Parse(fileContent);
 var contract = new Contract(xElement);
 
-
-//Data type convertors
-var propertyCardinalityConvertor = new PropertyCardinalityConvertor();
-var propertyTypeConvertor = new PrimitivePropertyTypeConvertor();
-var primitivePropertyConvertor = new PrimitivePropertyConvertor(
-    propertyTypeConvertor,
-    propertyCardinalityConvertor);
-var referencePropertyConvertor = new ReferencePropertyConvertor(
-    propertyCardinalityConvertor);
-var dictionaryPropertyConvertor = new DictionaryPropertyConvertor(
-    propertyTypeConvertor);
-var enumPropertyConvertor = new EnumPropertyConvertor(
-    propertyCardinalityConvertor);
-var propertyConvertor = new ContractPropertyConvertor(
-    primitivePropertyConvertor,
-    referencePropertyConvertor,
-    dictionaryPropertyConvertor,
-    enumPropertyConvertor);
-var entityConvertor = new ContractEntityConvertor(
-    propertyConvertor);
-var contractEnumConvertor = new EnumConvertor();
-var plutusDataModelConvertor = new ContractDataModelConvertor(
-    entityConvertor,
-    contractEnumConvertor);
-
-//User convertor
-var roleConvertor = new ContractRoleConvertor();
-var userConvertor = new ContractUserConvertor();
-var usersConvertor = new ContractUsersConvertor(
-    roleConvertor,
-    userConvertor);
-
-//Process convertor
-var multiInstanceConvertor = new ContractSequentialMultiInstanceConvertor();
-var scriptActivityConvertor = new ContractScriptActivityConvertor(
-    multiInstanceConvertor);
-var contractFieldTypeConvertor = new ContractFieldTypeConvertor();
-var userFormConvertor = new ContractFormConvertor(
-    contractFieldTypeConvertor);
-var userActivityConvertor = new ContractUserActivityConvertor(
-    multiInstanceConvertor,
-    userFormConvertor);
-var callActivityConvertor = new ContractCallActivityConvertor(
-    multiInstanceConvertor);
-var timerBoundaryConvertor = new ContractTimerBoundaryEventConvertor();
-var mergingExclusiveGatewayConvertor = new ContractMergingExclusiveGatewayConvertor();
-var exclusiveGatewayConvertor = new ContractExclusiveGatewayConvertor();
-var processConvertor = new ContractProcessConvertor(
-    scriptActivityConvertor,
-    userActivityConvertor,
-    callActivityConvertor,
-    timerBoundaryConvertor,
-    exclusiveGatewayConvertor,
-    mergingExclusiveGatewayConvertor);
-var processesConvertor = new ContractProcessesConvertor(
-    processConvertor);
-
-//Contract convertor
-var plutusContractConvertor = new PlutusContractConvertor(
-    plutusDataModelConvertor,
-    usersConvertor,
-    processesConvertor);
-
-var plutusContract = plutusContractConvertor.Convert(contract);
+var plutusContract = PlutusContractConvertor.Default.Convert(contract);
 
 //Remove assignees for debug
 var userActivities = plutusContract.Processes.AllProcesses
@@ -112,8 +50,10 @@ foreach(var userActivity in userActivities)
 }
 
 //Generate
-var contractCode = new PlutusGenerator().GeneratePlutusContract(plutusContract);
+var contractCode = PlutusContractGenerator.Default(plutusContract).Generate();
 Console.WriteLine(contractCode.InString());
-Console.WriteLine("COPIED TO CLIPBOARD");
+
 new Clipboard().SetText(contractCode.InString());
+Console.WriteLine("COPIED TO CLIPBOARD");
+
 
