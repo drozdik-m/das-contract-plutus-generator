@@ -1,0 +1,23 @@
+﻿using System.Collections.Generic;
+
+namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways
+{
+    public class ContractMergingExclusiveGateway : ContractGateway
+    {
+        /// <summary>
+        /// The outgoing connection
+        /// </summary>
+        public ContractProcessElement Outgoing { get; set; }
+
+        /// <inheritdoc/>
+        public override void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
+        {
+            base.CollectSuccessors(ref collector);
+            Outgoing.CollectSuccessors(ref collector);
+        }
+
+        /// <inheritdoc/>
+        public override T Accept<T>(IContractProcessElementVisitor<T> visitor)
+            => visitor.Visit(this);
+    }
+}

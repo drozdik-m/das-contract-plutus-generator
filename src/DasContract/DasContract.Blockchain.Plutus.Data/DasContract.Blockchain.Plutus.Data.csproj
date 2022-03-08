@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DasContract.Abstraction\DasContract.Abstraction.csproj" />
+    <ProjectReference Include="..\DasContract.String.Utils\DasContract.String.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
