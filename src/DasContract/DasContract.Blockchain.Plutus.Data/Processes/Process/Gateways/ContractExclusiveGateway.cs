@@ -4,11 +4,14 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways
 {
     public class ContractExclusiveGateway : ContractGateway
     {
-        //public ContractProcessElement Incoming { get; set; }
 
+        /// <summary>
+        /// Outgoing connections of this gateway
+        /// </summary>
         public ICollection<ContractConditionedConnection> Outgoing { get; set; } 
             = new List<ContractConditionedConnection>();
 
+        /// <inheritdoc/>
         public override void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {
             base.CollectSuccessors(ref collector);

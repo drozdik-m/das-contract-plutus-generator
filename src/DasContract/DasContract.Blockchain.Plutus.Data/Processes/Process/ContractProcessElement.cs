@@ -6,12 +6,21 @@ using DasContract.Blockchain.Plutus.Data.Interfaces;
 
 namespace DasContract.Blockchain.Plutus.Data.Processes.Process
 {
+    /// <summary>
+    /// Element that is part of the contract process (can be event, activity, ...)
+    /// </summary>
     public abstract class ContractProcessElement : IIdentifiable, INamable
     {
+        /// <inheritdoc/>
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
+        /// <inheritdoc/>
         public string Name => Id;
 
+        /// <summary>
+        /// Collects all successor process elements if this element
+        /// </summary>
+        /// <param name="collector"></param>
         public virtual void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {
             collector.TryAdd(Id, this);

@@ -9,18 +9,39 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
     public class ContractUserActivity : ContractActivityWithCode
     {
+        /// <summary>
+        /// User form of this activity
+        /// </summary>
         public ContractForm Form { get; set; } = new ContractForm();
 
+        /// <summary>
+        /// User that is assigned to this activity
+        /// </summary>
         public ContractUser? Assignee { get; set; }
 
+        /// <summary>
+        /// User id of a user that is assigned to this activity
+        /// </summary>
         public string AssigneeId { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Candidate users for this activity
+        /// </summary>
         public ICollection<ContractUser> CandidateUsers { get; set; } = new List<ContractUser>();
 
+        /// <summary>
+        /// Candidate user ids for this activity
+        /// </summary>
         public ICollection<string> CandidateUserIds { get; set; } = new List<string>();
 
+        /// <summary>
+        /// Candidate roles for this activity
+        /// </summary>
         public ICollection<ContractRole> CandidateRoles { get; set; } = new List<ContractRole>();
 
+        /// <summary>
+        /// Candidate role ids for this activity
+        /// </summary>
         public ICollection<string> CandidateRoleIds { get; set; } = new List<string>();
 
         public IEnumerable<string> FormValidationCodeLines => ReadPragma(FormValidationPragma);
@@ -33,6 +54,7 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 
         public IEnumerable<string> TransitionCodeLines => ReadPragma(TransitionPragma);
 
+        /// <inheritdoc/>
         protected override bool IsCodePragma(string code)
         {
             code = code.Trim().ToUpperInvariant();

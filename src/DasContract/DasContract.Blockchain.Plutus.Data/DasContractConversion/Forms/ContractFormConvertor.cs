@@ -28,6 +28,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
         /// <inheritdoc/>
         public ContractForm Convert(UserForm source)
         {
+            //Gather all form fields
             var formFields = source.FieldGroups
                 .Aggregate(new List<Field>(), (acc, item) =>
                 {

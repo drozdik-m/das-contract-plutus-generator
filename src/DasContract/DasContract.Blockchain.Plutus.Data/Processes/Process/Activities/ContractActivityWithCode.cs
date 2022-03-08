@@ -7,8 +7,16 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
     public abstract class ContractActivityWithCode : ContractActivity
     {
+        /// <summary>
+        /// The code that this activity contains
+        /// </summary>
         public string Code { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Reads and returns code for a pragma
+        /// </summary>
+        /// <param name="pragma">The pragma</param>
+        /// <returns></returns>
         protected virtual IEnumerable<string> ReadPragma(string pragma)
         {
             using var reader = new StringReader(Code);
@@ -35,6 +43,11 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
             return result;
         }
 
+        /// <summary>
+        /// Checks if a code line a pragma
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         protected virtual bool IsCodePragma(string code) => false;
     }
 }

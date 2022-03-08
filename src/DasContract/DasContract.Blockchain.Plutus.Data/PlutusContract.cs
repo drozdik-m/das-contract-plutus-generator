@@ -11,7 +11,7 @@ using System.Text;
 namespace DasContract.Blockchain.Plutus.Data
 {
     /// <summary>
-    /// Plutus contract 
+    /// Data model representing a plutus contract
     /// </summary>
     public class PlutusContract : IIdentifiable, INamable
     {

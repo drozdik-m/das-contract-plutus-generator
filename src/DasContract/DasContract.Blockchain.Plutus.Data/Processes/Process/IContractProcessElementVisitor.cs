@@ -12,20 +12,28 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process
 {
     public interface IContractProcessElementVisitor<T>
     {
+        /// <inheritdoc/>
         T Visit(ContractExclusiveGateway element);
 
+        /// <inheritdoc/>
         T Visit(ContractMergingExclusiveGateway element);
-        
+
+        /// <inheritdoc/>
         T Visit(ContractStartEvent element);
 
+        /// <inheritdoc/>
         T Visit(ContractEndEvent element);
 
+        /// <inheritdoc/>
         T Visit(ContractCallActivity element);
 
+        /// <inheritdoc/>
         T Visit(ContractUserActivity element);
 
+        /// <inheritdoc/>
         T Visit(ContractScriptActivity element);
 
+        /// <inheritdoc/>
         T Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
     }
 }

@@ -6,8 +6,12 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
 {
     public class ContractScriptActivity : ContractActivityWithCode
     {
+        /// <summary>
+        /// Code lines for transition
+        /// </summary>
         public IEnumerable<string> TransitionCodeLines => ReadPragma(TransitionPragma);
 
+        /// <inheritdoc/>
         protected override bool IsCodePragma(string code)
         {
             code = code.Trim().ToUpperInvariant();
@@ -15,7 +19,6 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Activities
             return base.IsCodePragma(code) ||
                 code == TransitionPragma.ToUpperInvariant();
         }
-
 
         public const string TransitionPragma = "{-# TRANSITION #-}";
 
