@@ -11,8 +11,8 @@ var arguments = new ConsoleArguments(args);
 if (args.Length == 0 || arguments.FlagExists("--help"))
 {
     Console.WriteLine("--help               for help");
-    Console.WriteLine("--input \"path\"     for loading and translating a DasContract file");
-    Console.WriteLine("--output \"path\"    for exporting translated Plutus contract into a file");
+    Console.WriteLine("--input path         for loading and translating a DasContract file");
+    Console.WriteLine("--output path        for exporting translated Plutus contract into a file");
     Console.WriteLine("--output-console     for exporting translated Plutus contract into the standard output");
     Console.WriteLine("--watch              watches for changes in the input file and automatically exports the result");
     Console.WriteLine("--verbose            exceptions and errors are more verbose");
@@ -51,7 +51,7 @@ PlutusContract GetContract()
 
     if (arguments.TryGetArgumentValue("--input", out string path))
     {
-        if (File.Exists(path))
+        if (!File.Exists(path))
             throw new Exception($"File does not exist {path}");
 
         var fileLines = File.ReadAllLines(path);
@@ -77,7 +77,7 @@ void Export(PlutusContract contract)
     if (arguments is null)
         throw new Exception("Arguments object is null");
 
-    if (!arguments.FlagExists("--output") && !arguments.FlagExists("--output-console "))
+    if (!arguments.FlagExists("--output") && !arguments.FlagExists("--output-console"))
         throw new Exception("No form of Plutus output is set. Please checkout --help for help.");
 
     var contractCode = PlutusContractGenerator.Default(contract).Generate();
@@ -87,8 +87,8 @@ void Export(PlutusContract contract)
 
     if (arguments.TryGetArgumentValue("--output", out var path))
     {
-        if (File.Exists(path))
-            throw new Exception($"File does not exist {path}");
+        if (!File.Exists(path))
+            File.Create(path).Close();
 
         File.WriteAllText(path, contractCode.InString());
     } 
@@ -97,7 +97,7 @@ void Export(PlutusContract contract)
 /// <summary>
 /// Watches for file changes
 /// </summary>
-void Watch()
+async Task Watch()
 {
     if (arguments is null)
         throw new Exception("Arguments object is null");
@@ -105,15 +105,30 @@ void Watch()
     if (!arguments.TryGetArgumentValue("--input", out var path))
         throw new Exception("DasContract file input is set or does not have a single path input. Please checkout --help for help.");
 
-    FileSystemWatcher watcher = new FileSystemWatcher()
+    var dirName = Path.GetDirectoryName(path);
+    if (dirName is null)
+        throw new Exception($"Could not recover directory of path {path}");
+
+    var fileName = Path.GetFileName(path);
+    if (fileName is null)
+        throw new Exception($"Could not file name of path {path}");
+
+    using FileSystemWatcher watcher = new FileSystemWatcher()
     {
-        Path = path,
-        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess | NotifyFilters.Size,
+        Path = dirName,
+        Filter = fileName,
+        NotifyFilter = NotifyFilters.LastWrite | 
+            NotifyFilters.LastAccess | 
+            NotifyFilters.Size | 
+            NotifyFilters.FileName |
+            NotifyFilters.Security,
+        EnableRaisingEvents = true,
     };
 
     watcher.Changed += new FileSystemEventHandler(OnWatchedFileChanged);
 
-    Console.WriteLine("Press \"quit\" or \"q\" to quit");
+    Console.WriteLine($"Watching file {fileName}");
+    Console.WriteLine($"Write \"quit\" or \"q\" to quit");
     while (true)
     {
         var read = Console.ReadLine();
@@ -124,4 +139,6 @@ void Watch()
 void OnWatchedFileChanged(object source, FileSystemEventArgs e)
 {
     Export(GetContract());
+    var date = DateTime.Now;
+    Console.WriteLine($"[{date.Hour}:{date.Minute}:{date.Second}] Output updated");
 }

@@ -12,34 +12,7 @@ namespace DasContract.Blockchain.Plutus.Console
 
         public ConsoleArguments(IEnumerable<string> arguments)
         {
-            var result = new List<string>();
-            var readingQuoted = false;
-            var quotedString = string.Empty;
-            foreach (var argument in arguments)
-            {
-                if (readingQuoted)
-                {
-                    quotedString += argument;
-
-                    if (argument.EndsWith("\""))
-                    {
-                        readingQuoted = false;
-                        result.Add(quotedString);
-                    }
-                }
-                else
-                {
-                    if (!argument.StartsWith("\""))
-                    {
-                        readingQuoted = true;
-                        quotedString = argument;
-                    }
-                    else
-                        result.Add(argument);
-                }
-            }
-
-            this.arguments = result;
+            this.arguments = arguments.ToList();
         }
 
         /// <summary>
