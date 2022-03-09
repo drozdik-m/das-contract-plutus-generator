@@ -7,6 +7,6 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Prim
         Bool,
         BuiltinByteString,
         POSIXTime,
-        Address,
+        PubKeyHash,
     }
 }

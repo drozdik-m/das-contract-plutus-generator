@@ -19,8 +19,8 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels.Pr
                 PropertyDataType.Bool => PrimitiveContractPropertyType.Bool,
                 PropertyDataType.String => PrimitiveContractPropertyType.BuiltinByteString,
                 PropertyDataType.DateTime => PrimitiveContractPropertyType.POSIXTime,
-                PropertyDataType.Address => PrimitiveContractPropertyType.Address,
-                PropertyDataType.AddressPayable => PrimitiveContractPropertyType.Address,
+                PropertyDataType.Address => PrimitiveContractPropertyType.PubKeyHash,
+                PropertyDataType.AddressPayable => PrimitiveContractPropertyType.PubKeyHash,
                 PropertyDataType.Data => PrimitiveContractPropertyType.BuiltinByteString,
                 _ => throw new Exception("No suitable property type found"),
             };

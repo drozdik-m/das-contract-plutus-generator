@@ -1,1 +1,2 @@
-# das-contract-plutus-generator
+# DasContract Plutus generator
+
