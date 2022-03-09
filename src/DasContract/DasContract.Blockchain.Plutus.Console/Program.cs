@@ -32,10 +32,10 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine(ex.ToString());
-
     if (arguments.FlagExists("--verbose"))
-        Console.WriteLine(ex.StackTrace);
+        Console.WriteLine(ex.ToString());
+    else
+        Console.WriteLine(ex.Message);
 }
 
 /// <summary>
@@ -97,7 +97,7 @@ void Export(PlutusContract contract)
 /// <summary>
 /// Watches for file changes
 /// </summary>
-async Task Watch()
+void Watch()
 {
     if (arguments is null)
         throw new Exception("Arguments object is null");
