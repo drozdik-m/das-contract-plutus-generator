@@ -18,7 +18,7 @@ namespace DasContract.Blockchain.Plutus.Code.Convertors.DataType
             return source switch
             {
                 PrimitiveContractPropertyType.Integer => PlutusInteger.Type,
-                PrimitiveContractPropertyType.Address => PlutusPubKeyHash.Type,
+                PrimitiveContractPropertyType.PubKeyHash => PlutusPubKeyHash.Type,
                 PrimitiveContractPropertyType.Bool => PlutusBool.Type,
                 PrimitiveContractPropertyType.BuiltinByteString => PlutusBuiltinByteString.Type,
                 PrimitiveContractPropertyType.POSIXTime => PlutusPOSIXTime.Type,

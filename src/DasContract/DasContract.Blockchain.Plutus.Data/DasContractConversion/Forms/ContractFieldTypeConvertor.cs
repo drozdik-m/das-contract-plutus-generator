@@ -19,7 +19,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
         /// <inheritdoc/>
         public PrimitiveContractPropertyType Convert(Field source)
         {
-            if (source is AddressField) return PrimitiveContractPropertyType.Address;
+            if (source is AddressField) return PrimitiveContractPropertyType.PubKeyHash;
             if (source is BoolField) return PrimitiveContractPropertyType.Bool;
             if (source is DateField) return PrimitiveContractPropertyType.POSIXTime;
             if (source is DecimalField) return PrimitiveContractPropertyType.Integer;

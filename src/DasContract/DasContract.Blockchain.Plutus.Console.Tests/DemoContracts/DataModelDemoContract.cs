@@ -184,7 +184,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                         Id = "optinalWalletId",
                         Cardinality = ContractPropertyCardinality.Single,
                         IsMandatory = false,
-                        Type = PrimitiveContractPropertyType.Address
+                        Type = PrimitiveContractPropertyType.PubKeyHash
                     },
                     new PrimitiveContractProperty()
                     {
@@ -244,7 +244,7 @@ namespace DasContract.Blockchain.Plutus.Console.Tests.DemoContracts
                             Id = "DICT_ID",
                             Cardinality = ContractPropertyCardinality.Collection,
                             IsMandatory = true,
-                            Type = PrimitiveContractPropertyType.Address
+                            Type = PrimitiveContractPropertyType.PubKeyHash
                         },
                     },
                     new DictionaryContractProperty()
