@@ -20,6 +20,9 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process.Events
         /// <inheritdoc/>
         public override void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {
+            if (collector.ContainsKey(Id))
+                return;
+
             base.CollectSuccessors(ref collector);
             TimeOutDirection.CollectSuccessors(ref collector);
         }
