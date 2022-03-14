@@ -166,3 +166,11 @@ var plutusCodeString1 = plutusCode.InString();
 var plutusCodeString2 = plutusCode.ToString(); //alternative
 ```
 
+Thanks to the intermediary data model PlutusContract between DasContract and the final code, you can effortlessly model the Plutus contract directly, without the DasContract format. PlutusContract is somewhat similar tho. Examples and tests of directly modelled PlutusContracts are:
+
+1. [DataModel demo](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/DemoContracts/DataModelDemoContract.cs)
+2. [Process demo](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/DemoContracts/TransitionDemoContract.cs)
+
+
+
+
