@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.Blockchain.Plut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.Blockchain.Plutus", "DasContract.Blockchain.Plutus\DasContract.Blockchain.Plutus.csproj", "{7C7A81B8-7476-4CE8-B566-FE8D4FA0BC70}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.Abstraction", "DasContract.Abstraction\DasContract.Abstraction.csproj", "{F95EC565-A753-46A6-BB8F-A4B1FE3382D5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.Blockchain.Plutus.Data", "DasContract.Blockchain.Plutus.Data\DasContract.Blockchain.Plutus.Data.csproj", "{73F1FEB6-49B9-42DD-9130-A32316651A6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{753DF742-FFBE-4827-AB24-B8B2E12C0F47}"
@@ -26,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.Blockchain.Plut
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{DF771E6F-4122-4403-B02D-8269A30E052B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DasContract.String.Utils", "DasContract.String.Utils\DasContract.String.Utils.csproj", "{F00537E8-41CB-40A4-8069-1BE1FA87D1C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DasContract.String.Utils", "DasContract.String.Utils\DasContract.String.Utils.csproj", "{F00537E8-41CB-40A4-8069-1BE1FA87D1C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,10 +40,6 @@ Global
 		{7C7A81B8-7476-4CE8-B566-FE8D4FA0BC70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C7A81B8-7476-4CE8-B566-FE8D4FA0BC70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C7A81B8-7476-4CE8-B566-FE8D4FA0BC70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F95EC565-A753-46A6-BB8F-A4B1FE3382D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F95EC565-A753-46A6-BB8F-A4B1FE3382D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F95EC565-A753-46A6-BB8F-A4B1FE3382D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F95EC565-A753-46A6-BB8F-A4B1FE3382D5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73F1FEB6-49B9-42DD-9130-A32316651A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU

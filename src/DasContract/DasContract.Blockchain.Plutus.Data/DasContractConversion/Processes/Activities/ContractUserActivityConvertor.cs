@@ -13,6 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Data.Users;
+using DasContract.String.Utils;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance
 {
@@ -33,7 +34,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Act
         {
             var result = new ContractUserActivity()
             {
-                Id = source.Id,
+                Id = source.Id.FirstCharToUpperCase(),
                 AssigneeId = source.Assignee is null ? string.Empty : source.Assignee.Name,
                 CandidateRoleIds = source.CandidateRoles.Select(e => e.Name).ToList(),
                 CandidateUserIds = source.CandidateUsers.Select(e => e.Name).ToList(),

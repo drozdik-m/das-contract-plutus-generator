@@ -270,6 +270,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
         public override IPlutusCode Visit(ContractCallActivity element)
         {
+            if (element?.CalledProcess?.StartEvent is null)
+                throw new Exception($"Called process {element?.Name} or its start event is null");
+
             //Already visited
             if (!TryVisit(element))
                 return PlutusCode.Empty;

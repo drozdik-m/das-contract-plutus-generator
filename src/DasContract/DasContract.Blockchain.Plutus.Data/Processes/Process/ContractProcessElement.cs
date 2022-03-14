@@ -23,6 +23,9 @@ namespace DasContract.Blockchain.Plutus.Data.Processes.Process
         /// <param name="collector"></param>
         public virtual void CollectSuccessors(ref Dictionary<string, ContractProcessElement> collector)
         {
+            if (collector.ContainsKey(Id))
+                return;
+
             collector.TryAdd(Id, this);
         }
 

@@ -134,13 +134,13 @@ The behavior is defined using a validation script. Several pragmas are available
 - `{-# CONSTRAINS #-}` - additional constraints
 - `{-# TRANSITION #-}` - how the datum should be transformed – has an extra `form` variable accessible
 
-All activities can be **sequential multi-instance**, which means they can be executed sequentially more times than once. Unfortunately, loop collection binding is currently not supported. 
+All activities can be **sequential multi-instance**, which means they can be executed sequentially more times than once. Unfortunately, loop collection binding is currently not supported. The `dat` keyword is at your disposal (=datum) if you use an expression instead of a number for loop cardinality: `${expression}`.
 
-User tasks can have a **timeout event**, which can timeout at a specified amount of time. The time specified can be determined or extracted from the datum. 
+User tasks can have a **timeout event**, which can timeout at a specified amount of time. The `datum` keyword is at your disposal if you use an expression instead of a POSIXTime for setting the timeout: `${expression}`.
 
 ## Examples
 
-[Vesting contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Vesting.dascontract), where you lock funds and unlock them under certain conditions. 
+[Lock funds for a time contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Lock funds.dascontract), where you lock funds and unlock them after a time. 
 
 [Playground contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Playground.dascontract), where many situations and examples are presented in a playground contract. 
 
@@ -149,4 +149,28 @@ User tasks can have a **timeout event**, which can timeout at a specified amount
 Stick it in the Plutus convertor and have fun.
 
 This repository provides a .NET CLI project that can do the generation, but the DasContract editor should have built in Plutus conversion soon. 
+
+## Converting using the [DasContract.Blockchain.Plutus nuget](TODO)
+
+If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](TODO) nuget. The nuget targets `netstandard2.1`, making it very portable. The conversion process has two steps:
+
+```csharp
+// 1. Convert DasContract into PlutusContract
+var plutusContract = PlutusContractConvertor.Default.Convert(contract);
+
+// 2. Convert PlutusContract into IPlutusCode
+var plutusCode = PlutusContractGenerator.Default(plutusContract).Generate();
+
+// 3. Get the Plutus code in string
+var plutusCodeString1 = plutusCode.InString();
+var plutusCodeString2 = plutusCode.ToString(); //alternative
+```
+
+Thanks to the intermediary data model PlutusContract between DasContract and the final code, you can effortlessly model the Plutus contract directly, without the DasContract format. PlutusContract is somewhat similar tho. Examples and tests of directly modelled PlutusContracts are:
+
+1. [DataModel demo](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/DemoContracts/DataModelDemoContract.cs)
+2. [Process demo](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/DemoContracts/TransitionDemoContract.cs)
+
+
+
 

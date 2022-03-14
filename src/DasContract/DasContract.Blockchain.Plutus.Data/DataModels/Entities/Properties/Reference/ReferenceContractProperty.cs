@@ -18,7 +18,7 @@ namespace DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Refe
         /// <summary>
         /// Id if the linked entity 
         /// </summary>
-        public string EntityId { get; set; }
+        public string EntityId { get; set; } = string.Empty;
 
         /// <inheritdoc/>
         public override void CollectDependencies(ref Dictionary<string, ContractEntity> dependencies)
