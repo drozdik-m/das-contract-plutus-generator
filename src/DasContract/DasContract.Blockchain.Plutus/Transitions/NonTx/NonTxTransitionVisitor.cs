@@ -55,6 +55,9 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         string CallTransitionSnippet(ContractCallActivity callActivity)
         {
+            if (callActivity?.CalledProcess?.StartEvent is null)
+                throw new Exception($"Called process {callActivity?.Name} or its start event is null");
+
             var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
             var returnName = FutureElementName(callActivity, Subprocess);
 
@@ -91,6 +94,9 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         IPlutusCode CallTransition(ContractProcessElement source, ContractCallActivity callActivity)
         {
+            if (callActivity?.CalledProcess?.StartEvent is null)
+                throw new Exception($"Called process {callActivity?.Name} or its start event is null");
+
             var currentName = CurrentElementName(source, Subprocess);
             var futureName = FutureElementName(callActivity.CalledProcess.StartEvent, callActivity.CalledProcess);
             var returnName = FutureElementName(callActivity, Subprocess);

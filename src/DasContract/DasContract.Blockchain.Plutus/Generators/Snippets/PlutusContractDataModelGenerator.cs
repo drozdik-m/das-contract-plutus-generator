@@ -151,6 +151,8 @@ namespace DasContract.Blockchain.Plutus.Generators.Snippets
                     "ToJSON"
                 });
 
+            if (contract?.Processes?.Main?.StartEvent is null)
+                throw new Exception("Main process or its start event is null");
 
             dataModels = dataModels
                 .Append(contractState)
