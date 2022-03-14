@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <Authors>Martin Drozdík</Authors>
+    <Description>Data models for PlutusContract and DasContract conversion</Description>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/drozdik-m/das-contract-plutus-generator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Plutus, DasContract</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DasContract.String.Utils\DasContract.String.Utils.csproj" />
+    <ProjectReference Include="..\DasContract.String.Utils\DasContract.String.Utils.csproj">
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <IncludeAssets>{ProjectName}.dll</IncludeAssets>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>
