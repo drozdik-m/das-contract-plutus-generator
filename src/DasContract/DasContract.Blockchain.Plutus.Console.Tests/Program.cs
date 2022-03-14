@@ -24,7 +24,7 @@ using TextCopy;
 //Console.WriteLine(new PlutusGenerator().GeneratePlutusContract(contract));
 
 //Loaded DasContract
-string path = @"../../../contract.dascontract";
+string path = @"../../../Lock funds.dascontract";
 var lines = File.ReadAllLines(path);
 var fileContent = string.Join(Environment.NewLine, lines);
 var xElement = XElement.Parse(fileContent);
