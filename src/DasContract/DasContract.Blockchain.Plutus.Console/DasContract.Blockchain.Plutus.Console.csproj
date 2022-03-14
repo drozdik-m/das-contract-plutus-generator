@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DasContract.Blockchain.Plutus\DasContract.Blockchain.Plutus.csproj" />
+    <PackageReference Include="DasContract.Abstraction" Version="2.1.0" />
+    <PackageReference Include="DasContract.Blockchain.Plutus" Version="1.0.1" />
+    <PackageReference Include="DasContract.Blockchain.Plutus.Data" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
