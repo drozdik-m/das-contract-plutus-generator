@@ -9,6 +9,7 @@ using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
+using DasContract.String.Utils;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance
 {
@@ -22,7 +23,7 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Act
 
             var result = new ContractMergingExclusiveGateway()
             {
-                Id = source.Id,
+                Id = source.Id.FirstCharToUpperCase(),
             };
 
             return result;

@@ -17,9 +17,17 @@ namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Act
 
             else if (source.InstanceType == InstanceType.Sequential)
             {
+                var resultLoopCardinality = source.LoopCardinality;
+
+                if (resultLoopCardinality.StartsWith("${") && resultLoopCardinality.EndsWith("}"))
+                {
+                    resultLoopCardinality = resultLoopCardinality[2..^1];
+                    resultLoopCardinality = resultLoopCardinality.Trim();
+                }
+
                 return new ContractSequentialMultiInstance()
                 {
-                    LoopCardinality = source.LoopCardinality.ToString(),
+                    LoopCardinality = resultLoopCardinality,
                 };
             }
 

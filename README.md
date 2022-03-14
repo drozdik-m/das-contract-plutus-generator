@@ -134,9 +134,9 @@ The behavior is defined using a validation script. Several pragmas are available
 - `{-# CONSTRAINS #-}` - additional constraints
 - `{-# TRANSITION #-}` - how the datum should be transformed – has an extra `form` variable accessible
 
-All activities can be **sequential multi-instance**, which means they can be executed sequentially more times than once. Unfortunately, loop collection binding is currently not supported. 
+All activities can be **sequential multi-instance**, which means they can be executed sequentially more times than once. Unfortunately, loop collection binding is currently not supported. The `dat` keyword is at your disposal (=datum) if you use an expression instead of a number for loop cardinality: `${expression}`.
 
-User tasks can have a **timeout event**, which can timeout at a specified amount of time. The time specified can be determined or extracted from the datum. 
+User tasks can have a **timeout event**, which can timeout at a specified amount of time. The `datum` keyword is at your disposal if you use an expression instead of a POSIXTime for setting the timeout: `${expression}`.
 
 ## Examples
 
