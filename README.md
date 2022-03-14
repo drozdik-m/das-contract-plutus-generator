@@ -150,9 +150,9 @@ Stick it in the Plutus convertor and have fun.
 
 This repository provides a .NET CLI project that can do the generation, but the DasContract editor should have built in Plutus conversion soon. 
 
-## Converting using the [DasContract.Blockchain.Plutus nuget](TODO)
+## Converting using the [DasContract.Blockchain.Plutus nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus/)
 
-If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](TODO) nuget. The nuget targets `netstandard2.1`, making it very portable. The conversion process has two steps:
+If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus/) nuget. The nuget targets `netstandard2.1`, making it very portable. The conversion process has two steps:
 
 ```csharp
 // 1. Convert DasContract into PlutusContract
