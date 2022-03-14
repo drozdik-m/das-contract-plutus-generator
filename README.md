@@ -140,7 +140,7 @@ User tasks can have a **timeout event**, which can timeout at a specified amount
 
 ## Examples
 
-[Vesting contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Vesting.dascontract), where you lock funds and unlock them under certain conditions. 
+[Lock funds for a time contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Lock funds.dascontract), where you lock funds and unlock them after a time. 
 
 [Playground contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Playground.dascontract), where many situations and examples are presented in a playground contract. 
 
@@ -149,4 +149,20 @@ User tasks can have a **timeout event**, which can timeout at a specified amount
 Stick it in the Plutus convertor and have fun.
 
 This repository provides a .NET CLI project that can do the generation, but the DasContract editor should have built in Plutus conversion soon. 
+
+## Converting using the [DasContract.Blockchain.Plutus nuget](TODO)
+
+If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](TODO) nuget. The nuget targets `netstandard2.1`, making it very portable. The conversion process has two steps:
+
+```csharp
+// 1. Convert DasContract into PlutusContract
+var plutusContract = PlutusContractConvertor.Default.Convert(contract);
+
+// 2. Convert PlutusContract into IPlutusCode
+var plutusCode = PlutusContractGenerator.Default(plutusContract).Generate();
+
+// 3. Get the Plutus code in string
+var plutusCodeString1 = plutusCode.InString();
+var plutusCodeString2 = plutusCode.ToString(); //alternative
+```
 
