@@ -4,7 +4,21 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Version>$(VersionPrefix)</Version>
+    <Authors>Martin Drozdík</Authors>
+    <Description>Convertor for DasContract files into Plutus code</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/drozdik-m/das-contract-plutus-generator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>plutus, DasContract</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DasContract.Blockchain.Plutus.Data\DasContract.Blockchain.Plutus.Data.csproj" />
