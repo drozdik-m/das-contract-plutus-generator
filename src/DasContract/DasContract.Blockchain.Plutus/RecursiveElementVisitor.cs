@@ -56,3 +56,4 @@ namespace DasContract.Blockchain.Plutus
         public abstract IPlutusCode Visit(ContractTimerBoundaryEvent contractTimerBoundaryEvent);
     }
 }
+
