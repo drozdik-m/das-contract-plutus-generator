@@ -140,7 +140,7 @@ User tasks can have a **timeout event**, which can timeout at a specified amount
 
 ## Examples
 
-[Lock funds for a time contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Lock funds.dascontract), where you lock funds and unlock them after a time. 
+[Lock funds for a time contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Lock_funds.dascontract), where you lock funds and unlock them after a time. 
 
 [Playground contract](src/DasContract/DasContract.Blockchain.Plutus.Console.Tests/Playground.dascontract), where many situations and examples are presented in a playground contract. 
 
