@@ -150,18 +150,18 @@ Stick it in the Plutus convertor and have fun.
 
 This repository provides a .NET CLI project that can do the generation, but the DasContract editor should have built in Plutus conversion soon. 
 
-## Converting using the [DasContract.Blockchain.Plutus nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus/)
+## Converting using the nugets
 
-If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus/) nuget. The nuget targets `netstandard2.1`, making it very portable. The conversion process has two steps:
+If you want to convert the contract programmatically, use the [DasContract.Blockchain.Plutus nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus/) and [DasContract.Blockchain.Plutus.Data nuget](https://www.nuget.org/packages/DasContract.Blockchain.Plutus.Data/). The nugets target `netstandard2.1`, making them very portable. The conversion process has two steps:
 
 ```csharp
-// 1. Convert DasContract into PlutusContract
+// 1. Convert DasContract into PlutusContract (DasContract.Blockchain.Plutus.Data nuget)
 var plutusContract = PlutusContractConvertor.Default.Convert(contract);
 
-// 2. Convert PlutusContract into IPlutusCode
+// 2. Convert PlutusContract into IPlutusCode (DasContract.Blockchain.Plutus nuget)
 var plutusCode = PlutusContractGenerator.Default(plutusContract).Generate();
 
-// 3. Get the Plutus code in string
+// 3. Get the Plutus code in string (DasContract.Blockchain.Plutus nuget)
 var plutusCodeString1 = plutusCode.InString();
 var plutusCodeString2 = plutusCode.ToString(); //alternative
 ```
