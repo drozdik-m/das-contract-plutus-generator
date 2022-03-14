@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Martin Drozdík</Authors>
     <Description>Convertor for DasContract files into Plutus code</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
