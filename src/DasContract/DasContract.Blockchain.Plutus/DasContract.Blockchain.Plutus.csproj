@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Martin Drozdík</Authors>
     <Description>Convertor for DasContract files into Plutus code</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -22,14 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DasContract.Blockchain.Plutus.Data" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DasContract.String.Utils\DasContract.String.Utils.csproj">
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <IncludeAssets>{ProjectName}.dll</IncludeAssets>
-    </ProjectReference>
+    <PackageReference Include="DasContract.Blockchain.Plutus.Data" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
-using DasContract.String.Utils;
+using DasContract.Blockchain.Plutus.Data.Utils.String;
 
 namespace DasContract.Blockchain.Plutus.Transitions
 {
