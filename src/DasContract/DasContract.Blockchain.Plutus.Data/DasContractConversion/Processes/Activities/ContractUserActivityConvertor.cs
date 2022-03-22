@@ -13,7 +13,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Data.Users;
-using DasContract.String.Utils;
+using DasContract.Blockchain.Plutus.Data.Utils.String;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance
 {

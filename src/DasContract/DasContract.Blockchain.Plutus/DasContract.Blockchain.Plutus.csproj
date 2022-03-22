@@ -10,7 +10,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/drozdik-m/das-contract-plutus-generator</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>plutus, DasContract</PackageTags>
+    <PackageTags>Plutus, DasContract</PackageTags>
     <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 

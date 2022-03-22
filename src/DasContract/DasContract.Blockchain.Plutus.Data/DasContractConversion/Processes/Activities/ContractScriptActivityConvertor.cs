@@ -6,7 +6,7 @@ using DasContract.Abstraction.Processes.Tasks;
 using DasContract.Blockchain.Plutus.Data.Abstraction;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
-using DasContract.String.Utils;
+using DasContract.Blockchain.Plutus.Data.Utils.String;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.Processes.Activities.MultiInstance
 {
