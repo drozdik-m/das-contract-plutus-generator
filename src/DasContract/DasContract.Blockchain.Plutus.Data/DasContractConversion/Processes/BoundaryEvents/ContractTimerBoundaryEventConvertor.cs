@@ -10,7 +10,7 @@ using DasContract.Blockchain.Plutus.Data.DataModels.Entities;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties;
 using DasContract.Blockchain.Plutus.Data.DataModels.Entities.Properties.Primitive;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
-using DasContract.String.Utils;
+using DasContract.Blockchain.Plutus.Data.Utils.String;
 
 namespace DasContract.Blockchain.Plutus.Data.DasContractConversion.DataModels
 {
