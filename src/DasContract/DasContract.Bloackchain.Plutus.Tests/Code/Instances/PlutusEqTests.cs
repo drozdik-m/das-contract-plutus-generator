@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Code.Instances;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using NUnit.Framework;
