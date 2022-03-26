@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DasContract.Blockchain.Plutus.Code.Comments;
+using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Utils;
 
-namespace DasContract.Blockchain.Plutus.Code.Types
+namespace DasContract.Blockchain.Plutus.Code.Instances
 {
     /// <summary>
     /// Instance for equality
@@ -14,9 +15,9 @@ namespace DasContract.Blockchain.Plutus.Code.Types
     public class PlutusEq : PlutusCode
     {
         public PlutusEq(PlutusRecord record)
-            :base(GetLinesOfCode(record))
+            : base(GetLinesOfCode(record))
         {
-            
+
         }
 
         public PlutusEq(PlutusAlgebraicType type)
@@ -82,7 +83,7 @@ namespace DasContract.Blockchain.Plutus.Code.Types
             var rightSide = $"{item.Name} ";
             const string ComparisonInit = "= ";
             var comparison = ComparisonInit;
-            for (int i = 0; i < memberCount; i++)
+            for (var i = 0; i < memberCount; i++)
             {
                 var randLetter = generator.GetNext();
                 leftSide += $"{randLetter} ";

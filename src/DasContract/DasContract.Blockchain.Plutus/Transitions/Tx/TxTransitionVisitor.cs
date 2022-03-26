@@ -14,9 +14,9 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Events;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Data.Users;
-using DasContract.Blockchain.Plutus.Transitions.Tx;
+using DasContract.Blockchain.Plutus.Transitions.NonTx;
 
-namespace DasContract.Blockchain.Plutus.Transitions.NonTx
+namespace DasContract.Blockchain.Plutus.Transitions.Tx
 {
     /// <summary>
     /// A visitor the recursively traverses a process (not its subprocesses)
@@ -44,7 +44,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         IPlutusLine CurrentStateMatching(string currentStateName, string redeemerName)
         {
-            string redeemer = redeemerName;
+            var redeemer = redeemerName;
 
             if (redeemerName != PlutusContractFinishedRedeemer.Type.Name &&
                 redeemerName != PlutusTimeoutRedeemer.Type.Name)
@@ -64,7 +64,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         IPlutusLine GuardLine(bool expectedVal = false, bool formValidation = false, string transitionCondition = "")
         {
-            string userDefinedExpectedValue = $"{UserDefinedExpectedValueSignature.Name} par dat v";
+            var userDefinedExpectedValue = $"{UserDefinedExpectedValueSignature.Name} par dat v";
             const string userDefinedFormValidation = "userDefinedFormValidation par dat red v";
 
             var conditions = new List<string>();
@@ -93,7 +93,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         IPlutusCode ReturningJust(IEnumerable<string> constrains, string newDatumExp, string newValueExp)
         {
-            string constrainsLine = string.Join(" <> ", constrains);
+            var constrainsLine = string.Join(" <> ", constrains);
             if (constrains.Count() == 0)
                 constrainsLine = "mempty";
 
@@ -188,13 +188,13 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     userActivity.NewValueCodeLines,
                     "val");
             }
-            
+
             //Constraints
             if (statements.Contains(TxUserDefinedStatement.UserDefinedConstraints))
             {
                 CommonLines(UserDefinedConstraintsSignature,
                     commonParams,
-                    userActivity.ContrainsCodeLines, 
+                    userActivity.ContrainsCodeLines,
                     "mempty");
             }
 
@@ -283,12 +283,12 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
         /// <returns></returns>
         IPlutusCode UserActivityTransition(ContractProcessElement source, ContractUserActivity userActivity, string condition = "")
         {
-            
+
             var currentName = CurrentElementName(source, Subprocess);
 
             IPlutusCode resultCode = PlutusCode.Empty;
             var boundaryTimerEvent = userActivity.BoundaryEvents.OfType<ContractTimerBoundaryEvent>().FirstOrDefault();
-            
+
 
             //Regular transition
             {
@@ -300,7 +300,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                     MustBeSignedByConstraint(userActivity),
                 };
 
-                    //constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
+                //constraints.Add($"Constraints.mustValidateIn (to $ {boundaryTimerEvent.TimerDefinition})");
 
                 var comment = TransitionComment(2, currentName, targetName);
                 var matchLine = CurrentStateMatching(currentName, PlutusUserActivityRedeemer.Type(userActivity).Name);
@@ -370,7 +370,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
             resultCode = resultCode
                 .Append(userActivity.Accept(this));
 
-             if (!(boundaryTimerEvent is null))
+            if (!(boundaryTimerEvent is null))
                 resultCode = resultCode
                     .Append(boundaryTimerEvent.Accept(this));
 
@@ -425,7 +425,7 @@ namespace DasContract.Blockchain.Plutus.Transitions.NonTx
                 return PlutusCode.Empty;
 
             IPlutusCode result = PlutusCode.Empty;
-            foreach(var target in element.Outgoing)
+            foreach (var target in element.Outgoing)
             {
                 result = result
                     .Append(SingleOutputCommonTransition(element, target.Target, target.Condition));

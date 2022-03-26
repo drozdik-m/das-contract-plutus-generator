@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DasContract.Blockchain.Plutus.Code;
 
-namespace DasContract.Blockchain.Plutus
+namespace DasContract.Blockchain.Plutus.Code
 {
     public interface IPlutusCode : IStringable
     {
