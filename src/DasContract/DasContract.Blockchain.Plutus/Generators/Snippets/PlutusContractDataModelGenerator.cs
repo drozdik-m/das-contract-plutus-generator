@@ -5,6 +5,7 @@ using System.Text;
 using DasContract.Blockchain.Plutus.Code;
 using DasContract.Blockchain.Plutus.Code.Comments;
 using DasContract.Blockchain.Plutus.Code.Convertors.DataType;
+using DasContract.Blockchain.Plutus.Code.Instances;
 using DasContract.Blockchain.Plutus.Code.Keywords;
 using DasContract.Blockchain.Plutus.Code.Types;
 using DasContract.Blockchain.Plutus.Code.Types.Determined;

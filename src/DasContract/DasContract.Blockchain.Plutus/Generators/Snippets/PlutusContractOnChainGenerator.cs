@@ -11,6 +11,7 @@ using DasContract.Blockchain.Plutus.Data;
 using DasContract.Blockchain.Plutus.Data.Interfaces;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.Activities;
 using DasContract.Blockchain.Plutus.Transitions.NonTx;
+using DasContract.Blockchain.Plutus.Transitions.Tx;
 
 namespace DasContract.Blockchain.Plutus.Generators.Snippets
 {
