@@ -15,7 +15,7 @@ using DasContract.Blockchain.Plutus.Data.Processes.Process.Gateways;
 using DasContract.Blockchain.Plutus.Data.Processes.Process.MultiInstances;
 using DasContract.Blockchain.Plutus.Data.Utils.String;
 
-namespace DasContract.Blockchain.Plutus.Transitions
+namespace DasContract.Blockchain.Plutus.Endpoints
 {
     /// <summary>
     /// A visitor the recursively traverses a process and its subprocesses 
@@ -181,9 +181,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// Lines that clean the timed out state
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IPlutusLine> TimeoutCheck(int indent, 
+        IEnumerable<IPlutusLine> TimeoutCheck(int indent,
             string timeout,
-            IEnumerable<IPlutusLine> timedOut, 
+            IEnumerable<IPlutusLine> timedOut,
             IEnumerable<IPlutusLine> regular) => new IPlutusLine[]
            {
                 new PlutusComment(indent, "Check timeout"),
@@ -248,7 +248,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
             var functionLines = Do(1).ToList();
             functionLines.AddRange(EndpointBegun(1, signature.Name));
 
-            
+
             functionLines.AddRange(ClientSetup(1));
             var parameter = "threadToken";
 
@@ -258,9 +258,9 @@ namespace DasContract.Blockchain.Plutus.Transitions
             functionLines.Add(new PlutusRawLine(1, "logInfo @String \"CONTRACT ENDED\""));
             functionLines.Add(PlutusLine.Empty);
 
-            var function = new PlutusFunction(0, 
+            var function = new PlutusFunction(0,
                 signature,
-                string.IsNullOrWhiteSpace(parameter) ? Array.Empty<string>() : new string[] { parameter }, 
+                string.IsNullOrWhiteSpace(parameter) ? Array.Empty<string>() : new string[] { parameter },
                 functionLines);
 
             createdEndpoints.Add(("finishContract", signature));
@@ -315,8 +315,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
             //There is a timer
             else
             {
-                IEnumerable<IPlutusLine> timeoutCode = TimeoutCleaning(2);
-                IEnumerable<IPlutusLine> regularCode = CreateRedeemer(2, element)
+                var timeoutCode = TimeoutCleaning(2);
+                var regularCode = CreateRedeemer(2, element)
                     .Concat(ValidateForm(2))
                     .Concat(StateTransition(2));
 
@@ -327,7 +327,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
 
             //Calculate the result
-            IPlutusCode result = new PlutusFunction(0, signature, new [] { parameter }, functionLines)
+            var result = new PlutusFunction(0, signature, new[] { parameter }, functionLines)
                 .Prepend(signature);
 
             createdEndpoints.Add((element.Name.FirstCharToLowerCase(), signature));
@@ -423,7 +423,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
 
             result = result.Append(new PlutusRawLine(0, $"type {PlutusContractSchema.Type.Name} ="));
             var first = true;
-            foreach(var endpInfo in createdEndpoints)
+            foreach (var endpInfo in createdEndpoints)
             {
                 var name = endpInfo.Item1;
                 var signature = endpInfo.Item2;
@@ -450,8 +450,8 @@ namespace DasContract.Blockchain.Plutus.Transitions
         /// <returns></returns>
         public IPlutusCode MakeEndpoints()
         {
-            List<IPlutusLine> result = new List<IPlutusLine>();
-            List<IPlutusLine> endpointDefinitions = new List<IPlutusLine>();
+            var result = new List<IPlutusLine>();
+            var endpointDefinitions = new List<IPlutusLine>();
 
             result.Add(new PlutusRawLine(1, $"awaitPromise ("));
             var first = true;
@@ -533,7 +533,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
                         )
                 });
 
-        public static PlutusFunctionSignature FinishContractEndpointSignature => 
+        public static PlutusFunctionSignature FinishContractEndpointSignature =>
             new PlutusFunctionSignature(0,
                "finishContractEndpoint",
                new INamable[]
@@ -566,7 +566,7 @@ namespace DasContract.Blockchain.Plutus.Transitions
                     )
                 });
         }
-            
+
     }
 }
 
