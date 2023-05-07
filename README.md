@@ -6,6 +6,8 @@ DasContract files can be created and edited on the [DasContract editor](https://
 
 **This generator is designed to produce human-readable code.**
 
+*The project is parts of my Master's Thesis.* 
+
 ## DasContract basics
 
 DasContract is a format for generating blockchain smart contracts using more intuitive tools, such as BPMN language for processes, easily defined data models, and users. 
